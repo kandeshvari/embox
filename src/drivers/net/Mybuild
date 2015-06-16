@@ -170,6 +170,14 @@ module usbnet {
 	depends embox.net.core
 }
 
+module tlwn823n {
+	source "tlwn823n.c"
+
+	depends embox.compat.libc.assert
+	depends embox.driver.usb.class.cdc
+	depends embox.lib.Printk
+}
+
 @BuildDepends(third_party.bsp.st_f4.core)
 module stm32f4_eth {
 	source "stm32f4_eth.c"
