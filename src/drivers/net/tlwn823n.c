@@ -13,6 +13,9 @@
 #include <drivers/usb/usb_driver.h>
 #include <embox/unit.h>
 #include <kernel/printk.h>
+#include <mem/sysmalloc.h>
+#include <net/inetdevice.h>
+#include <net/l2/ethernet.h>
 #include <net/netdevice.h>
 
 static struct usb_device_id wn823n_id_table[] = {
@@ -29,9 +32,42 @@ static int wn823n_init(void) {
 	return usb_driver_register(&wn823n_driver);
 }
 
-static int wn823n_probe(struct usb_driver *drv, struct usb_dev *dev,
-		void **data) {
+struct wn823n_priv {
+	struct usb_dev *usbdev;
+	char *data;
+	char *pdata;
+};
+
+static int wn823n_probe(struct usb_driver *drv, struct usb_dev *dev, void **data) {
+	struct net_device *nic;
+	struct wn823n_priv *nic_priv;
+	int errcode;
+	assert(drv);
+	assert(dev);
+	assert(data);
+
 	printk("wn823n probe\n");
+	/* TODO etherdev sets ethXX as devname, while wlanXX should be used */
+	nic = (struct net_device *) etherdev_alloc(sizeof *nic_priv);
+	if (!nic)
+		return -ENOMEM;
+
+	nic->drv_ops = &wn823n_drv_ops;
+	nic_priv = netdev_priv(nic, struct wn823n_priv);
+	nic_priv->data = nic_priv->pdata = sysmalloc(ETH_FRAME_LEN);
+	if (!nic_priv->data) {
+		etherdev_free(nic);
+		return -ENOMEM;
+	}
+
+	*nic_priv = (struct wn823n_priv) {
+		.usbdev = dev,
+	};
+
+	if ((errcode = inetdev_register_dev(nic)) < 0) {
+		etherdev_free(nic);
+		return errcode;
+	}
 	return 0;
 }
 
