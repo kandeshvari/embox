@@ -152,7 +152,6 @@ struct net_device * netdev_get_by_name(const char *name) {
 
 int netdev_open(struct net_device *dev) {
 	int ret;
-
 	if (dev == NULL) {
 		return -EINVAL;
 	}
@@ -167,6 +166,8 @@ int netdev_open(struct net_device *dev) {
 			return ret;
 		}
 	}
+
+	netdev_get_macaddr(dev, &dev->dev_addr[0]);
 
 	dev->flags |= IFF_UP;
 
@@ -218,6 +219,16 @@ int netdev_set_macaddr(struct net_device *dev, const void *addr) {
 	}
 
 	memcpy(&dev->dev_addr[0], addr, dev->addr_len);
+
+	return 0;
+}
+
+int netdev_get_macaddr(struct net_device *dev, void *buff) {
+	assert(dev && buff && dev->drv_ops);
+
+	if (dev->drv_ops->get_macaddr) {
+		return dev->drv_ops->get_macaddr(dev, buff);
+	}
 
 	return 0;
 }

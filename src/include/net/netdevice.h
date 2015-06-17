@@ -75,6 +75,7 @@ typedef struct net_driver {
 	int (*stop)(struct net_device *dev);
 	int (*xmit)(struct net_device *dev, struct sk_buff *skb);
 	int (*set_macaddr)(struct net_device *dev, const void *addr);
+	int (*get_macaddr)(struct net_device *dev, void *buff);
 } net_driver_t;
 
 
@@ -213,6 +214,16 @@ extern int netdev_flag_down(struct net_device *dev, unsigned int flag);
  */
 extern int netdev_set_macaddr(struct net_device *dev,
 		const void *mac_addr);
+
+/**
+ * @brief Write MAC address to given buffer
+ *
+ * @param dev Device
+ * @param buff Buffer to be filled
+ *
+ * @return Negative error code
+ */
+extern int netdev_get_macaddr(struct net_device *dev, void *buff);
 
 extern int netdev_set_irq(struct net_device *dev, int irq_num);
 extern int netdev_set_baseaddr(struct net_device *dev,
