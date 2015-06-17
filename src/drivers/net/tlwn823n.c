@@ -80,6 +80,25 @@ static int wn823n_xmit(struct net_device *dev, struct sk_buff *skb) {
 	return 0;
 }
 
+#define REG_MACID	0x0610
+static int rtl_read_byte(int addr) {
+	/* Stub */
+	return 0xff;
+}
+
+static int wn823n_get_macaddr(struct net_device *dev, void *buff) {
+	char *str = buff;
+	int i;
+	assert(dev);
+	assert(buff);
+
+	printk("wn823n get macaddr\n");
+	for (i = 0; i < 6; i++)
+		str[i] = rtl_read_byte(REG_MACID + i);
+
+	return 0;
+}
+
 static struct usb_driver wn823n_driver = {
 	.probe = wn823n_probe,
 	.disconnect = wn823n_disconnect,
@@ -87,5 +106,6 @@ static struct usb_driver wn823n_driver = {
 };
 
 static const struct net_driver wn823n_drv_ops = {
-	.xmit = wn823n_xmit,
+	.xmit        = wn823n_xmit,
+	.get_macaddr = wn823n_get_macaddr,
 };
