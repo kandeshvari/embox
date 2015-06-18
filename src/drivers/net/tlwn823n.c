@@ -53,9 +53,17 @@ struct wn823n_priv {
 static void wn823n_hnd(struct usb_request *req, void *arg) {
 }
 
-static int rtl_read_byte(int addr) {
-	/* Stub */
-	return 0xff;
+static int rtl_read_byte(struct wn823n_priv *priv, int addr, void *data) {
+	usb_endp_control(priv->usbdev->endpoints[0],
+			wn823n_hnd,
+			NULL,
+			REALTEK_USB_VENQT_READ,
+			REALTEK_USB_VENQT_CMD_REQ,
+			addr,
+			REALTEK_USB_VENQT_CMD_IDX,
+			1,
+			data);
+	return 0;
 }
 
 static int rtl_write_byte(struct wn823n_priv *priv, int addr, char *data) {
@@ -72,7 +80,6 @@ static int rtl_write_byte(struct wn823n_priv *priv, int addr, char *data) {
 			REALTEK_USB_VENQT_CMD_IDX,
 			1,
 			data);
-
 	return 0;
 }
 
@@ -151,13 +158,17 @@ static int wn823n_xmit(struct net_device *dev, struct sk_buff *skb) {
 
 static int wn823n_get_macaddr(struct net_device *dev, void *buff) {
 	char *str = buff;
+	struct wn823n_priv *priv;
 	int i;
 	assert(dev);
 	assert(buff);
 
 	printk("wn823n get macaddr\n");
+
+	priv = netdev_priv(dev, struct wn823n_priv);
+
 	for (i = 0; i < 6; i++)
-		str[i] = rtl_read_byte(REG_MACID + i);
+		rtl_read_byte(priv, REG_MACID + i, str + i);
 
 	return 0;
 }
