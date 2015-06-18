@@ -10,10 +10,13 @@
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
+#include <drivers/usb/usb.h>
 #include <drivers/usb/usb_driver.h>
 #include <embox/unit.h>
 #include <kernel/printk.h>
+#include <kernel/sched/sched_lock.h>
 #include <mem/sysmalloc.h>
 #include <net/inetdevice.h>
 #include <net/l2/ethernet.h>
@@ -42,13 +45,34 @@ struct wn823n_priv {
 };
 
 #define REG_MACID	0x0610
+#define	REALTEK_USB_VENQT_READ			0xC0
+#define	REALTEK_USB_VENQT_WRITE			0x40
+#define REALTEK_USB_VENQT_CMD_REQ		0x05
+#define	REALTEK_USB_VENQT_CMD_IDX		0x00
+
+static void wn823n_hnd(struct usb_request *req, void *arg) {
+}
+
 static int rtl_read_byte(int addr) {
 	/* Stub */
 	return 0xff;
 }
 
-static int rtl_write_byte(int addr, char *data) {
-	/* Stub */
+static int rtl_write_byte(struct wn823n_priv *priv, int addr, char *data) {
+	uint16_t wvalue;
+
+	wvalue = addr & 0x0000ffff;
+
+	usb_endp_control(priv->usbdev->endpoints[0],
+			wn823n_hnd,
+			NULL,
+			REALTEK_USB_VENQT_WRITE,
+			REALTEK_USB_VENQT_CMD_REQ,
+			wvalue,
+			REALTEK_USB_VENQT_CMD_IDX,
+			1,
+			data);
+
 	return 0;
 }
 
@@ -64,12 +88,12 @@ static int wn823n_load_firmware(struct wn823n_priv *priv) {
 	if (NULL == (fs_fw = fopen(FW_NAME, "r")))
 		return -EINVAL;
 
-	if ((priv->fw_len = fread(priv->fw, FW_MAX_LEN, 1, fs_fw)) < 0) {
+	if ((priv->fw_len = fread(priv->fw, 1, FW_MAX_LEN, fs_fw)) < 0) {
 		return priv->fw_len;
 	}
 
 	for (i = 0; i < priv->fw_len; i++) {
-		if (rtl_write_byte(FW_START_ADDR + i, priv->fw + i))
+		if (rtl_write_byte(priv, FW_START_ADDR + i, priv->fw + i))
 			return -1;
 	}
 
@@ -92,8 +116,12 @@ static int wn823n_probe(struct usb_driver *drv, struct usb_dev *dev, void **data
 
 	nic->drv_ops = &wn823n_drv_ops;
 	nic_priv = netdev_priv(nic, struct wn823n_priv);
+	nic_priv->usbdev = dev;
 	nic_priv->fw = sysmalloc(FW_MAX_LEN);
+
+	sched_lock();
 	wn823n_load_firmware(nic_priv);
+	sched_unlock();
 
 	nic_priv->data = nic_priv->pdata = sysmalloc(ETH_FRAME_LEN);
 	if (!nic_priv->data) {
