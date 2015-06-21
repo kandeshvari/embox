@@ -18,8 +18,11 @@ objs := $($(MODULE_NAME)-y)
 $(CONFIGURE) :
 	touch $@
 
+#XXX
+$(objs) : CPPFLAGS=-DCONFIG_LITTLE_ENDIAN
+
 $(objs) : %.o : %.c
-	$(EMBOX_GCC) -I./include -c -o $@ $<
+	$(EMBOX_GCC) $(CPPFLAGS) -I./include -c -o $@ $<
 
 $(MODULE_NAME).o : $(objs)
 
