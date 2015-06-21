@@ -1,0 +1,7 @@
+
+package third_party
+
+@Build(script="$(EXTERNAL_MAKE) -f Makefile.extbld")
+module rtlwifi {
+
+}

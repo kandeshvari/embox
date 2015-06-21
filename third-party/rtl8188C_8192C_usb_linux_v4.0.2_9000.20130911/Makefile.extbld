@@ -1,0 +1,31 @@
+
+PKG_NAME := rtlwifi
+PKG_VER  := 4.0.2_9000.20130911
+
+PKG_SOURCES :=
+PKG_MD5     :=
+
+PKG_PATCHES :=
+
+include $(EXTBLD_LIB)
+
+KERNELRELEASE=embox
+CONFIG_RTL8192CU=y
+include Makefile.krn
+
+objs := $($(MODULE_NAME)-y)
+
+$(CONFIGURE) :
+	touch $@
+
+$(objs) : %.o : %.c
+	$(EMBOX_GCC) -I./include -c -o $@ $<
+
+$(MODULE_NAME).o : $(objs)
+
+$(BUILD) : $(MODULE_NAME).o
+	touch $@
+
+$(INSTALL) :
+	touch $@
+
