@@ -10,6 +10,7 @@
 
 #include <net/skbuff.h>
 #include <sys/types.h>
+#include <string.h>
 
 static inline struct sk_buff * alloc_skb(unsigned int size, gfp_t priority) {
 	return skb_alloc(size);
