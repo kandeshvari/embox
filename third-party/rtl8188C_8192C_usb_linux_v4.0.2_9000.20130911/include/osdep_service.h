@@ -751,6 +751,9 @@ __inline static void _set_workitem(_workitem *pwork)
 #ifdef PLATFORM_EMBOX
 #define LINUX_VERSION_CODE 0
 #define KERNEL_VERSION(x,y,z) 0
+	#include <kernel/sched/sched_lock.h>
+	#include <kernel/time/timer.h>
+	#include <util/dlist.h>
 
 	#include <linux/version.h>
 	#include <linux/spinlock.h>
@@ -830,10 +833,10 @@ __inline static void _set_workitem(_workitem *pwork)
 #else
 	typedef struct semaphore	_mutex;
 #endif
-	typedef struct timer_list _timer;
+	typedef struct sys_timer _timer;
 
 	struct	__queue	{
-		struct	list_head	queue;	
+		struct	dlist_head	queue;
 		_lock	lock;
 	};
 
@@ -841,7 +844,7 @@ __inline static void _set_workitem(_workitem *pwork)
 	typedef unsigned char	_buffer;
 	
 	typedef struct	__queue	_queue;
-	typedef struct	list_head	_list;
+	typedef struct	dlist_head	_list;
 	typedef	int	_OS_STATUS;
 	//typedef u32	_irqL;
 	typedef unsigned long _irqL;
@@ -921,12 +924,14 @@ __inline static void _exit_critical_ex(_lock *plock, _irqL *pirqL)
 
 __inline static void _enter_critical_bh(_lock *plock, _irqL *pirqL)
 {
-	spin_lock_bh(plock);
+	spin_lock(plock);
+	sched_lock();
 }
 
 __inline static void _exit_critical_bh(_lock *plock, _irqL *pirqL)
 {
-	spin_unlock_bh(plock);
+	sched_unlock();
+	spin_unlock(plock);
 }
 
 __inline static void _enter_critical_mutex(_mutex *pmutex, _irqL *pirqL)
@@ -950,7 +955,7 @@ __inline static void _exit_critical_mutex(_mutex *pmutex, _irqL *pirqL)
 
 __inline static void rtw_list_delete(_list *plist)
 {
-	list_del_init(plist);
+	dlist_del_init(plist);
 }
 
 __inline static void _init_timer(_timer *ptimer,_nic_hdl nic_hdl,void *pfunc,void* cntx)
