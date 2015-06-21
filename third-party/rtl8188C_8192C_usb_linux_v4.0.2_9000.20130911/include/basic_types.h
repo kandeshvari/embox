@@ -164,7 +164,7 @@
 	
 	typedef unsigned int	uint;
 	typedef	signed int		sint;
-	typedef long atomic_t;
+	//typedef long atomic_t;
 
 	typedef signed long long s64;
 	typedef unsigned long long u64;
