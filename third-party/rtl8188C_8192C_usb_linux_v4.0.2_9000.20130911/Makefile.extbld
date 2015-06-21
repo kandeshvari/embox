@@ -11,7 +11,7 @@ include $(EXTBLD_LIB)
 
 KERNELRELEASE=embox
 CONFIG_RTL8192CU=y
-include Makefile.krn
+include Makefile
 
 objs := $($(MODULE_NAME)-y)
 
