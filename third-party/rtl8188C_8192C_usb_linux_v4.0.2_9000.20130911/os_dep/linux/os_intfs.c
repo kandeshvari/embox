@@ -27,6 +27,10 @@
 
 #endif
 
+#ifdef PLATFORM_EMBOX
+#include <stdio.h> // snprintf
+#endif
+
 #include <osdep_service.h>
 #include <drv_types.h>
 #include <xmit_osdep.h>

@@ -544,6 +544,29 @@ struct _ADAPTER{
 	u32	MCAddrCount;
 #endif //end of PLATFORM_WINDOWS
 
+#ifdef PLATFORM_EMBOX
+	_nic_hdl pnetdev;
+
+	// used by rtw_rereg_nd_name related function
+	struct rereg_nd_name_data {
+		_nic_hdl old_pnetdev;
+		char old_ifname[IFNAMSIZ];
+		u8 old_ips_mode;
+		u8 old_bRegUseLed;
+	} rereg_nd_name_priv;
+
+	int bup;
+	struct net_device_stats stats;
+	struct iw_statistics {
+
+	} iwstats;
+	struct proc_dir_entry *dir_dev;// for proc directory
+
+#ifdef CONFIG_IOCTL_CFG80211
+	struct wireless_dev *rtw_wdev;
+#endif //CONFIG_IOCTL_CFG80211
+
+#endif //end of PLATFORM_EMBOX
 
 #ifdef PLATFORM_LINUX
 	_nic_hdl pnetdev;
