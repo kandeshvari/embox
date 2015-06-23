@@ -1665,6 +1665,7 @@ int _rtw_netif_rx(_nic_hdl ndev, struct sk_buff *skb);
 void _rtw_skb_queue_purge(struct sk_buff_head *list);
 
 #ifdef CONFIG_USB_HCI
+struct usb_device dev;
 void *_rtw_usb_buffer_alloc(struct usb_device *dev, size_t size, dma_addr_t *dma);
 void _rtw_usb_buffer_free(struct usb_device *dev, size_t size, void *addr, dma_addr_t dma);
 #endif /* CONFIG_USB_HCI */
@@ -1960,6 +1961,8 @@ extern void rtw_lock_suspend_timeout(u32 timeout_ms);
 	#define ATOMIC_T LONG
 #elif defined(PLATFORM_FREEBSD)
 	typedef uint32_t ATOMIC_T ;
+#elif PLATFORM_EMBOX
+	#define ATOMIC_T atomic_t
 #endif
 
 extern void ATOMIC_SET(ATOMIC_T *v, int i);

@@ -333,7 +333,7 @@ extern u32 GlobalDebugLevel;
 
 
 #ifdef CONFIG_PROC_DEBUG
-
+	struct file;
 	int proc_get_drv_version(char *page, char **start,
 			  off_t offset, int count,
 			  int *eof, void *data);

@@ -47,10 +47,15 @@
 #include <rtw_br_ext.h>
 #endif //CONFIG_BR_EXT
 
+#if 0
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("Realtek Wireless Lan Driver");
 MODULE_AUTHOR("Realtek Semiconductor Corp.");
 MODULE_VERSION(DRIVERVERSION);
+#endif
+
+#define module_param(x,y,z)
+#define MODULE_PARM_DESC(a,b)
 
 /* module param defaults */
 int rtw_chip_version = 0x00;
