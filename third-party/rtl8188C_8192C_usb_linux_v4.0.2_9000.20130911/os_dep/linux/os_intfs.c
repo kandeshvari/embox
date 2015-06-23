@@ -933,6 +933,7 @@ static const u16 rtw_1d_to_queue[8] = { 2, 3, 3, 2, 1, 1, 0, 0 };
 /* Given a data frame determine the 802.1p/1d tag to use. */
 unsigned int rtw_classify8021d(struct sk_buff *skb)
 {
+#if 0
 	unsigned int dscp;
 
 	/* skb->priority values from 256->263 are magic values to
@@ -952,10 +953,13 @@ unsigned int rtw_classify8021d(struct sk_buff *skb)
 	}
 
 	return dscp >> 5;
+#endif
+	return 0;
 }
 
 static u16 rtw_select_queue(struct net_device *dev, struct sk_buff *skb)
 {
+#if 0
 	_adapter	*padapter = rtw_netdev_priv(dev);
 	struct mlme_priv *pmlmepriv = &padapter->mlmepriv;
 
@@ -967,6 +971,9 @@ static u16 rtw_select_queue(struct net_device *dev, struct sk_buff *skb)
 	}
 
 	return rtw_1d_to_queue[skb->priority];
+#else 
+	return rtw_1d_to_queue[0];
+#endif
 }
 
 u16 rtw_recv_select_queue(struct sk_buff *skb)
