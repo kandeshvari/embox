@@ -1990,7 +1990,9 @@ struct rtw_netdev_priv_indicator {
 struct net_device *rtw_alloc_etherdev_with_old_priv(int sizeof_priv, void *old_priv);
 extern struct net_device * rtw_alloc_etherdev(int sizeof_priv);
 
-#ifndef PLATFORM_FREEBSD
+#if defined(PLATFORM_EMBOX)
+#define rtw_netdev_priv(netdev) ( (netdev_priv(netdev, struct rtw_netdev_priv_indicator))->priv )
+#elif !defined(PLATFORM_FREEBSD)
 #define rtw_netdev_priv(netdev) ( ((struct rtw_netdev_priv_indicator *)netdev_priv(netdev))->priv )
 #else //PLATFORM_FREEBSD
 #define rtw_netdev_priv(netdev) (((struct ifnet *)netdev)->if_softc)

@@ -270,7 +270,7 @@ MODULE_PARM_DESC(rtw_notch_filter, "0:Disable, 1:Enable, 2:Enable only for P2P")
 static uint loadparam( _adapter *padapter,  _nic_hdl	pnetdev);
 int _netdev_open(struct net_device *pnetdev);
 int netdev_open (struct net_device *pnetdev);
-static int netdev_close (struct net_device *pnetdev);
+static int this_netdev_close (struct net_device *pnetdev);
 
 //#ifdef RTK_DMP_PLATFORM
 #ifdef CONFIG_PROC_DEBUG
@@ -998,7 +998,7 @@ u16 rtw_recv_select_queue(struct sk_buff *skb)
 #if (LINUX_VERSION_CODE>=KERNEL_VERSION(2,6,29))
 static const struct net_device_ops rtw_netdev_ops = {
 	.ndo_open = netdev_open,
-	.ndo_stop = netdev_close,
+	.ndo_stop = this_netdev_close,
 	.ndo_start_xmit = rtw_xmit_entry,
 #if (LINUX_VERSION_CODE>=KERNEL_VERSION(2,6,35))
 	.ndo_select_queue	= rtw_select_queue,
@@ -1090,7 +1090,7 @@ struct net_device *rtw_init_netdev(_adapter *old_padapter)
 	pnetdev->netdev_ops = &rtw_netdev_ops;
 #else
 	pnetdev->open = netdev_open;
-	pnetdev->stop = netdev_close;
+	pnetdev->stop = this_netdev_close;
 	pnetdev->hard_start_xmit = rtw_xmit_entry;
 	pnetdev->set_mac_address = rtw_net_set_mac_address;
 	pnetdev->get_stats = rtw_net_get_stats;
@@ -1135,7 +1135,7 @@ void rtw_unregister_netdevs(struct dvobj_priv *dvobj)
 		pnetdev = padapter->pnetdev;
 
 		if((padapter->DriverState != DRIVER_DISAPPEAR) && pnetdev) {
-			unregister_netdev(pnetdev); //will call netdev_close()
+			unregister_netdev(pnetdev); //will call this_netdev_close()
 			rtw_proc_remove_one(pnetdev);
 		}
 
@@ -2662,7 +2662,7 @@ int pm_netdev_open(struct net_device *pnetdev,u8 bnormal)
 	return status;
 }
 
-static int netdev_close(struct net_device *pnetdev)
+static int this_netdev_close(struct net_device *pnetdev)
 {
 	_adapter *padapter = (_adapter *)rtw_netdev_priv(pnetdev);
 
