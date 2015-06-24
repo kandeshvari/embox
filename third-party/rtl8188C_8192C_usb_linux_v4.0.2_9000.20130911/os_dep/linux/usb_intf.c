@@ -26,6 +26,7 @@
 #include <xmit_osdep.h>
 #include <hal_intf.h>
 #include <rtw_version.h>
+#include <signal.h>
 
 #ifndef CONFIG_USB_HCI
 

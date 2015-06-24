@@ -29,6 +29,22 @@
 #define RTW_RX_HANDLED 2
 //#define RTW_STATUS_TIMEDOUT -110
 
+#define USB_DIR_OUT			0		/* to device */
+#define USB_DIR_IN			0x80		/* to host */
+#define USB_TYPE_MASK			(0x03 << 5)
+#define USB_TYPE_STANDARD		(0x00 << 5)
+#define USB_TYPE_CLASS			(0x01 << 5)
+#define USB_TYPE_VENDOR			(0x02 << 5)
+#define USB_TYPE_RESERVED		(0x03 << 5)
+#define USB_ENDPOINT_NUMBER_MASK	0x0f	/* in bEndpointAddress */
+#define USB_ENDPOINT_DIR_MASK		0x80
+#define USB_ENDPOINT_XFERTYPE_MASK	0x03	/* in bmAttributes */
+#define USB_ENDPOINT_XFER_CONTROL	0
+#define USB_ENDPOINT_XFER_ISOC		1
+#define USB_ENDPOINT_XFER_BULK		2
+#define USB_ENDPOINT_XFER_INT		3
+#define USB_ENDPOINT_MAX_ADJUSTABLE	0x80
+
 #undef _TRUE
 #define _TRUE		1
 
