@@ -751,6 +751,13 @@ __inline static void _set_workitem(_workitem *pwork)
 #ifdef PLATFORM_EMBOX
 #define LINUX_VERSION_CODE 0
 #define KERNEL_VERSION(x,y,z) 0
+
+#define USB_DEVICE(vend, prod) \
+	.vid = (vend), \
+	.pid = (prod)
+
+#define container_of(p,t,n) (t*)((p)-&(((t*)0)->n))
+
 	#include <kernel/sched/sched_lock.h>
 	#include <kernel/time/timer.h>
 	#include <util/dlist.h>
