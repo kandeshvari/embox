@@ -47,6 +47,10 @@
 
 #endif
 
+#ifdef PLATFORM_EMBOX
+#include <drivers/usb/usb_driver.h>
+#endif
+
 #ifdef CONFIG_80211N_HT
 extern int rtw_ht_enable;
 extern int rtw_cbw40_enable;
