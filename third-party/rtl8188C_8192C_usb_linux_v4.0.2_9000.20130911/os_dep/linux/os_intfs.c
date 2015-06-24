@@ -29,6 +29,7 @@
 
 #ifdef PLATFORM_EMBOX
 #include <stdio.h> // snprintf
+#include <net/l2/ethernet.h>
 #endif
 
 #include <osdep_service.h>
@@ -339,7 +340,7 @@ void rtw_proc_init_one(struct net_device *dev)
 			return;
 		}
 		entry->write_proc = proc_set_log_level;
-		
+
 #ifdef DBG_MEM_ALLOC
 		entry = create_proc_read_entry("mstat", S_IFREG | S_IRUGO,
 				   rtw_proc, proc_get_mstat, dev);
@@ -971,7 +972,7 @@ static u16 rtw_select_queue(struct net_device *dev, struct sk_buff *skb)
 	}
 
 	return rtw_1d_to_queue[skb->priority];
-#else 
+#else
 	return rtw_1d_to_queue[0];
 #endif
 }
@@ -1334,7 +1335,7 @@ void devobj_deinit(struct dvobj_priv *pdvobj)
 	_rtw_mutex_free(&pdvobj->setbw_mutex);
 
 	rtw_mfree((u8*)pdvobj, sizeof(*pdvobj));
-}	
+}
 
 u8 rtw_reset_drv_sw(_adapter *padapter)
 {
@@ -1458,7 +1459,7 @@ _func_enter_;
 	}
 	// add for CONFIG_IEEE80211W, none 11w also can use
 	_rtw_spinlock_init(&padapter->security_key_mutex);
-	
+
 	// We don't need to memset padapter->XXX to zero, because adapter is allocated by rtw_zvmalloc().
 	//_rtw_memset((unsigned char *)&padapter->securitypriv, 0, sizeof (struct security_priv));
 
@@ -1588,7 +1589,7 @@ u8 rtw_free_drv_sw(_adapter *padapter)
 	#endif
 	// add for CONFIG_IEEE80211W, none 11w also can use
 	_rtw_spinlock_free(&padapter->security_key_mutex);
-	
+
 #ifdef CONFIG_BR_EXT
 	_rtw_spinlock_free(&padapter->br_ext_lock);
 #endif	// CONFIG_BR_EXT
