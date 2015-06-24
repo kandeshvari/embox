@@ -39,6 +39,7 @@
 #include <hal_intf.h>
 #include <rtw_ioctl.h>
 #include <rtw_version.h>
+#include <ip.h>
 
 #ifdef CONFIG_USB_HCI
 #include <usb_osintf.h>
