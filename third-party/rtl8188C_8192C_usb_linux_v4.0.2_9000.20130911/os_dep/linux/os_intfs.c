@@ -2375,7 +2375,9 @@ void netdev_br_init(struct net_device *netdev)
 	{
 		//struct net_bridge	*br = netdev->br_port->br;//->dev->dev_addr;
 #if (LINUX_VERSION_CODE <= KERNEL_VERSION(2, 6, 35))
+	#ifndef PLATFORM_EMBOX
 		if (netdev->br_port)
+	#endif
 #else   // (LINUX_VERSION_CODE <= KERNEL_VERSION(2, 6, 35))
 		if (rcu_dereference(adapter->pnetdev->rx_handler_data))
 #endif  // (LINUX_VERSION_CODE <= KERNEL_VERSION(2, 6, 35))
