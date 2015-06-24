@@ -30,6 +30,7 @@
 #ifdef PLATFORM_EMBOX
 #include <stdio.h> // snprintf
 #include <net/l2/ethernet.h>
+#include <net/netdevice.h>
 #endif
 
 #include <osdep_service.h>
@@ -888,7 +889,7 @@ _func_exit_;
 	return status;
 }
 
-static int rtw_net_set_mac_address(struct net_device *pnetdev, void *p)
+static int rtw_net_set_mac_address(struct net_device *pnetdev, const void *p)
 {
 	_adapter *padapter = (_adapter *)rtw_netdev_priv(pnetdev);
 	struct sockaddr *addr = p;
@@ -1003,6 +1004,16 @@ u16 rtw_recv_select_queue(struct sk_buff *skb)
 
 #endif
 
+#ifdef PLATFORM_EMBOX
+static const struct net_driver rtw_netdev_driver = {
+	.start = netdev_open,
+	.stop  = this_netdev_close,
+	.xmit  = rtw_xmit_entry,
+	.set_macaddr = rtw_net_set_mac_address,
+};
+
+#else
+
 #if (LINUX_VERSION_CODE>=KERNEL_VERSION(2,6,29))
 static const struct net_device_ops rtw_netdev_ops = {
 	.ndo_open = netdev_open,
@@ -1016,6 +1027,8 @@ static const struct net_device_ops rtw_netdev_ops = {
 	.ndo_do_ioctl = rtw_ioctl,
 };
 #endif
+
+#endif /* PLATFORM_EMBOX */
 
 int rtw_init_netdev_name(struct net_device *pnetdev, const char *ifname)
 {
@@ -1087,6 +1100,10 @@ struct net_device *rtw_init_netdev(_adapter *old_padapter)
 	padapter = rtw_netdev_priv(pnetdev);
 	padapter->pnetdev = pnetdev;
 
+#ifdef PLATFORM_EMBOX
+	pnetdev->drv_ops = &rtw_netdev_driver;
+#else
+	asdasf
 #if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,24)
 	SET_MODULE_OWNER(pnetdev);
 #endif
@@ -1104,7 +1121,7 @@ struct net_device *rtw_init_netdev(_adapter *old_padapter)
 	pnetdev->get_stats = rtw_net_get_stats;
 	pnetdev->do_ioctl = rtw_ioctl;
 #endif
-
+#endif /* PLATFORM_EMBOX */
 
 #ifdef CONFIG_TCP_CSUM_OFFLOAD_TX
 	pnetdev->features |= NETIF_F_IP_CSUM;
@@ -1789,6 +1806,9 @@ _adapter *rtw_drv_add_vir_if(_adapter *primary_padapter, void (*set_intf_ops)(st
 	if (!pnetdev)
 		goto error_rtw_drv_add_iface;
 
+#ifdef PLATFORM_EMBOX
+	pnetdev->drv_ops = &rtw_netdev_driver;
+#else
 #if (LINUX_VERSION_CODE>=KERNEL_VERSION(2,6,29))
 	DBG_871X("register rtw_netdev_virtual_iface_ops to netdev_ops\n");
 	pnetdev->netdev_ops = &rtw_netdev_vir_if_ops;
@@ -1796,6 +1816,7 @@ _adapter *rtw_drv_add_vir_if(_adapter *primary_padapter, void (*set_intf_ops)(st
 	pnetdev->open = netdev_vir_if_open;
 	pnetdev->stop = netdev_vir_if_close;
 #endif
+#endif /* PLATFORM_EMBOX */
 
 #ifdef CONFIG_NO_WIRELESS_HANDLERS
 	pnetdev->wireless_handlers = NULL;
@@ -2155,6 +2176,9 @@ _adapter *rtw_drv_if2_init(_adapter *primary_padapter, void (*set_intf_ops)(stru
 	if (!pnetdev)
 		goto error_rtw_drv_if2_init;
 
+#ifdef PLATFORM_EMBOX
+	pnetdev->drv_ops = &rtw_netdev_driver;
+#else
 #if (LINUX_VERSION_CODE>=KERNEL_VERSION(2,6,29))
 	DBG_871X("register rtw_netdev_if2_ops to netdev_ops\n");
 	pnetdev->netdev_ops = &rtw_netdev_if2_ops;
@@ -2162,7 +2186,7 @@ _adapter *rtw_drv_if2_init(_adapter *primary_padapter, void (*set_intf_ops)(stru
 	pnetdev->open = netdev_if2_open;
 	pnetdev->stop = netdev_if2_close;
 #endif
-
+#endif /* PLATFORM_EMBOX */
 #ifdef CONFIG_NO_WIRELESS_HANDLERS
 	pnetdev->wireless_handlers = NULL;
 #endif
