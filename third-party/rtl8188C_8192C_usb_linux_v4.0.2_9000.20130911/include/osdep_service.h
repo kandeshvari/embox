@@ -772,8 +772,8 @@ __inline static void _set_workitem(_workitem *pwork)
 	.vid = (vend), \
 	.pid = (prod)
 
-#define container_of(p,t,n) (t*)((p)-&(((t*)0)->n))
-
+#define container_of(p,t,n) NULL//(t*)((p)-&(((t*)0)->n))
+#define MODULE_DEVICE_TABLE(type, name) /* Stub */
 	#include <kernel/sched/sched_lock.h>
 	#include <kernel/time/timer.h>
 	#include <util/dlist.h>

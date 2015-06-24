@@ -159,6 +159,10 @@
 	typedef struct {
 		int event;
 	} pm_message_t;
+
+	struct usb_interface {
+	};
+
 	typedef unsigned short u16;
 
 	typedef signed int s32;
