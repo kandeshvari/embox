@@ -754,7 +754,7 @@ __inline static void _set_workitem(_workitem *pwork)
 	#include <kernel/sched/sched_lock.h>
 	#include <kernel/time/timer.h>
 	#include <util/dlist.h>
-
+	#include <drivers/usb/usb.h>
 	#include <linux/version.h>
 	#include <linux/spinlock.h>
 	#include <linux/compiler.h>
@@ -1665,7 +1665,7 @@ int _rtw_netif_rx(_nic_hdl ndev, struct sk_buff *skb);
 void _rtw_skb_queue_purge(struct sk_buff_head *list);
 
 #ifdef CONFIG_USB_HCI
-struct usb_device dev;
+//struct usb_device dev;
 void *_rtw_usb_buffer_alloc(struct usb_device *dev, size_t size, dma_addr_t *dma);
 void _rtw_usb_buffer_free(struct usb_device *dev, size_t size, void *addr, dma_addr_t dma);
 #endif /* CONFIG_USB_HCI */
