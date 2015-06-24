@@ -108,7 +108,8 @@
 
 
 #ifdef PLATFORM_FREEBSD
-
+	struct usb_interface {
+	};
 	typedef signed char s8;
 	typedef unsigned char u8;
 
@@ -155,8 +156,9 @@
 
 	typedef signed char s8;
 	typedef unsigned char u8;
-
-	typedef signed short s16;
+	typedef struct {
+		int event;
+	} pm_message_t;
 	typedef unsigned short u16;
 
 	typedef signed int s32;
