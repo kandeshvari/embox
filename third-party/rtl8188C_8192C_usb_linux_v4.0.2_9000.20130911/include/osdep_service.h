@@ -1134,7 +1134,7 @@ __inline static void _cancel_timer(_timer *ptimer,u8 *bcancelled)
 	*bcancelled=  _TRUE;//TRUE ==1; FALSE==0
 }
 
-#ifdef PLATFORM_LINUX
+#if defined (PLATFORM_LINUX) || defined (PLATFORM_EMBOX)
 #define RTW_TIMER_HDL_ARGS void *FunctionContext
 #elif defined(PLATFORM_OS_CE) || defined(PLATFORM_WINDOWS)
 #define RTW_TIMER_HDL_ARGS IN PVOID SystemSpecific1, IN PVOID FunctionContext, IN PVOID SystemSpecific2, IN PVOID SystemSpecific3
