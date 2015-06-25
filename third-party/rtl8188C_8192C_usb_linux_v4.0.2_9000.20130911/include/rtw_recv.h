@@ -96,10 +96,10 @@ struct smooth_rssi_data {
 };
 
 struct signal_stat {
-	u8	update_req;		//used to indicate 
+	u8	update_req;		//used to indicate
 	u8	avg_val;		//avg of valid elements
 	u32	total_num;		//num of valid elements
-	u32	total_val;		//sum of valid elements	
+	u32	total_val;		//sum of valid elements
 };
 
 struct rx_pkt_attrib
@@ -134,9 +134,9 @@ struct rx_pkt_attrib
 	u8 	ta[ETH_ALEN];
 	u8 	ra[ETH_ALEN];
 	u8 	bssid[ETH_ALEN];
-	
+
 	u8 ack_policy;
-	
+
 //#ifdef CONFIG_TCP_CSUM_OFFLOAD_RX
 	u8	tcpchk_valid; // 0: invalid, 1: valid
 	u8	ip_chkrpt; //0: incorrect, 1: correct
@@ -332,7 +332,7 @@ struct recv_priv
 	u32 recvbuf_null_cnt;
 	u32 read_port_complete_EINPROGRESS_cnt;
 	u32 read_port_complete_other_urb_err_cnt;
-	
+
 
 };
 
