@@ -76,6 +76,7 @@ extern int rtw_xmit_entry(_pkt *pkt, _nic_hdl pnetdev);
 #endif
 
 #ifdef PLATFORM_EMBOX
+#define NR_XMITFRAME	256
 extern int rtw_xmit_entry(_nic_hdl pnetdev, _pkt *pkt);
 #endif
 void rtw_os_xmit_schedule(_adapter *padapter);
