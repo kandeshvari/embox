@@ -11,4 +11,6 @@
 
 #include <errno.h>
 
+#define ECOMM	70 /* Communication error on send */
+
 #endif
