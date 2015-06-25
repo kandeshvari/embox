@@ -408,16 +408,15 @@ _func_enter_;
 	if((pdvobjpriv = devobj_init()) == NULL) {
 		goto exit;
 	}
-
-	//pdvobjpriv->pusbintf = usb_intf ;
-	//pusbd = pdvobjpriv->pusbdev = interface_to_usbdev(usb_intf);
+	EMBOX_NIY(pdvobjpriv->pusbintf = usb_intf, 0);
+	EMBOX_NIY(ppusbd = pdvobjpriv->pusbdev = interface_to_usbdev(usb_intf), 0);
 	usb_set_intfdata(usb_intf, pdvobjpriv);
 
 	pdvobjpriv->RtNumInPipes = 0;
 	pdvobjpriv->RtNumOutPipes = 0;
 
 
-	//pdev_desc = &pusbd->descriptor;
+	EMBOX_NIY(ppdev_desc = &pusbd->descriptor, 0);
 #if 0
 	DBG_871X("\n8712_usb_device_descriptor:\n");
 	DBG_871X("bLength=%x\n", pdev_desc->bLength);
@@ -453,7 +452,7 @@ _func_enter_;
 
 	//DBG_871X("\n/****** num of altsetting = (%d) ******/\n", usb_intf->num_altsetting);
 
-	//phost_iface = &usb_intf->altsetting[0];
+	EMBOX_NIY(phost_iface = &usb_intf->altsetting[0], 0);
 	piface_desc = &phost_iface->desc;
 
 #if 0
@@ -469,18 +468,18 @@ _func_enter_;
 	DBG_871X("iInterface=%x\n", piface_desc->iInterface);
 #endif
 
-//	pdvobjpriv->NumInterfaces = pconf_desc->bNumInterfaces;
-	//pdvobjpriv->InterfaceNumber = piface_desc->bInterfaceNumber;
+	EMBOX_NIY(pdvobjpriv->NumInterfaces = pconf_desc->bNumInterfaces, 0);
+	EMBOX_NIY(ppdvobjpriv->InterfaceNumber = piface_desc->bInterfaceNumber, 0);
 	pdvobjpriv->nr_endpoint = piface_desc->bNumEndpoints;
 
 	//DBG_871X("\ndump usb_endpoint_descriptor:\n");
 
 	for (i = 0; i < pdvobjpriv->nr_endpoint; i++)
 	{
-		//phost_endp = phost_iface->endpoint + i;
+		EMBOX_NIY(phost_endp = phost_iface->endpoint + i, 0);
 		if (phost_endp)
 		{
-			//pendp_desc = &phost_endp->desc;
+			EMBOX_NIY(pendp_desc = &phost_endp->desc, 0);
 
 			DBG_871X("\nusb_endpoint_descriptor(%d):\n", i);
 			DBG_871X("bLength=%x\n",pendp_desc->bLength);
@@ -514,7 +513,7 @@ _func_enter_;
 
 	DBG_871X("nr_endpoint=%d, in_num=%d, out_num=%d\n\n", pdvobjpriv->nr_endpoint, pdvobjpriv->RtNumInPipes, pdvobjpriv->RtNumOutPipes);
 
-	if (true /* pusbd->speed == USB_SPEED_HIGH */ )
+	if ( EMBOX_NIY(pusbd->speed == USB_SPEED_HIGH, 1))
 	{
 		pdvobjpriv->ishighspeed = _TRUE;
 		DBG_871X("USB_SPEED_HIGH\n");
@@ -808,7 +807,7 @@ int rtw_hw_resume(_adapter *padapter)
 
 	_func_enter_;
 
-	if(padapter)//system resume
+	if(EMBOX_NIY(padapter), 1)//system resume
 	{
 		DBG_871X("==> rtw_hw_resume\n");
 		_enter_pwrlock(&pwrpriv->lock);

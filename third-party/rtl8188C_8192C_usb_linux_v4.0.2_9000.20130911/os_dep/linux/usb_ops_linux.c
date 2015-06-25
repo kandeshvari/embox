@@ -163,7 +163,8 @@ unsigned int ffaddr2pipehdl(struct dvobj_priv *pdvobj, u32 addr)
 	unsigned int pipe=0;
 	int ep_num=0;
 	_adapter *padapter = pdvobj->if1;
-	struct usb_device *pusbd = NULL;//pdvobj->pusbdev;
+	struct usb_device *pusbd = NULL;
+	EMBOX_NIY(pusbd = pdvobj->pusbdev, 0);
 	HAL_DATA_TYPE *pHalData = GET_HAL_DATA(padapter);
 
 	if (addr == RECV_BULK_IN_ADDR) {
@@ -189,7 +190,8 @@ struct zero_bulkout_context{
 
 static void usb_bulkout_zero_complete(struct urb *purb, struct pt_regs *regs)
 {
-	struct zero_bulkout_context *pcontext = NULL; //(struct zero_bulkout_context *)purb->context;
+	struct zero_bulkout_context *pcontext = NULL;
+	EMBOX_NIY(pcontex = (struct zero_bulkout_context *)purb->context, 0);
 
 	//DBG_8192C("+usb_bulkout_zero_complete\n");
 
@@ -221,7 +223,8 @@ static u32 usb_bulkout_zero(struct intf_hdl *pintfhdl, u32 addr)
 	PURB	purb = NULL;
 	_adapter *padapter = (_adapter *)pintfhdl->padapter;
 	struct dvobj_priv *pdvobj = adapter_to_dvobj(padapter);
-	struct usb_device *pusbd = NULL; //pdvobj->pusbdev;
+	struct usb_device *pusbd = NULL;
+	EMBOX_NIY(pusbd = pdvobj->pusbdev, 0);
 
 	//DBG_871X("%s\n", __func__);
 
@@ -293,10 +296,10 @@ void usb_read_port_cancel(struct intf_hdl *pintfhdl)
 
 	for (i=0; i < NR_RECVBUFF ; i++) {
 
-		//precvbuf->reuse = _TRUE;
-		if (1 /* precvbuf->purb*/){
+		EMBOX_NIY(precvbuf->reuse = _TRUE, 0);
+		if (EMBOX_NIY(precvbuf->purb, 1)){
 			//DBG_8192C("usb_read_port_cancel : usb_kill_urb \n");
-			//usb_kill_urb(precvbuf->purb);
+			EMBOX_NIY(usb_kill_urb(precvbuf->purb), 0);
 		}
 		precvbuf++;
 	}
@@ -310,7 +313,8 @@ static void usb_write_port_complete(struct urb *purb, struct pt_regs *regs)
 {
 	_irqL irqL;
 	int i;
-	struct xmit_buf *pxmitbuf = NULL; //(struct xmit_buf *)purb->context;
+	struct xmit_buf *pxmitbuf = NULL;
+	EMBOX_NIY(pxmitbuf = (struct xmit_buf *)purb->context, 0);
 	//struct xmit_frame *pxmitframe = (struct xmit_frame *)pxmitbuf->priv_data;
 	//_adapter			*padapter = pxmitframe->padapter;
 	_adapter	*padapter = pxmitbuf->padapter;
@@ -395,7 +399,7 @@ _func_enter_;
 	}
 
 
-	if (1 /* purb->status==0 */) {
+	if (EMBOX_NIY(purb->status==0, 1)) {
 
 	} else {
 		RT_TRACE(_module_hci_ops_os_c_,_drv_err_,("usb_write_port_complete : purb->status(%d) != 0 \n", purb->status));
@@ -452,7 +456,7 @@ check_completion:
 
 	//if(rtw_txframes_pending(padapter))
 	{
-		//tasklet_hi_schedule(&pxmitpriv->xmit_tasklet);
+		EMBOX_NIY(tasklet_hi_schedule(&pxmitpriv->xmit_tasklet), 0);
 	}
 
 _func_exit_;
@@ -471,7 +475,8 @@ u32 usb_write_port(struct intf_hdl *pintfhdl, u32 addr, u32 cnt, u8 *wmem)
 	struct xmit_priv	*pxmitpriv = &padapter->xmitpriv;
 	struct xmit_buf *pxmitbuf = (struct xmit_buf *)wmem;
 	struct xmit_frame *pxmitframe = (struct xmit_frame *)pxmitbuf->priv_data;
-	struct usb_device *pusbd = NULL; //pdvobj->pusbdev;
+	struct usb_device *pusbd = NULL;
+	EMBOX_NIY(pusbd = pdvobj->pusbdev, 0);
 	struct pkt_attrib *pattrib = &pxmitframe->attrib;
 
 _func_enter_;
@@ -518,7 +523,7 @@ _func_enter_;
 
 	_exit_critical(&pxmitpriv->lock, &irqL);
 
-	//purb	= pxmitbuf->pxmit_urb[0];
+	EMBOX_NIY(purb	= pxmitbuf->pxmit_urb[0], 0);
 
 #if 0
 	if(pdvobj->ishighspeed)
