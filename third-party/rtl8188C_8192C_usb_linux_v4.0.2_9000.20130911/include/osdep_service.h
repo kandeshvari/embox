@@ -24,6 +24,12 @@
 #include <basic_types.h>
 //#include <rtl871x_byteorder.h>
 
+#ifdef PLATFORM_EMBOX
+#define EMBOX_NIY(exp) printk("NIY: %s:%d, func %s:"#exp, __FILE__, __LINE__, __FUNCTION__)
+#else
+#define EMBOX_NIY(exp) exp
+#endif
+
 #define _FAIL		0
 #define _SUCCESS	1
 #define RTW_RX_HANDLED 2
