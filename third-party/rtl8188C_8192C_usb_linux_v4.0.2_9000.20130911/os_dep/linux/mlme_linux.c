@@ -146,7 +146,7 @@ _func_enter_;
 	netif_carrier_on(adapter->pnetdev);
 
 	if(adapter->pid[2] !=0)
-		rtw_signal_process(adapter->pid[2], SIGALRM);
+		EMBOX_NIY(rtw_signal_process(adapter->pid[2], SIGALRM), 0);
 
 #ifdef RTK_DMP_PLATFORM
 	_set_workitem(&adapter->mlmepriv.Linkup_workitem);
@@ -259,6 +259,7 @@ void rtw_report_sec_ie(_adapter *adapter,u8 authmode,u8 *sec_ie)
 	uint	len;
 	u8	*buff,*p,i;
 	union iwreq_data wrqu;
+	const u32 iw_custom_max = EMBOX_NIY(IW_CUSTOM_MAX, 2048);
 
 _func_enter_;
 
@@ -269,16 +270,16 @@ _func_enter_;
 	{
 		RT_TRACE(_module_mlme_osdep_c_,_drv_info_,("rtw_report_sec_ie, authmode=%d\n", authmode));
 
-		buff = rtw_malloc(IW_CUSTOM_MAX);
+		buff = rtw_malloc(iw_custom_max);
 
-		_rtw_memset(buff,0,IW_CUSTOM_MAX);
+		_rtw_memset(buff,0,iw_custom_max);
 
 		p=buff;
 
 		p+=sprintf(p,"ASSOCINFO(ReqIEs=");
 
 		len = sec_ie[1]+2;
-		len =  (len < IW_CUSTOM_MAX) ? len:IW_CUSTOM_MAX;
+		len =  (len < iw_custom_max) ? len: iw_custom_max;
 
 		for(i=0;i<len;i++){
 			p+=sprintf(p,"%02x",sec_ie[i]);
@@ -290,12 +291,12 @@ _func_enter_;
 
 		wrqu.data.length=p-buff;
 
-		wrqu.data.length = (wrqu.data.length<IW_CUSTOM_MAX) ? wrqu.data.length:IW_CUSTOM_MAX;
+		wrqu.data.length = (wrqu.data.length<iw_custom_max) ? wrqu.data.length:iw_custom_max;
 
-		wireless_send_event(adapter->pnetdev,IWEVCUSTOM,&wrqu,buff);
+		EMBOX_NIY(wireless_send_event(adapter->pnetdev,IWEVCUSTOM,&wrqu,buff), 0);
 
 		if(buff)
-		    rtw_mfree(buff, IW_CUSTOM_MAX);
+		    rtw_mfree(buff, iw_custom_max);
 
 	}
 
@@ -382,13 +383,13 @@ void rtw_indicate_sta_assoc_event(_adapter *padapter, struct sta_info *psta)
 		return;
 
 
-	wrqu.addr.sa_family = ARPHRD_ETHER;
+	EMBOX_NIY(wrqu.addr.sa_family = ARPHRD_ETHER, 0);
 
-	_rtw_memcpy(wrqu.addr.sa_data, psta->hwaddr, ETH_ALEN);
+	EMBOX_NIY(_rtw_memcpy(wrqu.addr.sa_data, psta->hwaddr, ETH_ALEN), 0);
 
 	DBG_871X("+rtw_indicate_sta_assoc_event\n");
 
-	wireless_send_event(padapter->pnetdev, IWEVREGISTERED, &wrqu, NULL);
+	EMBOX_NIY(wireless_send_event(padapter->pnetdev, IWEVREGISTERED, &wrqu, NULL), 0);
 
 }
 
@@ -407,13 +408,13 @@ void rtw_indicate_sta_disassoc_event(_adapter *padapter, struct sta_info *psta)
 		return;
 
 
-	wrqu.addr.sa_family = ARPHRD_ETHER;
+	EMBOX_NIY(wrqu.addr.sa_family = ARPHRD_ETHER, 0);
 
-	_rtw_memcpy(wrqu.addr.sa_data, psta->hwaddr, ETH_ALEN);
+	EMBOX_NIY(_rtw_memcpy(wrqu.addr.sa_data, psta->hwaddr, ETH_ALEN), 0);
 
 	DBG_871X("+rtw_indicate_sta_disassoc_event\n");
 
-	wireless_send_event(padapter->pnetdev, IWEVEXPIRED, &wrqu, NULL);
+	EMBOX_NIY(wireless_send_event(padapter->pnetdev, IWEVEXPIRED, &wrqu, NULL), 0);
 
 }
 
