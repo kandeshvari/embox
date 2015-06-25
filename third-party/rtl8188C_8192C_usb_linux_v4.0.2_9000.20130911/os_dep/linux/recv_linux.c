@@ -69,7 +69,7 @@ int rtw_os_recvbuf_resource_alloc(_adapter *padapter, struct recv_buf *precvbuf)
 	struct usb_device	*pusbd = pdvobjpriv->pusbdev;
 
 	precvbuf->irp_pending = _FALSE;
-	precvbuf->purb = usb_alloc_urb(0, GFP_KERNEL);
+	EMBOX_NIY(precvbuf->purb = usb_alloc_urb(0, GFP_KERNEL), 0);
 	if(precvbuf->purb == NULL){
 		res = _FAIL;
 	}
@@ -133,6 +133,7 @@ int rtw_os_recvbuf_resource_free(_adapter *padapter, struct recv_buf *precvbuf)
 
 }
 
+#if 0
 void rtw_handle_tkip_mic_err(_adapter *padapter,u8 bgroup)
 {
 #ifdef CONFIG_IOCTL_CFG80211
@@ -196,6 +197,7 @@ void rtw_handle_tkip_mic_err(_adapter *padapter,u8 bgroup)
 
 	wireless_send_event( padapter->pnetdev, IWEVMICHAELMICFAILURE, &wrqu, (char*) &ev );
 }
+#endif
 
 void rtw_hostapd_mlme_rx(_adapter *padapter, union recv_frame *precv_frame)
 {
@@ -337,7 +339,7 @@ _func_enter_;
 #ifdef CONFIG_BR_EXT
 
 #if (LINUX_VERSION_CODE <= KERNEL_VERSION(2, 6, 35))
-	br_port = padapter->pnetdev->br_port;
+	EMBOX_NIY(br_port = padapter->pnetdev->br_port, 0);
 #else   // (LINUX_VERSION_CODE <= KERNEL_VERSION(2, 6, 35))
 	rcu_read_lock();
 	br_port = rcu_dereference(padapter->pnetdev->rx_handler_data);
@@ -372,12 +374,12 @@ _func_enter_;
 	}
 #else /* !CONFIG_TCP_CSUM_OFFLOAD_RX */
 
-	skb->ip_summed = CHECKSUM_NONE;
+	EMBOX_NIY(skb->ip_summed = CHECKSUM_NONE, 0);
 
 #endif
 
 	skb->dev = padapter->pnetdev;
-	skb->protocol = eth_type_trans(skb, padapter->pnetdev);
+	EMBOX_NIY(skb->protocol = eth_type_trans(skb, padapter->pnetdev), 0);
 
 	rtw_netif_rx(padapter->pnetdev, skb);
 

@@ -578,7 +578,7 @@ _func_enter_;
 
 				if(brpt_micerror == _TRUE)
 				{
-					rtw_handle_tkip_mic_err(adapter,(u8)IS_MCAST(prxattrib->ra));
+					EMBOX_NIY(rtw_handle_tkip_mic_err(adapter,(u8)IS_MCAST(prxattrib->ra)), 0);
 					RT_TRACE(_module_rtl871x_recv_c_,_drv_err_,(" mic error :prxattrib->bdecrypted=%d \n", brpt_micerror));
 					DBG_871X(" mic error :brpt_micerror=%d\n", brpt_micerror);
 				}
