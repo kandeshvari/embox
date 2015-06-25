@@ -776,6 +776,32 @@ __inline static void _set_workitem(_workitem *pwork)
 #define MODULE_DEVICE_TABLE(type, name) /* Stub */
 #define __init /* Stub */
 #define __exit /* Stub */
+typedef unsigned gfp_t;
+#define __GFP_WAIT      ((gfp_t)0x10u)  /* Can wait and reschedule? */
+#define __GFP_HIGH      ((gfp_t)0x20u)  /* Should access emergency pools? */
+#define __GFP_IO        ((gfp_t)0x40u)  /* Can start physical IO? */
+#define __GFP_FS        ((gfp_t)0x80u)  /* Can call down to low-level FS? */
+#define __GFP_COLD      ((gfp_t)0x100u) /* Cache-cold page required */
+#define __GFP_NOWARN    ((gfp_t)0x200u) /* Suppress page allocation failure warning */
+#define __GFP_REPEAT    ((gfp_t)0x400u) /* Retry the allocation.  Might fail */
+#define __GFP_NOFAIL    ((gfp_t)0x800u) /* Retry for ever.  Cannot fail */
+#define __GFP_NORETRY   ((gfp_t)0x1000u)/* Do not retry.  Might fail */
+#define __GFP_NO_GROW   ((gfp_t)0x2000u)/* Slab internal usage */
+#define __GFP_COMP      ((gfp_t)0x4000u)/* Add compound page metadata */
+#define __GFP_ZERO      ((gfp_t)0x8000u)/* Return zeroed page on success */
+#define __GFP_NOMEMALLOC ((gfp_t)0x10000u) /* Don't use emergency reserves */
+#define __GFP_HARDWALL   ((gfp_t)0x20000u) /* Enforce hardwall cpuset memory allocs */
+/* This equals 0, but use constants in case they ever change */
+#define GFP_NOWAIT      (GFP_ATOMIC & ~__GFP_HIGH)
+/* GFP_ATOMIC means both !wait (__GFP_WAIT not set) and use emergency pool */
+#define GFP_ATOMIC      (__GFP_HIGH)
+#define GFP_NOIO        (__GFP_WAIT)
+#define GFP_NOFS        (__GFP_WAIT | __GFP_IO)
+#define GFP_KERNEL      (__GFP_WAIT | __GFP_IO | __GFP_FS)
+#define GFP_USER        (__GFP_WAIT | __GFP_IO | __GFP_FS | __GFP_HARDWALL)
+#define GFP_HIGHUSER    (__GFP_WAIT | __GFP_IO | __GFP_FS | __GFP_HARDWALL | \
+                         __GFP_HIGHMEM)
+#define EPROTO          71      /* Protocol error */
 
 	#include <kernel/sched/sched_lock.h>
 	#include <kernel/time/timer.h>
@@ -909,6 +935,46 @@ __inline static void _set_workitem(_workitem *pwork)
 		uint8_t  bInterfaceProtocol;
 		uint8_t  iInterface;
 	};
+
+	struct urb {
+		int status;			/* (return) non-ISO status */
+#if 0
+		struct kref kref;		/* reference count of the URB */
+		void *hcpriv;			/* private data for host controller */
+		atomic_t use_count;		/* concurrent submissions counter */
+		atomic_t reject;		/* submissions will fail */
+		int unlinked;			/* unlink error code */
+		struct list_head urb_list;	/* list head for use by the urb's
+						 * current owner */
+		struct list_head anchor_list;	/* the URB may be anchored */
+		struct usb_anchor *anchor;
+		struct usb_device *dev;		/* (in) pointer to associated device */
+		struct usb_host_endpoint *ep;	/* (internal) pointer to endpoint */
+		unsigned int pipe;		/* (in) pipe information */
+		unsigned int stream_id;		/* (in) stream ID */
+		unsigned int transfer_flags;	/* (in) URB_SHORT_NOT_OK | ...*/
+		void *transfer_buffer;		/* (in) associated data buffer */
+		dma_addr_t transfer_dma;	/* (in) dma addr for transfer_buffer */
+		struct scatterlist *sg;		/* (in) scatter gather buffer list */
+		int num_mapped_sgs;		/* (internal) mapped sg entries */
+		int num_sgs;			/* (in) number of entries in the sg list */
+		u32 transfer_buffer_length;	/* (in) data buffer length */
+		u32 actual_length;		/* (return) actual transfer length */
+		unsigned char *setup_packet;	/* (in) setup packet (control only) */
+		dma_addr_t setup_dma;		/* (in) dma addr for setup_packet */
+		int start_frame;		/* (modify) start frame (ISO) */
+		int number_of_packets;		/* (in) number of ISO packets */
+		int interval;			/* (modify) transfer interval
+						 * (INT/ISO) */
+		int error_count;		/* (return) number of ISO errors */
+		void *context;			/* (in) context for completion */
+		usb_complete_t complete;	/* (in) completion routine */
+		struct usb_iso_packet_descriptor iso_frame_desc[0];
+						/* (in) ISO ONLY */
+#endif
+	};
+
+
 
 	struct usb_host_config {
 		struct usb_config_descriptor	desc;
