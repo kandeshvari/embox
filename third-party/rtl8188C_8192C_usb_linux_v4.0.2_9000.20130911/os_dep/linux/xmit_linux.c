@@ -43,7 +43,7 @@ void _rtw_open_pktfile (_pkt *pktptr, struct pkt_file *pfile)
 _func_enter_;
 
 	pfile->pkt = pktptr;
-	pfile->cur_addr = pfile->buf_start = pktptr->data;
+	EMBOX_NIY(pfile->cur_addr = pfile->buf_start = pktptr->data, 0);
 	pfile->pkt_len = pfile->buf_len = pktptr->len;
 
 	pfile->cur_buffer = pfile->buf_start ;
@@ -145,14 +145,14 @@ int rtw_os_xmit_resource_alloc(_adapter *padapter, struct xmit_buf *pxmitbuf,u32
 	}
 
 	pxmitbuf->pbuf = (u8 *)N_BYTE_ALIGMENT((SIZE_PTR)(pxmitbuf->pallocated_buf), XMITBUF_ALIGN_SZ);
-	pxmitbuf->dma_transfer_addr = 0;
+	EMBOX_NIY(pxmitbuf->dma_transfer_addr = 0, 0);
 
 #endif // CONFIG_USE_USB_BUFFER_ALLOC_TX
 
 	for(i=0; i<8; i++)
       	{
-      		pxmitbuf->pxmit_urb[i] = usb_alloc_urb(0, GFP_KERNEL);
-             	if(pxmitbuf->pxmit_urb[i] == NULL)
+				EMBOX_NIY(pxmitbuf->pxmit_urb[i] = usb_alloc_urb(0, GFP_KERNEL), 0);
+				if(EMBOX_NIY(pxmitbuf->pxmit_urb[i] == NULL, 0))
              	{
              		DBG_871X("pxmitbuf->pxmit_urb[i]==NULL");
 	        	return _FAIL;
@@ -183,10 +183,10 @@ void rtw_os_xmit_resource_free(_adapter *padapter, struct xmit_buf *pxmitbuf,u32
 
 	for(i=0; i<8; i++)
 	{
-		if(pxmitbuf->pxmit_urb[i])
+		if(EMBOX_NIY(pxmitbuf->pxmit_urb[i], 0))
 		{
 			//usb_kill_urb(pxmitbuf->pxmit_urb[i]);
-			usb_free_urb(pxmitbuf->pxmit_urb[i]);
+			EMBOX_NIY(usb_free_urb(pxmitbuf->pxmit_urb[i]), 0);
 		}
 	}
 
@@ -255,7 +255,7 @@ void rtw_os_xmit_schedule(_adapter *padapter)
 
 	if(rtw_txframes_pending(padapter))
 	{
-		tasklet_hi_schedule(&pxmitpriv->xmit_tasklet);
+		EMBOX_NIY(tasklet_hi_schedule(&pxmitpriv->xmit_tasklet), 0);
 	}
 
 	_exit_critical_bh(&pxmitpriv->lock, &irqL);
@@ -302,9 +302,9 @@ int rtw_mlcst2unicst(_adapter *padapter, struct sk_buff *skb)
 		psta = rtw_get_stainfo_by_offset(pstapriv, chk_alive_list[i]);
 
 		/* avoid come from STA1 and send back STA1 */
-		if (_rtw_memcmp(psta->hwaddr, &skb->data[6], 6) == _TRUE
-			|| _rtw_memcmp(psta->hwaddr, null_addr, 6) == _TRUE
-			|| _rtw_memcmp(psta->hwaddr, bc_addr, 6) == _TRUE
+		if (EMBOX_NIY(_rtw_memcmp(psta->hwaddr, &skb->data[6], 6), 0) == _TRUE
+			|| EMBOX_NIY(_rtw_memcmp(psta->hwaddr, null_addr, 6), 0) == _TRUE
+			|| EMBOX_NIY(_rtw_memcmp(psta->hwaddr, bc_addr, 6), 0) == _TRUE
 		)
 			continue;
 
@@ -364,15 +364,15 @@ _func_enter_;
 	if (pxmitpriv->hwxmits[queue].accnt > NR_XMITFRAME/2) {
 		//DBG_871X("%s(): stop netif_subqueue[%d]\n", __FUNCTION__, queue);
 		netif_stop_subqueue(padapter->pnetdev, queue);
-		return NETDEV_TX_BUSY;
+		return EMBOX_NIY(NETDEV_TX_BUSY, -1);
 	}
 #endif
 
 #ifdef CONFIG_TX_MCAST2UNI
 	if ( !rtw_mc2u_disable
 		&& check_fwstate(pmlmepriv, WIFI_AP_STATE) == _TRUE
-		&& ( IP_MCAST_MAC(pkt->data)
-			|| ICMPV6_MCAST_MAC(pkt->data) )
+		&& ( EMBOX_NIY(IP_MCAST_MAC(pkt->data), 0)
+			|| EMBOX_NIY(ICMPV6_MCAST_MAC(pkt->data), 0) )
 		&& (padapter->registrypriv.wifi_spec == 0)
 		)
 	{
