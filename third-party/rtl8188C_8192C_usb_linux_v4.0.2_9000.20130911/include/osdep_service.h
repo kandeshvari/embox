@@ -915,7 +915,8 @@ typedef unsigned gfp_t;
 	};
 
 	struct device {
-
+	};
+	struct work_struct {
 	};
 
 	struct usb_endpoint_descriptor {
