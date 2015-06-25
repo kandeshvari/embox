@@ -397,7 +397,7 @@ struct recv_buf
 
 #endif
 
-#ifdef PLATFORM_LINUX
+#if defined PLATFORM_LINUX || defined PLATFORM_EMBOX
 	_pkt *pskb;
 	u8	reuse;
 #endif

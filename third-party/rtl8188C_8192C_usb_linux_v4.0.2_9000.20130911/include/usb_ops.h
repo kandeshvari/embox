@@ -38,7 +38,7 @@ enum{
 #define MAX_VENDOR_REQ_CMD_SIZE	254		//8188cu SIE Support
 #define MAX_USB_IO_CTL_SIZE		(MAX_VENDOR_REQ_CMD_SIZE +ALIGNMENT_UNIT)
 
-#ifdef PLATFORM_LINUX
+#if defined PLATFORM_LINUX || defined PLATFORM_EMBOX
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,12))
 #define rtw_usb_control_msg(dev, pipe, request, requesttype, value, index, data, size, timeout_ms) \
 	usb_control_msg((dev), (pipe), (request), (requesttype), (value), (index), (data), (size), (timeout_ms))

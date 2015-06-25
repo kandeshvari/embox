@@ -328,7 +328,7 @@ struct dvobj_priv
 	u32	config_descriptor_len;//ULONG UsbConfigurationDescriptorLength;
 #endif//PLATFORM_WINDOWS
 
-#ifdef PLATFORM_LINUX
+#if defined PLATFORM_LINUX || defined PLATFORM_EMBOX
 	struct usb_interface *pusbintf;
 	struct usb_device *pusbdev;
 #endif//PLATFORM_LINUX

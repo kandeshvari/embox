@@ -983,6 +983,7 @@ typedef unsigned gfp_t;
 
 	struct urb {
 		int status;			/* (return) non-ISO status */
+		uint32_t actual_length;		/* (return) actual transfer length */
 #if 0
 		struct kref kref;		/* reference count of the URB */
 		void *hcpriv;			/* private data for host controller */
@@ -1004,7 +1005,6 @@ typedef unsigned gfp_t;
 		int num_mapped_sgs;		/* (internal) mapped sg entries */
 		int num_sgs;			/* (in) number of entries in the sg list */
 		u32 transfer_buffer_length;	/* (in) data buffer length */
-		u32 actual_length;		/* (return) actual transfer length */
 		unsigned char *setup_packet;	/* (in) setup packet (control only) */
 		dma_addr_t setup_dma;		/* (in) dma addr for setup_packet */
 		int start_frame;		/* (modify) start frame (ISO) */

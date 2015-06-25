@@ -1128,7 +1128,7 @@ static int recvbuf2recvframe(_adapter *padapter, _pkt *pskb)
 			pkt_copy->dev = padapter->pnetdev;
 			precvframe->u.hdr.pkt = pkt_copy;
 			precvframe->u.hdr.rx_head = pkt_copy->data;
-			precvframe->u.hdr.rx_end = pkt_copy->data + alloc_sz;
+			EMBOX_NIY(precvframe->u.hdr.rx_end = pkt_copy->data + alloc_sz, 0);
 			skb_reserve( pkt_copy, 8 - ((SIZE_PTR)( pkt_copy->data ) & 7 ));//force pkt_copy->data at 8-byte alignment address
 			skb_reserve( pkt_copy, shift_sz );//force ip_hdr at 8-byte alignment address according to shift_sz.
 			_rtw_memcpy(pkt_copy->data, (pbuf + pattrib->shift_sz + pattrib->drvinfo_sz + RXDESC_SIZE), skb_len);
@@ -1217,7 +1217,7 @@ void rtl8192cu_recv_tasklet(void *priv)
 	_adapter		*padapter = (_adapter*)priv;
 	struct recv_priv	*precvpriv = &padapter->recvpriv;
 
-	while (NULL != (pskb = skb_dequeue(&precvpriv->rx_skb_queue)))
+	while (EMBOX_NIY(NULL != (pskb = skb_dequeue(&precvpriv->rx_skb_queue)), 0))
 	{
 		if ((padapter->bDriverStopped == _TRUE)||(padapter->bSurpriseRemoved== _TRUE))
 		{
@@ -1234,7 +1234,7 @@ void rtl8192cu_recv_tasklet(void *priv)
 
 		pskb->len = 0;
 
-		skb_queue_tail(&precvpriv->free_recv_skb_queue, pskb);
+		EMBOX_NIY(skb_queue_tail(&precvpriv->free_recv_skb_queue, pskb), 0);
 
 #else
 		rtw_skb_free(pskb);
@@ -1249,7 +1249,8 @@ static void usb_read_port_complete(struct urb *purb, struct pt_regs *regs)
 {
 	_irqL irqL;
 	uint isevt, *pbuf;
-	struct recv_buf	*precvbuf = (struct recv_buf *)purb->context;
+	struct recv_buf	*precvbuf = NULL;
+	EMBOX_NIY(precvbuf = (struct recv_buf *)purb->context, 0);
 	_adapter 			*padapter =(_adapter *)precvbuf->adapter;
 	struct recv_priv	*precvpriv = &padapter->recvpriv;
 
@@ -1273,7 +1274,7 @@ static void usb_read_port_complete(struct urb *purb, struct pt_regs *regs)
 		RT_TRACE(_module_hci_ops_os_c_,_drv_err_,("usb_read_port_complete:bDriverStopped(%d) OR bSurpriseRemoved(%d)\n", padapter->bDriverStopped, padapter->bSurpriseRemoved));
 
 	#ifdef CONFIG_PREALLOC_RECV_SKB
-		precvbuf->reuse = _TRUE;
+		EMBOX_NIY(precvbuf->reuse = _TRUE, 0);
 	#else
 		if(precvbuf->pskb){
 			DBG_8192C("==> free skb(%p)\n",precvbuf->pskb);
@@ -1300,10 +1301,10 @@ static void usb_read_port_complete(struct urb *purb, struct pt_regs *regs)
 
 			precvbuf->transfer_len = purb->actual_length;
 			skb_put(precvbuf->pskb, purb->actual_length);
-			skb_queue_tail(&precvpriv->rx_skb_queue, precvbuf->pskb);
+			EMBOX_NIY(skb_queue_tail(&precvpriv->rx_skb_queue, precvbuf->pskb), 0);
 
-			if (skb_queue_len(&precvpriv->rx_skb_queue)<=1)
-				tasklet_schedule(&precvpriv->recv_tasklet);
+			if (EMBOX_NIY(skb_queue_len(&precvpriv->rx_skb_queue)<=1, 0))
+				EMBOX_NIY(tasklet_schedule(&precvpriv->recv_tasklet), 0);
 
 			precvbuf->pskb = NULL;
 			precvbuf->reuse = _FALSE;
@@ -1388,7 +1389,7 @@ _func_enter_;
 #ifdef CONFIG_PREALLOC_RECV_SKB
 	if((precvbuf->reuse == _FALSE) || (precvbuf->pskb == NULL))
 	{
-		if (NULL != (precvbuf->pskb = skb_dequeue(&precvpriv->free_recv_skb_queue)))
+		if (EMBOX_NIY(NULL != (precvbuf->pskb = skb_dequeue(&precvpriv->free_recv_skb_queue)), 0))
 		{
 			precvbuf->reuse = _TRUE;
 		}
@@ -1416,7 +1417,7 @@ _func_enter_;
 	        	alignment = tmpaddr & (RECVBUFF_ALIGN_SZ-1);
 			skb_reserve(precvbuf->pskb, (RECVBUFF_ALIGN_SZ - alignment));
 
-			precvbuf->phead = precvbuf->pskb->head;
+			EMBOX_NIY(precvbuf->phead = precvbuf->pskb->head, 0);
 		   	precvbuf->pdata = precvbuf->pskb->data;
 			precvbuf->ptail = skb_tail_pointer(precvbuf->pskb);
 			precvbuf->pend = skb_end_pointer(precvbuf->pskb);
@@ -1424,7 +1425,7 @@ _func_enter_;
 		}
 		else//reuse skb
 		{
-			precvbuf->phead = precvbuf->pskb->head;
+			EMBOX_NIY(precvbuf->phead = precvbuf->pskb->head, 0);
 			precvbuf->pdata = precvbuf->pskb->data;
 			precvbuf->ptail = skb_tail_pointer(precvbuf->pskb);
 			precvbuf->pend = skb_end_pointer(precvbuf->pskb);
