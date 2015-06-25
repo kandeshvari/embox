@@ -807,7 +807,7 @@ int rtw_hw_resume(_adapter *padapter)
 
 	_func_enter_;
 
-	if(EMBOX_NIY(padapter), 1)//system resume
+	if(EMBOX_NIY(padapter, 1))//system resume
 	{
 		DBG_871X("==> rtw_hw_resume\n");
 		_enter_pwrlock(&pwrpriv->lock);
