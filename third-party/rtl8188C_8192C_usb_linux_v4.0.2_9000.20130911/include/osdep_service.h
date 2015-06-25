@@ -774,6 +774,9 @@ __inline static void _set_workitem(_workitem *pwork)
 
 #define container_of(p,t,n) NULL//(t*)((p)-&(((t*)0)->n))
 #define MODULE_DEVICE_TABLE(type, name) /* Stub */
+#define __init /* Stub */
+#define __exit /* Stub */
+
 	#include <kernel/sched/sched_lock.h>
 	#include <kernel/time/timer.h>
 	#include <util/dlist.h>
@@ -862,6 +865,68 @@ __inline static void _set_workitem(_workitem *pwork)
 		struct	dlist_head	queue;
 		_lock	lock;
 	};
+
+	struct device {
+
+	};
+
+	struct usb_endpoint_descriptor {
+		uint8_t  bLength;
+		uint8_t  bDescriptorType;
+
+		uint8_t  bEndpointAddress;
+		uint8_t  bmAttributes;
+		uint8_t wMaxPacketSize;
+		uint8_t  bInterval;
+
+	/* NOTE:  these two are _only_ in audio endpoints. */
+	/* use USB_DT_ENDPOINT*_SIZE in bLength, not sizeof. */
+		uint8_t  bRefresh;
+		uint8_t  bSynchAddress;
+	};
+
+	struct usb_config_descriptor {
+	/*	uint8_t  bLength;
+		uint8_t  bDescriptorType;
+
+		uint16_t wTotalLength;
+		uint8_t  bNumInterfaces;
+		uint8_t  bConfigurationValue;
+		uint8_t  iConfiguration;
+		uint8_t  bmAttributes;
+		uint8_t  bMaxPower;*/
+	};
+
+	struct usb_interface_descriptor {
+		uint8_t  bLength;
+		uint8_t  bDescriptorType;
+
+		uint8_t  bInterfaceNumber;
+		uint8_t  bAlternateSetting;
+		uint8_t  bNumEndpoints;
+		uint8_t  bInterfaceClass;
+		uint8_t  bInterfaceSubClass;
+		uint8_t  bInterfaceProtocol;
+		uint8_t  iInterface;
+	};
+
+	struct usb_host_config {
+		struct usb_config_descriptor	desc;
+	/*	char *string;
+		struct usb_interface_assoc_descriptor *intf_assoc[USB_MAXIADS];
+		struct usb_interface *interface[USB_MAXINTERFACES];
+		struct usb_interface_cache *intf_cache[USB_MAXINTERFACES];
+		unsigned char *extra;
+		int extralen;
+	*/};
+	struct usb_host_interface {
+		struct usb_interface_descriptor	desc;
+		struct usb_host_endpoint *endpoint;
+		/* int extralen;
+		unsigned char *extra;
+		char *string; */
+	};
+
 
 	typedef	struct sk_buff	_pkt;
 	typedef unsigned char	_buffer;
