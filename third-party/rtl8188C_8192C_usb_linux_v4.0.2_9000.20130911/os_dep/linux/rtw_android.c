@@ -18,6 +18,7 @@
  *
  ******************************************************************************/
 
+#if 0
 #include <linux/module.h>
 #include <linux/netdevice.h>
 
@@ -837,3 +838,4 @@ static void wifi_del_dev(void)
 }
 #endif /* defined(RTW_ENABLE_WIFI_CONTROL_FUNC) */
 
+#endif
