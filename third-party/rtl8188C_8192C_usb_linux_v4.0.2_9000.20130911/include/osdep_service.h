@@ -778,6 +778,20 @@ __inline static void _set_workitem(_workitem *pwork)
 	.vid = (vend), \
 	.pid = (prod)
 
+#define NDISC_ROUTER_SOLICITATION 133
+#define NDISC_ROUTER_ADVERTISEMENT 134
+#define NDISC_NEIGHBOUR_SOLICITATION 135
+#define NDISC_NEIGHBOUR_ADVERTISEMENT 136
+#define NDISC_REDIRECT 137
+
+#define PADO_CODE 0x07
+#define PADI_CODE 0x09
+#define PADR_CODE 0x19
+#define PADS_CODE 0x65
+#define PTT_RELAY_SID 0x110
+
+#define IPPROTO_UDP 17
+
 #define container_of(p,t,n) NULL//(t*)((p)-&(((t*)0)->n))
 #define MODULE_DEVICE_TABLE(type, name) /* Stub */
 #define __init /* Stub */
@@ -883,7 +897,9 @@ typedef unsigned gfp_t;
 #endif
 #endif
 #endif
-
+	typedef uint8_t u_int8_t;
+	typedef uint16_t u_int16_t;
+	typedef uint32_t u_int32_t;
 	typedef struct 	semaphore _sema;
 	typedef	spinlock_t	_lock;
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,37))
@@ -927,6 +943,28 @@ typedef unsigned gfp_t;
 		uint8_t  iConfiguration;
 		uint8_t  bmAttributes;
 		uint8_t  bMaxPower;*/
+	};
+
+	struct pppoe_tag {
+		__be16 tag_type;
+		__be16 tag_len;
+		char tag_data[0];
+	};
+	struct pppoe_hdr {
+#define __LITTLE_ENDIAN_BITFIELD /* XXX */
+#if defined(__LITTLE_ENDIAN_BITFIELD)
+		__u8 type : 4;
+		__u8 ver : 4;
+#elif defined(__BIG_ENDIAN_BITFIELD)
+		__u8 ver : 4;
+		__u8 type : 4;
+#else
+#error	"Please fix <asm/byteorder.h>"
+#endif
+		__u8 code;
+		__be16 sid;
+		__be16 length;
+		struct pppoe_tag tag[0];
 	};
 
 	struct usb_interface_descriptor {

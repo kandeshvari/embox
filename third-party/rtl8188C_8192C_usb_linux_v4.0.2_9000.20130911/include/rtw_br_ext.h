@@ -21,7 +21,7 @@
 #define _RTW_BR_EXT_H_
 
 #if 1	// rtw_wifi_driver
-#define CL_IPV6_PASS    	1
+//#define CL_IPV6_PASS    	0 /* XXX */
 #define MACADDRLEN		6
 #define _DEBUG_ERR		printk
 #define _DEBUG_INFO		//printk

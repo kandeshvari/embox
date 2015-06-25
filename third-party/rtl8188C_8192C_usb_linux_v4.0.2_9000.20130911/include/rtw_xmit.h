@@ -366,6 +366,12 @@ struct pkt_attrib
 };
 #endif
 
+#ifdef PLATFORM_EMBOX
+#define ETH_ALEN	6		/* Octets in one ethernet addr	 */
+#define ETH_HLEN	14		/* Total octets in header.	 */
+#define ETH_P_IP	0x0800		/* Internet Protocol packet	*/
+#endif
+
 #ifdef PLATFORM_FREEBSD
 #define ETH_ALEN	6		/* Octets in one ethernet addr	 */
 #define ETH_HLEN	14		/* Total octets in header.	 */
