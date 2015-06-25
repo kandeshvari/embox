@@ -3042,11 +3042,7 @@ void rtw_use_tkipkey_handler (
 	IN	PVOID					SystemSpecific2,
 	IN	PVOID					SystemSpecific3
 	)
-#endif
-#ifdef PLATFORM_LINUX
-void rtw_use_tkipkey_handler(void *FunctionContext)
-#endif
-#ifdef PLATFORM_FREEBSD
+#else
 void rtw_use_tkipkey_handler(void *FunctionContext)
 #endif
 {
