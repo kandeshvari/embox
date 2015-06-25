@@ -771,6 +771,65 @@ __inline static void _set_workitem(_workitem *pwork)
 #endif //PLATFORM_FREEBSD
 
 #ifdef PLATFORM_EMBOX
+	#include <kernel/sched/sched_lock.h>
+	#include <kernel/time/timer.h>
+	#include <util/dlist.h>
+	#include <drivers/usb/usb.h>
+	#include <linux/version.h>
+	#include <linux/spinlock.h>
+	#include <linux/compiler.h>
+	#include <linux/kernel.h>
+	#include <linux/errno.h>
+	//#include <linux/init.h>
+	#include <linux/slab.h>
+	//#include <linux/module.h>
+//#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,5))
+	//#include <linux/kref.h>
+//#endif
+	//#include <linux/smp_lock.h>
+	#include <linux/netdevice.h>
+	#include <linux/skbuff.h>
+	//#include <linux/circ_buf.h>
+	//#include <asm/uaccess.h>
+	//#include <asm/byteorder.h>
+	//#include <asm/atomic.h>
+	#include <asm/io.h>
+//#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,26))
+	#include <asm/semaphore.h>
+//#else
+	//#include <linux/semaphore.h>
+//#endif
+	//#include <linux/sem.h>
+	#include <linux/sched.h>
+	#include <linux/etherdevice.h>
+	#include <linux/wireless.h>
+	//#include <net/iw_handler.h>
+	#include <linux/if_arp.h>
+	//#include <linux/rtnetlink.h>
+	//#include <linux/delay.h>
+	//#include <linux/proc_fs.h>	// Necessary because we use the proc fs
+	//#include <linux/interrupt.h>	// for struct tasklet_struct
+	//#include <linux/ip.h>
+	//#include <linux/kthread.h>
+	#define HZ 1000
+#ifdef CONFIG_IOCTL_CFG80211
+//	#include <linux/ieee80211.h>
+        #include <net/ieee80211_radiotap.h>
+	#include <net/cfg80211.h>
+#endif //CONFIG_IOCTL_CFG80211
+
+#ifdef CONFIG_TCP_CSUM_OFFLOAD_TX
+	#include <linux/in.h>
+	#include <linux/udp.h>
+#endif
+
+#ifdef CONFIG_PCI_HCI
+	#include <linux/pci.h>
+#endif
+
+
+
+
 #define LINUX_VERSION_CODE 0
 #define KERNEL_VERSION(x,y,z) 0
 
@@ -829,15 +888,9 @@ __inline static void _set_workitem(_workitem *pwork)
 #define IWEVQUAL	0x8C01
 #define IWEVGENIE	0x8C05
 struct iw_event {
-};
-
-struct iw_freq {
-};
-
-struct iw_quality {
-};
-
-struct iw_param {
+	__u16 cmd;
+	__u16 len;
+	union iwreq_data u;
 };
 
 #define WIRELESS_EXT	22
@@ -928,72 +981,6 @@ typedef unsigned gfp_t;
 #define GFP_HIGHUSER    (__GFP_WAIT | __GFP_IO | __GFP_FS | __GFP_HARDWALL | \
                          __GFP_HIGHMEM)
 #define EPROTO          71      /* Protocol error */
-
-	#include <kernel/sched/sched_lock.h>
-	#include <kernel/time/timer.h>
-	#include <util/dlist.h>
-	#include <drivers/usb/usb.h>
-	#include <linux/version.h>
-	#include <linux/spinlock.h>
-	#include <linux/compiler.h>
-	#include <linux/kernel.h>
-	#include <linux/errno.h>
-	//#include <linux/init.h>
-	#include <linux/slab.h>
-	//#include <linux/module.h>
-//#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,5))
-	//#include <linux/kref.h>
-//#endif
-	//#include <linux/smp_lock.h>
-	#include <linux/netdevice.h>
-	#include <linux/skbuff.h>
-	//#include <linux/circ_buf.h>
-	//#include <asm/uaccess.h>
-	//#include <asm/byteorder.h>
-	//#include <asm/atomic.h>
-	#include <asm/io.h>
-//#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,26))
-	#include <asm/semaphore.h>
-//#else
-	//#include <linux/semaphore.h>
-//#endif
-	//#include <linux/sem.h>
-	#include <linux/sched.h>
-	#include <linux/etherdevice.h>
-	#include <linux/wireless.h>
-	//#include <net/iw_handler.h>
-	#include <linux/if_arp.h>
-	//#include <linux/rtnetlink.h>
-	//#include <linux/delay.h>
-	//#include <linux/proc_fs.h>	// Necessary because we use the proc fs
-	//#include <linux/interrupt.h>	// for struct tasklet_struct
-	//#include <linux/ip.h>
-	//#include <linux/kthread.h>
-	#define HZ 1000
-#ifdef CONFIG_IOCTL_CFG80211
-//	#include <linux/ieee80211.h>
-        #include <net/ieee80211_radiotap.h>
-	#include <net/cfg80211.h>
-#endif //CONFIG_IOCTL_CFG80211
-
-#ifdef CONFIG_TCP_CSUM_OFFLOAD_TX
-	#include <linux/in.h>
-	#include <linux/udp.h>
-#endif
-
-#ifdef CONFIG_USB_HCI
-	//#include <linux/usb.h>
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,21))
-	//#include <linux/usb_ch9.h>
-#else
-	//#include <linux/usb/ch9.h>
-#endif
-#endif
-
-#ifdef CONFIG_PCI_HCI
-	#include <linux/pci.h>
-#endif
-
 
 #ifdef CONFIG_USB_HCI
 	typedef struct urb *  PURB;

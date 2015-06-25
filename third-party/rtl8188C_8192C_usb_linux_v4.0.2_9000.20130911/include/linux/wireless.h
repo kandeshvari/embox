@@ -49,6 +49,30 @@ struct	iw_point
 };
 
 
+struct	iw_freq {
+	__s32		m;		/* Mantissa */
+	__s16		e;		/* Exponent */
+	__u8		i;		/* List index (when in range struct) */
+	__u8		flags;		/* Flags (fixed/auto) */
+};
+
+struct	iw_quality
+{
+	__u8		qual;		/* link quality (%retries, SNR,
+					   %missed beacons or better...) */
+	__u8		level;		/* signal level (dBm) */
+	__u8		noise;		/* noise level (dBm) */
+	__u8		updated;	/* Flags to know if updated */
+};
+
+struct	iw_param
+{
+  __s32		value;		/* The value of the parameter itself */
+  __u8		fixed;		/* Hardware should not use auto select */
+  __u8		disabled;	/* Disable the feature */
+  __u16		flags;		/* Various specifc flags (if any) */
+};
+
 /* ------------------------ IOCTL REQUEST ------------------------ */
 /*
  * This structure defines the payload of an ioctl, and is used
@@ -67,6 +91,28 @@ union	iwreq_data
 	/* Name : used to verify the presence of  wireless extensions.
 	 * Name of the protocol/provider... */
 
+	struct iw_point	essid;		/* Extended network name */
+	struct iw_param	nwid;		/* network id (or domain - the cell) */
+	struct iw_freq	freq;		/* frequency or channel :
+					 * 0-1000 = channel
+					 * > 1000 = frequency in Hz */
+
+	struct iw_param	sens;		/* signal level threshold */
+	struct iw_param	bitrate;	/* default bit rate */
+	struct iw_param	txpower;	/* default transmit power */
+	struct iw_param	rts;		/* RTS threshold threshold */
+	struct iw_param	frag;		/* Fragmentation threshold */
+	__u32		mode;		/* Operation mode */
+	struct iw_param	retry;		/* Retry limits & lifetime */
+
+	struct iw_point	encoding;	/* Encoding stuff : tokens */
+	struct iw_param	power;		/* PM duration/timeout */
+	struct iw_quality qual;		/* Quality part of statistics */
+
+	struct sockaddr	ap_addr;	/* Access point address */
+	struct sockaddr	addr;		/* Destination address (hw/mac) */
+
+	struct iw_param	param;		/* Other small parameters */
 	struct iw_point	data;		/* Other large parameters */
 };
 
