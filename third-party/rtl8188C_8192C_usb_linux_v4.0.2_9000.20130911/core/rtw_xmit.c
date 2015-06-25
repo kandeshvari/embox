@@ -32,7 +32,7 @@
 #error "Shall be Linux or Windows, but not both!\n"
 #endif
 
-#ifdef PLATFORM_WINDOWS
+#if defined (PLATFORM_WINDOWS) || defined (PLATFORM_EMBOX)
 #include <if_ether.h>
 #endif
 
@@ -3105,21 +3105,21 @@ int rtw_br_client_tx(_adapter *padapter, struct sk_buff **pskb)
 		//mac_clone_handle_frame(priv, skb);
 
 #if (LINUX_VERSION_CODE <= KERNEL_VERSION(2, 6, 35))
-		br_port = padapter->pnetdev->br_port;
+		EMBOX_NIY(br_port = padapter->pnetdev->br_port, 0);
 #else   // (LINUX_VERSION_CODE <= KERNEL_VERSION(2, 6, 35))
 		rcu_read_lock();
 		br_port = rcu_dereference(padapter->pnetdev->rx_handler_data);
 		rcu_read_unlock();
 #endif  // (LINUX_VERSION_CODE <= KERNEL_VERSION(2, 6, 35))
 		_enter_critical_bh(&padapter->br_ext_lock, &irqL);
-		if (	!(skb->data[0] & 1) &&
+		if (	EMBOX_NIY(!(skb->data[0] & 1) &&
 				br_port &&
 				memcmp(skb->data+MACADDRLEN, padapter->br_mac, MACADDRLEN) &&
 				*((unsigned short *)(skb->data+MACADDRLEN*2)) != __constant_htons(ETH_P_8021Q) &&
 				*((unsigned short *)(skb->data+MACADDRLEN*2)) == __constant_htons(ETH_P_IP) &&
-				!memcmp(padapter->scdb_mac, skb->data+MACADDRLEN, MACADDRLEN) && padapter->scdb_entry) {
-			memcpy(skb->data+MACADDRLEN, GET_MY_HWADDR(padapter), MACADDRLEN);
-			padapter->scdb_entry->ageing_timer = jiffies;
+				!memcmp(padapter->scdb_mac, skb->data+MACADDRLEN, MACADDRLEN) && padapter->scdb_entry, 1)) {
+			EMBOX_NIY(memcpy(skb->data+MACADDRLEN, GET_MY_HWADDR(padapter), MACADDRLEN), 0);
+			EMBOX_NIY(padapter->scdb_entry->ageing_timer = jiffies, 0);
 			_exit_critical_bh(&padapter->br_ext_lock, &irqL);
 		}
 		else
@@ -3128,33 +3128,33 @@ int rtw_br_client_tx(_adapter *padapter, struct sk_buff **pskb)
 //			if (priv->dev->br_port &&
 //				 !memcmp(skb->data+MACADDRLEN, priv->br_mac, MACADDRLEN)) {
 #if 1
-			if (*((unsigned short *)(skb->data+MACADDRLEN*2)) == __constant_htons(ETH_P_8021Q)) {
+			if (EMBOX_NIY(*((unsigned short *)(skb->data+MACADDRLEN*2)) == __constant_htons(ETH_P_8021Q), 0)) {
 				is_vlan_tag = 1;
-				vlan_hdr = *((unsigned short *)(skb->data+MACADDRLEN*2+2));
+				EMBOX_NIY(vlan_hdr = *((unsigned short *)(skb->data+MACADDRLEN*2+2)), 0);
 				for (i=0; i<6; i++)
-					*((unsigned short *)(skb->data+MACADDRLEN*2+2-i*2)) = *((unsigned short *)(skb->data+MACADDRLEN*2-2-i*2));
+					EMBOX_NIY(*((unsigned short *)(skb->data+MACADDRLEN*2+2-i*2)) = *((unsigned short *)(skb->data+MACADDRLEN*2-2-i*2)), 0);
 				skb_pull(skb, 4);
 			}
 			//if SA == br_mac && skb== IP  => copy SIP to br_ip ?? why
-			if (!memcmp(skb->data+MACADDRLEN, padapter->br_mac, MACADDRLEN) &&
-				(*((unsigned short *)(skb->data+MACADDRLEN*2)) == __constant_htons(ETH_P_IP)))
-				memcpy(padapter->br_ip, skb->data+WLAN_ETHHDR_LEN+12, 4);
+			if (EMBOX_NIY(!memcmp(skb->data+MACADDRLEN, padapter->br_mac, MACADDRLEN) &&
+				(*((unsigned short *)(skb->data+MACADDRLEN*2)) == __constant_htons(ETH_P_IP)), 0))
+				EMBOX_NIY(memcpy(padapter->br_ip, skb->data+WLAN_ETHHDR_LEN+12, 4), 0);
 
-			if (*((unsigned short *)(skb->data+MACADDRLEN*2)) == __constant_htons(ETH_P_IP)) {
-				if (memcmp(padapter->scdb_mac, skb->data+MACADDRLEN, MACADDRLEN)) {
+			if (EMBOX_NIY(*((unsigned short *)(skb->data+MACADDRLEN*2)) == __constant_htons(ETH_P_IP), 0)) {
+				if (EMBOX_NIY(memcmp(padapter->scdb_mac, skb->data+MACADDRLEN, MACADDRLEN), 0)) {
 					void *scdb_findEntry(_adapter *priv, unsigned char *macAddr, unsigned char *ipAddr);
 
-					if ((padapter->scdb_entry = (struct nat25_network_db_entry *)scdb_findEntry(padapter,
-								skb->data+MACADDRLEN, skb->data+WLAN_ETHHDR_LEN+12)) != NULL) {
-						memcpy(padapter->scdb_mac, skb->data+MACADDRLEN, MACADDRLEN);
-						memcpy(padapter->scdb_ip, skb->data+WLAN_ETHHDR_LEN+12, 4);
-						padapter->scdb_entry->ageing_timer = jiffies;
+					if (EMBOX_NIY((padapter->scdb_entry = (struct nat25_network_db_entry *)scdb_findEntry(padapter,
+								skb->data+MACADDRLEN, skb->data+WLAN_ETHHDR_LEN+12)) != NULL, 0)) {
+						EMBOX_NIY(memcpy(padapter->scdb_mac, skb->data+MACADDRLEN, MACADDRLEN), 0);
+						EMBOX_NIY(memcpy(padapter->scdb_ip, skb->data+WLAN_ETHHDR_LEN+12, 4), 0);
+						EMBOX_NIY(padapter->scdb_entry->ageing_timer = jiffies, 0);
 						do_nat25 = 0;
 					}
 				}
 				else {
-					if (padapter->scdb_entry) {
-						padapter->scdb_entry->ageing_timer = jiffies;
+					if (EMBOX_NIY(padapter->scdb_entry, 0)) {
+						EMBOX_NIY(padapter->scdb_entry->ageing_timer = jiffies, 0);
 						do_nat25 = 0;
 					}
 					else {
@@ -3174,9 +3174,9 @@ int rtw_br_client_tx(_adapter *padapter, struct sk_buff **pskb)
 					if (is_vlan_tag) {
 						skb_push(skb, 4);
 						for (i=0; i<6; i++)
-							*((unsigned short *)(skb->data+i*2)) = *((unsigned short *)(skb->data+4+i*2));
-						*((unsigned short *)(skb->data+MACADDRLEN*2)) = __constant_htons(ETH_P_8021Q);
-						*((unsigned short *)(skb->data+MACADDRLEN*2+2)) = vlan_hdr;
+							EMBOX_NIY(*((unsigned short *)(skb->data+i*2)) = *((unsigned short *)(skb->data+4+i*2)), 0);
+						EMBOX_NIY(*((unsigned short *)(skb->data+MACADDRLEN*2)) = __constant_htons(ETH_P_8021Q), 0);
+						EMBOX_NIY(*((unsigned short *)(skb->data+MACADDRLEN*2+2)) = vlan_hdr, 0);
 					}
 
 					newskb = rtw_skb_copy(skb);
@@ -3190,9 +3190,9 @@ int rtw_br_client_tx(_adapter *padapter, struct sk_buff **pskb)
 
 					*pskb = skb = newskb;
 					if (is_vlan_tag) {
-						vlan_hdr = *((unsigned short *)(skb->data+MACADDRLEN*2+2));
+						EMBOX_NIY(vlan_hdr = *((unsigned short *)(skb->data+MACADDRLEN*2+2)), 0);
 						for (i=0; i<6; i++)
-							*((unsigned short *)(skb->data+MACADDRLEN*2+2-i*2)) = *((unsigned short *)(skb->data+MACADDRLEN*2-2-i*2));
+							EMBOX_NIY(*((unsigned short *)(skb->data+MACADDRLEN*2+2-i*2)) = *((unsigned short *)(skb->data+MACADDRLEN*2-2-i*2)), 0);
 						skb_pull(skb, 4);
 					}
 				}
@@ -3228,16 +3228,16 @@ int rtw_br_client_tx(_adapter *padapter, struct sk_buff **pskb)
 				}
 			}
 
-			memcpy(skb->data+MACADDRLEN, GET_MY_HWADDR(padapter), MACADDRLEN);
+			EMBOX_NIY(memcpy(skb->data+MACADDRLEN, GET_MY_HWADDR(padapter), MACADDRLEN), 0);
 
 			dhcp_flag_bcast(padapter, skb);
 
 			if (is_vlan_tag) {
 				skb_push(skb, 4);
 				for (i=0; i<6; i++)
-					*((unsigned short *)(skb->data+i*2)) = *((unsigned short *)(skb->data+4+i*2));
-				*((unsigned short *)(skb->data+MACADDRLEN*2)) = __constant_htons(ETH_P_8021Q);
-				*((unsigned short *)(skb->data+MACADDRLEN*2+2)) = vlan_hdr;
+					EMBOX_NIY(*((unsigned short *)(skb->data+i*2)) = *((unsigned short *)(skb->data+4+i*2)), 0);
+				EMBOX_NIY(*((unsigned short *)(skb->data+MACADDRLEN*2)) = __constant_htons(ETH_P_8021Q), 0);
+				EMBOX_NIY(*((unsigned short *)(skb->data+MACADDRLEN*2+2)) = vlan_hdr, 0);
 			}
 		}
 #if 0
@@ -3260,10 +3260,10 @@ int rtw_br_client_tx(_adapter *padapter, struct sk_buff **pskb)
 #endif	// 0
 
 		// check if SA is equal to our MAC
-		if (memcmp(skb->data+MACADDRLEN, GET_MY_HWADDR(padapter), MACADDRLEN)) {
+		if (EMBOX_NIY(memcmp(skb->data+MACADDRLEN, GET_MY_HWADDR(padapter), MACADDRLEN), 0)) {
 			//priv->ext_stats.tx_drops++;
-			DEBUG_ERR("TX DROP: untransformed frame SA:%02X%02X%02X%02X%02X%02X!\n",
-				skb->data[6],skb->data[7],skb->data[8],skb->data[9],skb->data[10],skb->data[11]);
+			/*DEBUG_ERR("TX DROP: untransformed frame SA:%02X%02X%02X%02X%02X%02X!\n",
+				skb->data[6],skb->data[7],skb->data[8],skb->data[9],skb->data[10],skb->data[11]);*/
 			//goto free_and_stop;
 			return -1;
 		}
@@ -3332,7 +3332,7 @@ s32 rtw_xmit(_adapter *padapter, _pkt **ppkt)
 #ifdef CONFIG_BR_EXT
 
 #if (LINUX_VERSION_CODE <= KERNEL_VERSION(2, 6, 35))
-	br_port = padapter->pnetdev->br_port;
+	EMBOX_NIY(br_port = padapter->pnetdev->br_port, 0);
 #else   // (LINUX_VERSION_CODE <= KERNEL_VERSION(2, 6, 35))
 	rcu_read_lock();
 	br_port = rcu_dereference(padapter->pnetdev->rx_handler_data);
