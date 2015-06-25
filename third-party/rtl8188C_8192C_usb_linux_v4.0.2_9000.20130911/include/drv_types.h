@@ -557,9 +557,7 @@ struct _ADAPTER{
 
 	int bup;
 	struct net_device_stats stats;
-	struct iw_statistics {
-
-	} iwstats;
+	struct iw_statistics iwstats;
 	struct proc_dir_entry *dir_dev;// for proc directory
 
 #ifdef CONFIG_IOCTL_CFG80211

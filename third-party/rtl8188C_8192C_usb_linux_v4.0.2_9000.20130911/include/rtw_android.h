@@ -20,7 +20,7 @@
 
 #ifndef __RTW_ANDROID_H__
 #define __RTW_ANDROID_H__
-
+#if 0
 #include <linux/module.h>
 #include <linux/netdevice.h>
 
@@ -85,6 +85,8 @@ void *wifi_get_country_code(char *ccode);
 static int rtw_android_wifictrl_func_add(void) { return 0; }
 static void rtw_android_wifictrl_func_del(void) {}
 #endif /* defined(RTW_ENABLE_WIFI_CONTROL_FUNC) */
+
+#endif
 
 #endif //__RTW_ANDROID_H__
 

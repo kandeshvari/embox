@@ -59,6 +59,13 @@ struct	iw_point
   __u16		flags;		/* Optional params */
 };
 
+struct	iw_priv_args
+{
+	__u32		cmd;		/* Number of the ioctl to issue */
+	__u16		set_args;	/* Type and number of args */
+	__u16		get_args;	/* Type and number of args */
+	char		name[IFNAMSIZ];	/* Name of the extension */
+};
 
 struct	iw_freq {
 	__s32		m;		/* Mantissa */
@@ -125,6 +132,31 @@ union	iwreq_data
 
 	struct iw_param	param;		/* Other small parameters */
 	struct iw_point	data;		/* Other large parameters */
+};
+
+struct	iw_discarded
+{
+	__u32		nwid;		/* Rx : Wrong nwid/essid */
+	__u32		code;		/* Rx : Unable to code/decode (WEP) */
+	__u32		fragment;	/* Rx : Can't perform MAC reassembly */
+	__u32		retries;	/* Tx : Max MAC retries num reached */
+	__u32		misc;		/* Others cases */
+};
+
+struct	iw_missed
+{
+	__u32		beacon;		/* Missed beacons/superframe */
+};
+
+struct	iw_statistics
+{
+	__u16		status;		/* Status
+					 * - device dependent for now */
+
+	struct iw_quality	qual;		/* Quality of the link
+						 * (instant/mean/max) */
+	struct iw_discarded	discard;	/* Packet discarded counts */
+	struct iw_missed	miss;		/* Packet missed counts */
 };
 
 struct	iw_pmksa

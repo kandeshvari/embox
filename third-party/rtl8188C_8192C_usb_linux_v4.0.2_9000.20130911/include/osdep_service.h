@@ -887,11 +887,28 @@ __inline static void _set_workitem(_workitem *pwork)
 #define SIOCGIWRATE	0x8B21
 #define IWEVQUAL	0x8C01
 #define IWEVGENIE	0x8C05
+#define IWEVREGISTERED	0x8C03
+#define IWEVEXPIRED	0x8C04
 struct iw_event {
 	__u16 cmd;
 	__u16 len;
 	union iwreq_data u;
 };
+
+typedef int (*iw_handler)(struct net_device *, struct iw_request_info *,
+		 union iwreq_data *, char *);
+
+#define IW_PRIV_TYPE_MASK	0x7000	/* Type of arguments */
+#define IW_PRIV_TYPE_NONE	0x0000
+#define IW_PRIV_TYPE_BYTE	0x1000	/* Char as number */
+#define IW_PRIV_TYPE_CHAR	0x2000	/* Char as character */
+#define IW_PRIV_TYPE_INT	0x4000	/* 32 bits int */
+#define IW_PRIV_TYPE_FLOAT	0x5000	/* struct iw_freq */
+#define IW_PRIV_TYPE_ADDR	0x6000	/* struct sockaddr */
+
+#define IW_PRIV_SIZE_FIXED	0x0800	/* Variable or fixed number of args */
+
+#define IW_PRIV_SIZE_MASK	0x07FF	/* Max number of those args */
 
 #define WIRELESS_EXT	22
 
@@ -906,6 +923,12 @@ struct iw_event {
 #define IW_ENCODE_EXT_SET_TX_KEY	0x00000008
 #define IW_ENCODE_EXT_TX_SEQ_VALID	0x00000001
 #define IW_ENCODE_EXT_RX_SEQ_VALID	0x00000002
+
+#define SIOCIWFIRSTPRIV	0x8BE0
+#define SIOCIWLASTPRIV	0x8BFF
+#define SIOCIWFIRST	0x8B00
+#define SIOCIWLAST	SIOCIWLASTPR
+#define SIOCDEVPRIVATE	0x89F0
 
 #define IW_MAX_FREQUENCIES	32
 #define IW_MAX_BITRATES		32
