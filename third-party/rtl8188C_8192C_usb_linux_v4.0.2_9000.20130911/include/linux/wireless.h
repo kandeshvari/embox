@@ -23,6 +23,17 @@
 
 /***************************** INCLUDES *****************************/
 
+#include <osdep_service.h>
+
+#define IW_PMKID_LEN	16
+#define IW_ENCODE_SEQ_MAX_SIZE	8
+#define IW_MAX_FREQUENCIES	32
+#define IW_ESSID_MAX_SIZE	32
+#define IW_MAX_BITRATES		32
+#define IW_MAX_TXPOWER		8
+#define IW_MAX_ENCODING_SIZES	8
+
+
 #if 0
 #include <linux/types.h>		/* for __u* and __s* typedefs */
 #include <linux/socket.h>		/* for "struct sockaddr" et al	*/
