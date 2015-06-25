@@ -315,7 +315,7 @@ struct ieee_ibss_seq {
 	_list	list;
 };
 
-#if defined(PLATFORM_LINUX) || defined(CONFIG_RTL8711FW)||defined(PLATFORM_FREEBSD)
+#if defined(PLATFORM_LINUX) || defined(CONFIG_RTL8711FW)||defined(PLATFORM_FREEBSD) || defined(PLATFORM_EMBOX)
 
 struct rtw_ieee80211_hdr {
 	u16 frame_ctl;
@@ -524,7 +524,7 @@ enum eap_type {
 
 #define P80211_OUI_LEN 3
 
-#if defined(PLATFORM_LINUX) || defined(CONFIG_RTL8711FW) || defined(PLATFORM_FREEBSD)
+#if defined(PLATFORM_LINUX) || defined(CONFIG_RTL8711FW) || defined(PLATFORM_FREEBSD) || defined(PLATFORM_EMBOX)
 
 struct ieee80211_snap_hdr {
 
@@ -826,7 +826,7 @@ struct ieee80211_softmac_stats{
 #define BIP_AAD_SIZE  20
 #endif //CONFIG_IEEE80211W
 
-#if defined(PLATFORM_LINUX) || defined(CONFIG_RTL8711FW)
+#if defined(PLATFORM_LINUX) || defined(CONFIG_RTL8711FW) || defined(PLATFORM_EMBOX)
 
 struct ieee80211_security {
 	u16 active_key:2,
@@ -900,7 +900,7 @@ struct ieee80211_header_data {
 #define MFIE_TYPE_RATES_EX   50
 #define MFIE_TYPE_GENERIC    221
 
-#if defined(PLATFORM_LINUX) || defined(CONFIG_RTL8711FW)
+#if defined(PLATFORM_LINUX) || defined(CONFIG_RTL8711FW) || defined(PLATFORM_EMBOX)
 
 struct ieee80211_info_element_hdr {
 	u8 id;
@@ -953,7 +953,7 @@ struct ieee80211_info_element {
 #define IEEE80211_DEFAULT_BASIC_RATE 10
 
 
-#if defined(PLATFORM_LINUX) || defined(CONFIG_RTL8711FW)
+#if defined(PLATFORM_LINUX) || defined(CONFIG_RTL8711FW) || defined(PLATFORM_EMBOX)
 
 
 struct ieee80211_authentication {
