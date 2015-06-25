@@ -25,7 +25,7 @@
 #include <osdep_service.h>
 #include <drv_types.h>
 #include <mlme_osdep.h>
-
+#include <signal.h>
 
 #ifdef RTK_DMP_PLATFORM
 void Linkup_workitem_callback(struct work_struct *work)
