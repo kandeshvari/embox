@@ -792,6 +792,112 @@ __inline static void _set_workitem(_workitem *pwork)
 
 #define IPPROTO_UDP 17
 
+#define IW_MODE_AUTO	0	/* Let the driver decides */
+#define IW_MODE_ADHOC	1	/* Single cell network */
+#define IW_MODE_INFRA	2	/* Multi cell network, roaming, ... */
+#define IW_MODE_MASTER	3	/* Synchronisation master or Access Point */
+#define IW_MODE_REPEAT	4	/* Wireless Repeater (forwarder) */
+#define IW_MODE_SECOND	5	/* Secondary master/repeater (backup) */
+#define IW_MODE_MONITOR	6	/* Passive monitor (listen only) */
+#define IW_MODE_MESH	7	/* Mesh (IEEE 802.11s) network */
+
+#define IW_CUSTOM_MAX 256 /* Bytes */
+#define IWEVCUSTOM 0x8C02
+#define ARPHRD_ETHER 1
+
+#define IW_ENC_CAPA_WPA		0x00000001
+#define IW_ENC_CAPA_WPA2	0x00000002
+#define IW_ENC_CAPA_CIPHER_TKIP	0x00000004
+#define IW_ENC_CAPA_CIPHER_CCMP	0x00000008
+#define IW_ENC_CAPA_4WAY_HANDSHAKE	0x00000010
+
+#define IW_SCAN_THIS_ESSID	0x0002
+#define IW_SCAN_TYPE_ACTIVE 0
+#define IW_SCAN_TYPE_PASSIVE 1
+
+#define SIOCGIWNAME	0x8B01
+#define SIOCGIWFREQ	0x8B05
+#define SIOCGIWMODE	0x8B07
+#define SIOCGIWAP	0x8B15
+#define SIOCGIWSCAN	0x8B19
+#define SIOCSIWESSID	0x8B1A
+#define SIOCGIWESSID	0x8B1B
+#define SIOCSIWENCODE	0x8B2A
+#define SIOCGIWENCODE	0x8B2B
+#define SIOCSIWRATE	0x8B20
+#define SIOCGIWRATE	0x8B21
+#define IWEVQUAL	0x8C01
+#define IWEVGENIE	0x8C05
+struct iw_event {
+};
+
+struct iw_freq {
+};
+
+struct iw_quality {
+};
+
+struct iw_param {
+};
+
+#define WIRELESS_EXT	22
+
+#define IW_MAX_FREQUENCIES	32
+#define IW_MAX_BITRATES		32
+#define IW_PMKSA_ADD		1
+#define IW_PMKSA_REMOVE		2
+#define IW_PMKSA_FLUSH		3
+#define IW_PMKID_LEN	16
+#define IW_EV_LCP_LEN	(sizeof(struct iw_event) - sizeof(union iwreq_data))
+#define IW_EV_CHAR_LEN	(IW_EV_LCP_LEN + IFNAMSIZ)
+#define IW_EV_UINT_LEN	(IW_EV_LCP_LEN + sizeof(__u32))
+#define IW_EV_FREQ_LEN	(IW_EV_LCP_LEN + sizeof(struct iw_freq))
+#define IW_EV_PARAM_LEN	(IW_EV_LCP_LEN + sizeof(struct iw_param))
+#define IW_EV_ADDR_LEN	(IW_EV_LCP_LEN + sizeof(struct sockaddr))
+#define IW_EV_QUAL_LEN	(IW_EV_LCP_LEN + sizeof(struct iw_quality))
+
+#define IW_QUAL_QUAL_UPDATED	0x01
+#define IW_QUAL_LEVEL_UPDATED	0x02
+#define IW_QUAL_NOISE_UPDATED	0x04
+#define IW_QUAL_ALL_UPDATED	0x07
+#define IW_QUAL_DBM		0x08
+#define IW_QUAL_QUAL_INVALID	0x10
+#define IW_QUAL_LEVEL_INVALID	0x20
+#define IW_QUAL_NOISE_INVALID	0x40
+#define IW_QUAL_RCPI		0x80
+#define IW_QUAL_ALL_INVALID	0x70
+
+#define IW_AUTH_INDEX		0x0FFF
+#define IW_AUTH_FLAGS		0xF000
+#define IW_AUTH_WPA_VERSION		0
+#define IW_AUTH_CIPHER_PAIRWISE		1
+#define IW_AUTH_CIPHER_GROUP		2
+#define IW_AUTH_KEY_MGMT		3
+#define IW_AUTH_TKIP_COUNTERMEASURES	4
+#define IW_AUTH_DROP_UNENCRYPTED	5
+#define IW_AUTH_80211_AUTH_ALG		6
+#define IW_AUTH_WPA_ENABLED		7
+#define IW_AUTH_RX_UNENCRYPTED_EAPOL	8
+#define IW_AUTH_ROAMING_CONTROL		9
+#define IW_AUTH_PRIVACY_INVOKED		10
+#define IW_AUTH_CIPHER_GROUP_MGMT	11
+#define IW_AUTH_MFP			12
+
+#define IW_MLME_DEAUTH		0
+#define IW_MLME_DISASSOC	1
+#define IW_MLME_AUTH		2
+#define IW_MLME_ASSOC		3
+
+#define IW_ENCODE_INDEX		0x00FF	/* Token index (if needed) */
+#define IW_ENCODE_FLAGS		0xFF00	/* Flags defined below */
+#define IW_ENCODE_MODE		0xF000	/* Modes defined below */
+#define IW_ENCODE_DISABLED	0x8000	/* Encoding disabled */
+#define IW_ENCODE_ENABLED	0x0000	/* Encoding enabled */
+#define IW_ENCODE_RESTRICTED	0x4000	/* Refuse non-encoded packets */
+#define IW_ENCODE_OPEN		0x2000	/* Accept non-encoded packets */
+#define IW_ENCODE_NOKEY		0x0800  /* Key is write only, so not present */
+#define IW_ENCODE_TEMP		0x0400  /* Temporary key */
+
 #define container_of(p,t,n) NULL//(t*)((p)-&(((t*)0)->n))
 #define MODULE_DEVICE_TABLE(type, name) /* Stub */
 #define __init /* Stub */
@@ -916,7 +1022,11 @@ typedef unsigned gfp_t;
 
 	struct device {
 	};
+
 	struct work_struct {
+	};
+
+	struct iw_request_info {
 	};
 
 	struct usb_endpoint_descriptor {
