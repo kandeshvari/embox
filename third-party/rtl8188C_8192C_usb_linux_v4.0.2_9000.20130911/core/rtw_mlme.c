@@ -2540,7 +2540,7 @@ void rtw_dynamic_check_timer_handlder(_adapter *adapter)
 #endif	// (LINUX_VERSION_CODE > KERNEL_VERSION(2, 6, 35))
 
 #if (LINUX_VERSION_CODE <= KERNEL_VERSION(2, 6, 35))
-	if( adapter->pnetdev->br_port
+	if( EMBOX_NIY(adapter->pnetdev->br_port, 0) /* Denis: We dont need bridges at all, right? */
 #else	// (LINUX_VERSION_CODE <= KERNEL_VERSION(2, 6, 35))
 	if( rcu_dereference(adapter->pnetdev->rx_handler_data)
 #endif	// (LINUX_VERSION_CODE <= KERNEL_VERSION(2, 6, 35))
