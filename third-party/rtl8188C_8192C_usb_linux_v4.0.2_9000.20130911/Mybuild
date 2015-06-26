@@ -1,6 +1,7 @@
 
 package third_party
 
+@BuildArtifactPath(cppflags="-I$(abspath $(ROOT_DIR))/third-party/rtl8188C_8192C_usb_linux_v4.0.2_9000.20130911/include")
 @Build(script="$(EXTERNAL_MAKE) -f Makefile.extbld")
 module rtlwifi {
 

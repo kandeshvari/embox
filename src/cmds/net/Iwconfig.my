@@ -6,6 +6,7 @@ package embox.cmd.net
 	man = '''
 		TODO
 	''')
+@BuildDepends(third_party.rtlwifi)
 module iwconfig {
 	source "iwconfig.c"
 
