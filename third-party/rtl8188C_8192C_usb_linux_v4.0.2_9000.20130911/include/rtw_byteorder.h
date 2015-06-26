@@ -33,7 +33,7 @@
 #elif defined (CONFIG_BIG_ENDIAN)
 #  include <byteorder/big_endian.h>
 #else
-#  error "Must be LITTLE/BIG Endian Host"
+//#  error "Must be LITTLE/BIG Endian Host"
 #endif
 
 #endif /* _RTL871X_BYTEORDER_H_ */

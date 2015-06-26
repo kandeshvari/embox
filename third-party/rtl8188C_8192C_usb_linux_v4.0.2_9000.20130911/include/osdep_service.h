@@ -895,6 +895,8 @@ struct iw_event {
 	union iwreq_data u;
 };
 
+struct iw_request_info;
+
 typedef int (*iw_handler)(struct net_device *, struct iw_request_info *,
 		 union iwreq_data *, char *);
 
@@ -1043,9 +1045,6 @@ typedef unsigned gfp_t;
 	};
 
 	struct device {
-	};
-
-	struct work_struct {
 	};
 
 	struct iw_request_info {
@@ -1315,9 +1314,11 @@ __inline static void _cancel_timer(_timer *ptimer,u8 *bcancelled)
 #define RTW_DECLARE_TIMER_HDL(name) void RTW_TIMER_HDL_NAME(name)(RTW_TIMER_HDL_ARGS)
 
 
+#include <linux/workqueue.h>
+
 __inline static void _init_workitem(_workitem *pwork, void *pfunc, PVOID cntx)
 {
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,20))
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,20)) && ! defined PLATFORM_EMBOX
 	INIT_WORK(pwork, pfunc);
 #else
 	INIT_WORK(pwork, pfunc,pwork);
@@ -1329,6 +1330,8 @@ __inline static void _set_workitem(_workitem *pwork)
 	schedule_work(pwork);
 }
 
+#if !defined PLATFORM_EMBOX
+
 __inline static void _cancel_workitem_sync(_workitem *pwork)
 {
 #if (LINUX_VERSION_CODE>=KERNEL_VERSION(2,6,22))
@@ -1337,6 +1340,8 @@ __inline static void _cancel_workitem_sync(_workitem *pwork)
 	flush_scheduled_work();
 #endif
 }
+
+#endif /* !PLATFORM_EMBOX */
 
 //
 // Global Mutex: can only be used at PASSIVE level.
@@ -1356,6 +1361,8 @@ __inline static void _cancel_workitem_sync(_workitem *pwork)
 	atomic_dec((atomic_t *)&(_MutexCounter));        \
 }
 
+#if !(defined PLATFORM_EMBOX)
+
 static inline int rtw_netif_queue_stopped(struct net_device *pnetdev)
 {
 #if (LINUX_VERSION_CODE>=KERNEL_VERSION(2,6,35))
@@ -1368,6 +1375,9 @@ static inline int rtw_netif_queue_stopped(struct net_device *pnetdev)
 #endif
 }
 
+#endif /* ! PLATFORM_EMBOX */
+
+#if !defined PLATFORM_EMBOX
 static inline void rtw_netif_wake_queue(struct net_device *pnetdev)
 {
 #if (LINUX_VERSION_CODE>=KERNEL_VERSION(2,6,35))
@@ -1376,7 +1386,9 @@ static inline void rtw_netif_wake_queue(struct net_device *pnetdev)
 	netif_wake_queue(pnetdev);
 #endif
 }
+#endif /* !PLATFORM_EMBOX */
 
+#if !defined PLATFORM_EMBOX
 static inline void rtw_netif_start_queue(struct net_device *pnetdev)
 {
 #if (LINUX_VERSION_CODE>=KERNEL_VERSION(2,6,35))
@@ -1385,7 +1397,9 @@ static inline void rtw_netif_start_queue(struct net_device *pnetdev)
 	netif_start_queue(pnetdev);
 #endif
 }
+#endif /* !PLATFORM_EMBOX */
 
+#if !defined PLATFORM_EMBOX
 static inline void rtw_netif_stop_queue(struct net_device *pnetdev)
 {
 #if (LINUX_VERSION_CODE>=KERNEL_VERSION(2,6,35))
@@ -1394,6 +1408,7 @@ static inline void rtw_netif_stop_queue(struct net_device *pnetdev)
 	netif_stop_queue(pnetdev);
 #endif
 }
+#endif /* !PLATFORM_EMBOX */
 
 #endif	// PLATFORM_EMBOX
 
@@ -2100,7 +2115,7 @@ extern void	rtw_udelay_os(int us);
 
 extern void rtw_yield_os(void);
 
-
+#if !defined PLATFORM_EMBOX
 __inline static unsigned char _cancel_timer_ex(_timer *ptimer)
 {
 #ifdef PLATFORM_LINUX
@@ -2118,6 +2133,7 @@ __inline static unsigned char _cancel_timer_ex(_timer *ptimer)
 	return bcancelled;
 #endif
 }
+#endif /* !PLATFORM_EMBOX */
 
 #ifdef PLATFORM_FREEBSD
 static __inline void thread_enter(void *context);
@@ -2148,6 +2164,7 @@ __inline static void flush_signals_thread(void)
 #endif
 }
 
+#if !defined PLATFORM_EMBOX
 __inline static _OS_STATUS res_to_status(sint res)
 {
 
@@ -2166,6 +2183,7 @@ __inline static _OS_STATUS res_to_status(sint res)
 #endif
 
 }
+#endif /* !PLATFORM_EMBOX */
 
 __inline static void rtw_dump_stack(void)
 {
