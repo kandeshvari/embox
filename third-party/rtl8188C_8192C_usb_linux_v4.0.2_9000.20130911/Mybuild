@@ -1,8 +1,55 @@
-
 package third_party
 
-@BuildArtifactPath(cppflags="-I$(abspath $(ROOT_DIR))/third-party/rtl8188C_8192C_usb_linux_v4.0.2_9000.20130911/include")
-@Build(script="$(EXTERNAL_MAKE) -f Makefile.extbld")
+@Build(script="$(EXTERNAL_MAKE) -f Makefile.extbld", stage = 1)
+@BuildArtifactPath(cppflags="-I$(abspath $(EMBOX_ROOT_DIR))/third-party/rtl8188C_8192C_usb_linux_v4.0.2_9000.20130911/include")
 module rtlwifi {
-
+	source "core/efuse/rtw_efuse.o",
+	"core/rtw_ap.o",
+	"core/rtw_br_ext.o",
+	"core/rtw_cmd.o",
+	"core/rtw_debug.o",
+	"core/rtw_ieee80211.o",
+	"core/rtw_ioctl_query.o",
+	"core/rtw_ioctl_set.o",
+	"core/rtw_iol.o",
+	"core/rtw_io.o",
+	"core/rtw_mlme_ext.o",
+	"core/rtw_mlme.o",
+	"core/rtw_p2p.o",
+	"core/rtw_pwrctrl.o",
+	"core/rtw_recv.o",
+	"core/rtw_rf.o",
+	"core/rtw_security.o",
+	"core/rtw_sreset.o",
+	"core/rtw_sta_mgt.o",
+	"core/rtw_tdls.o",
+	"core/rtw_wlan_util.o",
+	"core/rtw_xmit.o",
+	"hal/dm.o",
+	"hal/hal_com.o",
+	"hal/hal_intf.o",
+	"hal/rtl8192c/rtl8192c_cmd.o",
+	"hal/rtl8192c/rtl8192c_dm.o",
+	"hal/rtl8192c/rtl8192c_hal_init.o",
+	"hal/rtl8192c/rtl8192c_phycfg.o",
+	"hal/rtl8192c/rtl8192c_rf6052.o",
+	"hal/rtl8192c/rtl8192c_rxdesc.o",
+	"hal/rtl8192c/rtl8192c_sreset.o",
+	"hal/rtl8192c/rtl8192c_xmit.o",
+	"hal/rtl8192c/usb/Hal8192CUHWImg.o",
+	"hal/rtl8192c/usb/rtl8192cu_led.o",
+	"hal/rtl8192c/usb/rtl8192cu_recv.o",
+	"hal/rtl8192c/usb/rtl8192cu_xmit.o",
+	"hal/rtl8192c/usb/usb_halinit.o",
+	"hal/rtl8192c/usb/usb_ops_linux.o",
+	"os_dep/linux/ioctl_cfg80211.o",
+	"os_dep/linux/ioctl_linux.o",
+	"os_dep/linux/mlme_linux.o",
+	"os_dep/linux/os_intfs.o",
+	"os_dep/linux/recv_linux.o",
+	"os_dep/linux/rtw_android.o",
+	"os_dep/linux/usb_intf.o",
+	"os_dep/linux/usb_ops_linux.o",
+	"os_dep/linux/xmit_linux.o",
+	"os_dep/osdep_service.o"
 }
