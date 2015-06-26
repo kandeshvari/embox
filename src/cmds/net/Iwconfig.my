@@ -1,0 +1,13 @@
+package embox.cmd.net
+
+@AutoCmd
+@Cmd(name = "iwconfig",
+	help = "Configure wireless connections",
+	man = '''
+		TODO
+	''')
+module iwconfig {
+	source "iwconfig.c"
+
+	depends embox.compat.libc.stdio.printf
+}
