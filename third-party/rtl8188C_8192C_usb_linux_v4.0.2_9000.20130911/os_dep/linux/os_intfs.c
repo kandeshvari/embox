@@ -275,8 +275,8 @@ module_param(rtw_notch_filter, uint, 0644);
 MODULE_PARM_DESC(rtw_notch_filter, "0:Disable, 1:Enable, 2:Enable only for P2P");
 
 static uint loadparam( _adapter *padapter,  _nic_hdl	pnetdev);
-int _netdev_open(struct net_device *pnetdev);
-int netdev_open (struct net_device *pnetdev);
+int _rtl_netdev_open(struct net_device *pnetdev);
+int rtl_netdev_open (struct net_device *pnetdev);
 static int this_netdev_close (struct net_device *pnetdev);
 
 //#ifdef RTK_DMP_PLATFORM
@@ -1006,7 +1006,7 @@ u16 rtw_recv_select_queue(struct sk_buff *skb)
 
 #ifdef PLATFORM_EMBOX
 static const struct net_driver rtw_netdev_driver = {
-	.start = netdev_open,
+	.start = rtl_netdev_open,
 	.stop  = this_netdev_close,
 	.xmit  = rtw_xmit_entry,
 	.set_macaddr = rtw_net_set_mac_address,
@@ -1016,7 +1016,7 @@ static const struct net_driver rtw_netdev_driver = {
 
 #if (LINUX_VERSION_CODE>=KERNEL_VERSION(2,6,29))
 static const struct net_device_ops rtw_netdev_ops = {
-	.ndo_open = netdev_open,
+	.ndo_open = rtl_netdev_open,
 	.ndo_stop = this_netdev_close,
 	.ndo_start_xmit = rtw_xmit_entry,
 #if (LINUX_VERSION_CODE>=KERNEL_VERSION(2,6,35))
@@ -1114,7 +1114,7 @@ struct net_device *rtw_init_netdev(_adapter *old_padapter)
 	DBG_871X("register rtw_netdev_ops to netdev_ops\n");
 	pnetdev->netdev_ops = &rtw_netdev_ops;
 #else
-	pnetdev->open = netdev_open;
+	pnetdev->open = rtl_netdev_open;
 	pnetdev->stop = this_netdev_close;
 	pnetdev->hard_start_xmit = rtw_xmit_entry;
 	pnetdev->set_mac_address = rtw_net_set_mac_address;
@@ -1680,7 +1680,7 @@ int _netdev_vir_if_open(struct net_device *pnetdev)
 
 	if(primary_padapter->bup == _FALSE || primary_padapter->hw_init_completed == _FALSE)
 	{
-		_netdev_open(primary_padapter->pnetdev);
+		_rtl_netdev_open(primary_padapter->pnetdev);
 	}
 
 	if(padapter->bup == _FALSE && primary_padapter->bup == _TRUE &&
@@ -2047,7 +2047,7 @@ int _netdev_if2_open(struct net_device *pnetdev)
 
 	if(primary_padapter->bup == _FALSE || primary_padapter->hw_init_completed == _FALSE)
 	{
-		_netdev_open(primary_padapter->pnetdev);
+		_rtl_netdev_open(primary_padapter->pnetdev);
 	}
 
 	if(padapter->bup == _FALSE && primary_padapter->bup == _TRUE &&
@@ -2478,7 +2478,7 @@ int rtw_drv_register_netdev(_adapter *if1)
 	return status;
 }
 
-int _netdev_open(struct net_device *pnetdev)
+int _rtl_netdev_open(struct net_device *pnetdev)
 {
 	uint status;
 	_adapter *padapter = (_adapter *)rtw_netdev_priv(pnetdev);
@@ -2582,13 +2582,13 @@ netdev_open_error:
 
 }
 
-int netdev_open(struct net_device *pnetdev)
+int rtl_netdev_open(struct net_device *pnetdev)
 {
 	int ret;
 	_adapter *padapter = (_adapter *)rtw_netdev_priv(pnetdev);
 
 	_enter_critical_mutex(&(adapter_to_dvobj(padapter)->hw_init_mutex), NULL);
-	ret = _netdev_open(pnetdev);
+	ret = _rtl_netdev_open(pnetdev);
 	_exit_critical_mutex(&(adapter_to_dvobj(padapter)->hw_init_mutex), NULL);
 
 	return ret;
@@ -2687,7 +2687,7 @@ int pm_netdev_open(struct net_device *pnetdev,u8 bnormal)
 {
 	int status;
 	if(bnormal)
-		status = netdev_open(pnetdev);
+		status = rtl_netdev_open(pnetdev);
 #ifdef CONFIG_IPS
 	else
 		status =  (_SUCCESS == ips_netdrv_open((_adapter *)rtw_netdev_priv(pnetdev)))?(0):(-1);
