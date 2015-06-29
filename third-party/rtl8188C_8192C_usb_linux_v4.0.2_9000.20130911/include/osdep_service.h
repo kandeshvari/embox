@@ -771,6 +771,7 @@ __inline static void _set_workitem(_workitem *pwork)
 #endif //PLATFORM_FREEBSD
 
 #ifdef PLATFORM_EMBOX
+	#include <byteorder/generic.h>
 	#include <kernel/sched/sched_lock.h>
 	#include <kernel/time/timer.h>
 	#include <util/dlist.h>
