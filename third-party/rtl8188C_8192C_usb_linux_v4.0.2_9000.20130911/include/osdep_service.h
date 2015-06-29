@@ -771,6 +771,9 @@ __inline static void _set_workitem(_workitem *pwork)
 #endif //PLATFORM_FREEBSD
 
 #ifdef PLATFORM_EMBOX
+	#define skb_tail_pointer(skb)	EMBOX_NIY(skb->tail, NULL)
+
+	#include <rtw_byteorder.h>
 	#include <byteorder/generic.h>
 	#include <kernel/sched/sched_lock.h>
 	#include <kernel/time/timer.h>

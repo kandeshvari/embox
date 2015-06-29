@@ -20,6 +20,10 @@
 #ifndef _LINUX_BYTEORDER_SWAB_H
 #define _LINUX_BYTEORDER_SWAB_H
 
+#if defined PLATFORM_EMBOX
+#include <swab.h>
+#endif
+
 #if !defined(CONFIG_PLATFORM_MSTAR)
 #ifndef __u16
 typedef unsigned short __u16;
@@ -110,20 +114,26 @@ __inline static __u64 __arch__swab64(__u64 x)
 
 #ifdef PLATFORM_FREEBSD
 __inline static __u16 __fswab16(__u16 x)
-#else
-__inline static const __u16 __fswab16(__u16 x)
-#endif //PLATFORM_FREEBSD
 {
 	return __arch__swab16(x);
 }
+#elif !defined PLATFORM_EMBOX
+__inline static const __u16 __fswab16(__u16 x)
+{
+	return __arch__swab16(x);
+}
+#endif //PLATFORM_FREEBSD
 #ifdef PLATFORM_FREEBSD
 __inline static __u32 __fswab32(__u32 x)
-#else
-__inline static const __u32 __fswab32(__u32 x)
-#endif //PLATFORM_FREEBSD
 {
 	return __arch__swab32(x);
 }
+#elif !defined PLATFORM_EMBOX
+__inline static const __u32 __fswab32(__u32 x)
+{
+	return __arch__swab32(x);
+}
+#endif //PLATFORM_FREEBSD
 
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
 #define swab16 __swab16
