@@ -146,7 +146,7 @@ static int skb_pull_and_merge(struct sk_buff *skb, unsigned char *src, int len)
 	if (tail_len > 0)
 		memmove(src, src+len, tail_len);
 
-	skb_trim(skb, skb->len-len);
+	EMBOX_NIY(skb_trim(skb, skb->len-len), 0);
 	return 0;
 }
 
@@ -163,7 +163,7 @@ static __inline__ unsigned long __nat25_timeout(_adapter *priv)
 static __inline__ int  __nat25_has_expired(_adapter *priv,
 				struct nat25_network_db_entry *fdb)
 {
-	if(time_before_eq(fdb->ageing_timer, __nat25_timeout(priv)))
+	if (EMBOX_NIY(time_before_eq(fdb->ageing_timer, __nat25_timeout(priv)), 0))
 		return 1;
 
 	return 0;
@@ -446,7 +446,7 @@ static int __nat25_db_network_lookup_and_replace(_adapter *priv,
 			{
 				// replace the destination mac address
 				memcpy(skb->data, db->macAddr, ETH_ALEN);
-				atomic_inc(&db->use_count);
+				EMBOX_NIY(atomic_inc(&db->use_count), 0);
 
 #ifdef CL_IPV6_PASS
 				DEBUG_INFO("NAT25: Lookup M:%02x%02x%02x%02x%02x%02x N:%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x"
@@ -538,7 +538,7 @@ static void __nat25_db_network_insert(_adapter *priv,
 
 	memcpy(db->networkAddr, networkAddr, MAX_NETWORK_ADDR_LEN);
 	memcpy(db->macAddr, macAddr, ETH_ALEN);
-	atomic_set(&db->use_count, 1);
+	EMBOX_NIY(atomic_set(&db->use_count, 1), 0);
 	EMBOX_NIY(db->ageing_timer = jiffies, 0);
 
 	__network_hash_link(priv, db, hash);
@@ -687,7 +687,7 @@ void nat25_db_expire(_adapter *priv)
 
 				if(__nat25_has_expired(priv, f))
 				{
-					if(atomic_dec_and_test(&f->use_count))
+					if(EMBOX_NIY(atomic_dec_and_test(&f->use_count), 0))
 					{
 #ifdef BR_EXT_DEBUG
 #ifdef CL_IPV6_PASS
