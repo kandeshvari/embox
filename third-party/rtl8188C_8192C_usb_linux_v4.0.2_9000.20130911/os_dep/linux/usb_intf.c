@@ -234,7 +234,7 @@ struct rtw_usb_drv {
 static void rtw_dev_shutdown(struct device *dev)
 {
 	struct usb_interface *usb_intf = container_of(dev, struct usb_interface, dev);
-	struct dvobj_priv *dvobj = usb_get_intfdata(usb_intf);
+	struct dvobj_priv *dvobj = EMBOX_NIY(usb_get_intfdata(usb_intf), 0);
 	_adapter *adapter = dvobj->if1;
 	int i;
 
@@ -410,7 +410,7 @@ _func_enter_;
 	}
 	EMBOX_NIY(pdvobjpriv->pusbintf = usb_intf, 0);
 	EMBOX_NIY(ppusbd = pdvobjpriv->pusbdev = interface_to_usbdev(usb_intf), 0);
-	usb_set_intfdata(usb_intf, pdvobjpriv);
+	EMBOX_NIY(usb_set_intfdata(usb_intf, pdvobjpriv), 0);
 
 	pdvobjpriv->RtNumInPipes = 0;
 	pdvobjpriv->RtNumOutPipes = 0;
@@ -532,7 +532,7 @@ _func_enter_;
 
 	rtw_reset_continual_urb_error(pdvobjpriv);
 
-	usb_get_dev(pusbd);
+	EMBOX_NIY(usb_get_dev(pusbd), 0);
 
 	//DBG_871X("%s %d\n", __func__, ATOMIC_READ(&usb_intf->dev.kobj.kref.refcount));
 
@@ -540,7 +540,7 @@ _func_enter_;
 
 free_dvobj:
 	if (status != _SUCCESS && pdvobjpriv) {
-		usb_set_intfdata(usb_intf, NULL);
+		EMBOX_NIY(usb_set_intfdata(usb_intf, NULL), 0);
 		devobj_deinit(pdvobjpriv);
 		pdvobjpriv = NULL;
 	}
@@ -551,11 +551,11 @@ _func_exit_;
 
 static void usb_dvobj_deinit(struct usb_interface *usb_intf)
 {
-	struct dvobj_priv *dvobj = usb_get_intfdata(usb_intf);
+	struct dvobj_priv *dvobj = EMBOX_NIY(usb_get_intfdata(usb_intf), 0);
 
 _func_enter_;
 
-	usb_set_intfdata(usb_intf, NULL);
+	EMBOX_NIY(usb_set_intfdata(usb_intf, NULL), 0);
 	if (dvobj) {
 		//Modify condition for 92DU DMDP 2010.11.18, by Thomas
 		/*if ((dvobj->NumInterfaces == 1)
@@ -572,7 +572,7 @@ _func_enter_;
 	}
 
 	//DBG_871X("%s %d\n", __func__, ATOMIC_READ(&usb_intf->dev.kobj.kref.refcount));
-	usb_put_dev(interface_to_usbdev(usb_intf));
+	EMBOX_NIY(usb_put_dev(interface_to_usbdev(usb_intf)), 0);
 
 _func_exit_;
 }
@@ -747,7 +747,7 @@ int rtw_hw_suspend(_adapter *padapter )
 		//s1.
 		if(pnetdev)
 		{
-			netif_carrier_off(pnetdev);
+			EMBOX_NIY(netif_carrier_off(pnetdev), 0);
 			rtw_netif_stop_queue(pnetdev);
 		}
 
@@ -820,11 +820,11 @@ int rtw_hw_resume(_adapter *padapter)
 			goto error_exit;
 		}
 
-		netif_device_attach(pnetdev);
-		netif_carrier_on(pnetdev);
+		EMBOX_NIY(netif_device_attach(pnetdev), 0);
+		EMBOX_NIY(netif_carrier_on(pnetdev), 0);
 
 		if(!rtw_netif_queue_stopped(pnetdev))
-      			rtw_netif_start_queue(pnetdev);
+      			EMBOX_NIY(rtw_netif_start_queue(pnetdev), 0);
 		else
 			rtw_netif_wake_queue(pnetdev);
 
@@ -852,12 +852,12 @@ error_exit:
 
 static int rtw_suspend(struct usb_interface *pusb_intf, pm_message_t message)
 {
-	struct dvobj_priv *dvobj = usb_get_intfdata(pusb_intf);
+	struct dvobj_priv *dvobj = EMBOX_NIY(usb_get_intfdata(pusb_intf), 0);
 	_adapter *padapter = dvobj->if1;
 	struct net_device *pnetdev = padapter->pnetdev;
 	struct mlme_priv *pmlmepriv = &padapter->mlmepriv;
 	struct pwrctrl_priv *pwrpriv = &padapter->pwrctrlpriv;
-	struct usb_device *usb_dev = interface_to_usbdev(pusb_intf);
+	struct usb_device *usb_dev = EMBOX_NIY(interface_to_usbdev(pusb_intf), 0);
 #ifdef CONFIG_WOWLAN
 	struct wowlan_ioctl_param poidparam;
 #endif // CONFIG_WOWLAN
@@ -899,7 +899,7 @@ static int rtw_suspend(struct usb_interface *pusb_intf, pm_message_t message)
 	//s1.
 	if(pnetdev)
 	{
-		netif_carrier_off(pnetdev);
+		EMBOX_NIY(netif_carrier_off(pnetdev), 0);
 		rtw_netif_stop_queue(pnetdev);
 	}
 #ifdef CONFIG_WOWLAN
@@ -963,7 +963,7 @@ exit:
 
 static int rtw_resume(struct usb_interface *pusb_intf)
 {
-	struct dvobj_priv *dvobj = usb_get_intfdata(pusb_intf);
+	struct dvobj_priv *dvobj = EMBOX_NIY(usb_get_intfdata(pusb_intf), 0);
 	_adapter *padapter = dvobj->if1;
 	struct net_device *pnetdev = padapter->pnetdev;
 	struct pwrctrl_priv *pwrpriv = &padapter->pwrctrlpriv;
@@ -1019,8 +1019,8 @@ int rtw_resume_process(_adapter *padapter)
 		goto exit;
 	}
 
-	netif_device_attach(pnetdev);
-	netif_carrier_on(pnetdev);
+	EMBOX_NIY(netif_device_attach(pnetdev), 0);
+	EMBOX_NIY(netif_carrier_on(pnetdev), 0);
 
 #ifdef CONFIG_AUTOSUSPEND
 	if(pwrpriv->bInternalAutoSuspend )
@@ -1045,7 +1045,7 @@ int rtw_resume_process(_adapter *padapter)
 
 	if( padapter->pid[1]!=0) {
 		//DBG_871X("pid[1]:%d\n",padapter->pid[1]);
-		rtw_signal_process(padapter->pid[1], SIGUSR2);
+		EMBOX_NIY(rtw_signal_process(padapter->pid[1], SIGUSR2), 0);
 	}
 
 	#ifdef CONFIG_LAYER2_ROAMING_RESUME
@@ -1199,7 +1199,7 @@ _adapter *rtw_usb_if1_init(struct dvobj_priv *dvobj,
 	if((pnetdev = rtw_init_netdev(padapter)) == NULL) {
 		goto free_adapter;
 	}
-	SET_NETDEV_DEV(pnetdev, dvobj_to_dev(dvobj));
+	EMBOX_NIY(SET_NETDEV_DEV(pnetdev, dvobj_to_dev(dvobj)), 0);
 	padapter = rtw_netdev_priv(pnetdev);
 
 	//step 2. hook HalFunc, allocate HalData
@@ -1319,7 +1319,7 @@ free_hal_data:
 free_adapter:
 	if (status != _SUCCESS) {
 		if (pnetdev)
-			rtw_free_netdev(pnetdev);
+			EMBOX_NIY(rtw_free_netdev(pnetdev), 0);
 		else if (padapter)
 			rtw_vmfree((u8*)padapter, sizeof(*padapter));
 		padapter = NULL;
@@ -1362,7 +1362,7 @@ static void rtw_usb_if1_deinit(_adapter *if1)
 	rtw_free_drv_sw(if1);
 
 	if(pnetdev)
-		rtw_free_netdev(pnetdev);
+		EMBOX_NIY(rtw_free_netdev(pnetdev), 0);
 
 #ifdef CONFIG_PLATFORM_RTD2880B
 	//DBG_871X("wlan link down\n");
@@ -1430,7 +1430,7 @@ static int rtw_drv_init(struct usb_interface *pusb_intf, const struct usb_device
 #ifdef CONFIG_GLOBAL_UI_PID
 	if (ui_pid[1]!=0) {
 		//DBG_871X("ui_pid[1]:%d\n",ui_pid[1]);
-		rtw_signal_process(ui_pid[1], SIGUSR2);
+		EMBOX_NIY(rtw_signal_process(ui_pid[1], SIGUSR2), 0);
 	}
 #endif
 
@@ -1473,7 +1473,7 @@ exit:
 //rmmod module & unplug(SurpriseRemoved) will call r871xu_dev_remove() => how to recognize both
 static void rtw_dev_remove(struct usb_interface *pusb_intf)
 {
-	struct dvobj_priv *dvobj = usb_get_intfdata(pusb_intf);
+	struct dvobj_priv *dvobj = EMBOX_NIY(usb_get_intfdata(pusb_intf), 0);
 	_adapter *padapter = dvobj->if1;
 
 _func_exit_;

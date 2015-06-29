@@ -1188,7 +1188,7 @@ typedef unsigned gfp_t;
 	typedef int		thread_return;
 	typedef void*	thread_context;
 
-	#define thread_exit() complete_and_exit(NULL, 0)
+	#define thread_exit() EMBOX_NIY(complete_and_exit(NULL, 0), 0)
 
 	typedef void timer_hdl_return;
 	typedef void* timer_hdl_context;
@@ -1334,18 +1334,18 @@ __inline static void _set_workitem(_workitem *pwork)
 	schedule_work(pwork);
 }
 
-#if !defined PLATFORM_EMBOX
 
 __inline static void _cancel_workitem_sync(_workitem *pwork)
 {
-#if (LINUX_VERSION_CODE>=KERNEL_VERSION(2,6,22))
+#if defined PLATFORM_EMBOX
+	if(EMBOX_NIY(0,0));
+#elif (LINUX_VERSION_CODE>=KERNEL_VERSION(2,6,22))
 	cancel_work_sync(pwork);
 #else
 	flush_scheduled_work();
 #endif
 }
 
-#endif /* !PLATFORM_EMBOX */
 
 //
 // Global Mutex: can only be used at PASSIVE level.
@@ -1365,11 +1365,11 @@ __inline static void _cancel_workitem_sync(_workitem *pwork)
 	atomic_dec((atomic_t *)&(_MutexCounter));        \
 }
 
-#if !(defined PLATFORM_EMBOX)
-
 static inline int rtw_netif_queue_stopped(struct net_device *pnetdev)
 {
-#if (LINUX_VERSION_CODE>=KERNEL_VERSION(2,6,35))
+#if defined PLATFORM_EMBOX
+	return EMBOX_NIY(this_func(), -1);
+#elif (LINUX_VERSION_CODE>=KERNEL_VERSION(2,6,35))
 	return (netif_tx_queue_stopped(netdev_get_tx_queue(pnetdev, 0)) &&
 		netif_tx_queue_stopped(netdev_get_tx_queue(pnetdev, 1)) &&
 		netif_tx_queue_stopped(netdev_get_tx_queue(pnetdev, 2)) &&
@@ -1379,18 +1379,16 @@ static inline int rtw_netif_queue_stopped(struct net_device *pnetdev)
 #endif
 }
 
-#endif /* ! PLATFORM_EMBOX */
-
-#if !defined PLATFORM_EMBOX
 static inline void rtw_netif_wake_queue(struct net_device *pnetdev)
 {
-#if (LINUX_VERSION_CODE>=KERNEL_VERSION(2,6,35))
+#if defined PLATFORM_EMBOX
+	if (EMBOX_NIY(this_func(), 0));
+#elif (LINUX_VERSION_CODE>=KERNEL_VERSION(2,6,35))
 	netif_tx_wake_all_queues(pnetdev);
 #else
 	netif_wake_queue(pnetdev);
 #endif
 }
-#endif /* !PLATFORM_EMBOX */
 
 #if !defined PLATFORM_EMBOX
 static inline void rtw_netif_start_queue(struct net_device *pnetdev)
@@ -1403,16 +1401,17 @@ static inline void rtw_netif_start_queue(struct net_device *pnetdev)
 }
 #endif /* !PLATFORM_EMBOX */
 
-#if !defined PLATFORM_EMBOX
 static inline void rtw_netif_stop_queue(struct net_device *pnetdev)
 {
-#if (LINUX_VERSION_CODE>=KERNEL_VERSION(2,6,35))
+#if defined PLATFORM_EMBOX
+	if (EMBOX_NIY(this_func(), 0));
+	return;
+#elif (LINUX_VERSION_CODE>=KERNEL_VERSION(2,6,35))
 	netif_tx_stop_all_queues(pnetdev);
 #else
 	netif_stop_queue(pnetdev);
 #endif
 }
-#endif /* !PLATFORM_EMBOX */
 
 #endif	// PLATFORM_EMBOX
 
@@ -2119,9 +2118,11 @@ extern void	rtw_udelay_os(int us);
 
 extern void rtw_yield_os(void);
 
-#if !defined PLATFORM_EMBOX
 __inline static unsigned char _cancel_timer_ex(_timer *ptimer)
 {
+#ifdef PLATFORM_EMBOX
+	return EMBOX_NIY(this_function(), 0);
+#endif
 #ifdef PLATFORM_LINUX
 	return del_timer_sync(ptimer);
 #endif
@@ -2137,7 +2138,6 @@ __inline static unsigned char _cancel_timer_ex(_timer *ptimer)
 	return bcancelled;
 #endif
 }
-#endif /* !PLATFORM_EMBOX */
 
 #ifdef PLATFORM_FREEBSD
 static __inline void thread_enter(void *context);

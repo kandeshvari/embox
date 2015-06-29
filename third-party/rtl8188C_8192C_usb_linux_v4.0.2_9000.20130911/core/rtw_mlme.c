@@ -687,7 +687,7 @@ _func_enter_;
 
 		if(pwlan->fixed!=_TRUE)
 		{
-			if (oldest == NULL ||time_after(oldest->last_scanned, pwlan->last_scanned))
+			if (oldest == NULL || EMBOX_NIY(time_after(oldest->last_scanned, pwlan->last_scanned), 0))
 				oldest = pwlan;
 		}
 
@@ -878,7 +878,7 @@ _func_enter_;
 			break;
 
 		if ((oldest == ((struct wlan_network *)0)) ||
-		time_after(oldest->last_scanned, pnetwork->last_scanned))
+		EMBOX_NIY(time_after(oldest->last_scanned, pnetwork->last_scanned), 0))
 			oldest = pnetwork;
 
 		plist = get_next(plist);

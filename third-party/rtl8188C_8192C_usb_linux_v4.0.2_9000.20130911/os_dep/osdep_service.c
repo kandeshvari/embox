@@ -309,7 +309,7 @@ inline struct sk_buff *_rtw_skb_alloc(u32 sz)
 
 inline void _rtw_skb_free(struct sk_buff *skb)
 {
-	dev_kfree_skb_any(skb);
+	EMBOX_NIY(dev_kfree_skb_any(skb), 0);
 }
 
 inline struct sk_buff *_rtw_skb_copy(const struct sk_buff *skb)
@@ -2062,7 +2062,7 @@ error:
 #endif
 #endif //MEM_ALLOC_REFINE_ADAPTOR
 
-#ifdef PLATFORM_FREEBSD
+#if defined PLATFORM_FREEBSD || defined PLATFORM_EMBOX
 /*
  * Copy a buffer from userspace and write into kernel address
  * space.
@@ -2078,7 +2078,7 @@ error:
 unsigned long
 copy_from_user(void *to, const void *from, unsigned long n)
 {
-        if ( copyin(from, to, n) != 0 ) {
+        if ( EMBOX_NIY(copyin(from, to, n), 0) != 0 ) {
                 /* Any errors will be treated as a failure
                    to copy any of the requested bytes */
                 return n;
@@ -2090,7 +2090,7 @@ copy_from_user(void *to, const void *from, unsigned long n)
 unsigned long
 copy_to_user(void *to, const void *from, unsigned long n)
 {
-	if ( copyout(from, to, n) != 0 ) {
+	if ( EMBOX_NIY(copyout(from, to, n), 0) != 0 ) {
 		/* Any errors will be treated as a failure
 		   to copy any of the requested bytes */
 		return n;
@@ -2111,7 +2111,7 @@ copy_to_user(void *to, const void *from, unsigned long n)
 int
 usb_register(struct usb_driver *driver)
 {
-        rtw_usb_linux_register(driver);
+        EMBOX_NIY(rtw_usb_linux_register(driver), 0);
         return 0;
 }
 
@@ -2119,7 +2119,7 @@ usb_register(struct usb_driver *driver)
 int
 usb_deregister(struct usb_driver *driver)
 {
-        rtw_usb_linux_deregister(driver);
+        EMBOX_NIY(rtw_usb_linux_deregister(driver), 0);
         return 0;
 }
 

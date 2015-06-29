@@ -143,7 +143,7 @@ _func_enter_;
 #endif //CONFIG_IOCTL_CFG80211
 
 	rtw_indicate_wx_assoc_event(adapter);
-	netif_carrier_on(adapter->pnetdev);
+	EMBOX_NIY(netif_carrier_on(adapter->pnetdev), 0);
 
 	if(adapter->pid[2] !=0)
 		EMBOX_NIY(rtw_signal_process(adapter->pid[2], SIGALRM), 0);
@@ -236,7 +236,7 @@ void rtw_os_indicate_disconnect( _adapter *adapter )
 
 _func_enter_;
 
-	netif_carrier_off(adapter->pnetdev); // Do it first for tx broadcast pkt after disconnection issue!
+	EMBOX_NIY(netif_carrier_off(adapter->pnetdev), 0); // Do it first for tx broadcast pkt after disconnection issue!
 
 #ifdef CONFIG_IOCTL_CFG80211
 	rtw_cfg80211_indicate_disconnect(adapter);

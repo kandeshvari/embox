@@ -174,7 +174,7 @@ exit:
 	return ret;
 }
 
-#if defined (PLATFORM_LINUX)||defined (PLATFORM_FREEBSD)
+#if defined (PLATFORM_LINUX)||defined (PLATFORM_FREEBSD) || defined PLATFORM_EMBOX
 void rtw_ps_processor(_adapter*padapter)
 {
 #ifdef CONFIG_P2P

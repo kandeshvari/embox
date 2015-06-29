@@ -168,14 +168,14 @@ unsigned int ffaddr2pipehdl(struct dvobj_priv *pdvobj, u32 addr)
 	HAL_DATA_TYPE *pHalData = GET_HAL_DATA(padapter);
 
 	if (addr == RECV_BULK_IN_ADDR) {
-		pipe=usb_rcvbulkpipe(pusbd, pHalData->RtBulkInPipe);
+		pipe = EMBOX_NIY(usb_rcvbulkpipe(pusbd, pHalData->RtBulkInPipe), 0);
 
 	} else if (addr == RECV_INT_IN_ADDR) {
-		pipe=usb_rcvbulkpipe(pusbd, pHalData->RtIntInPipe);
+		pipe = EMBOX_NIY(usb_rcvbulkpipe(pusbd, pHalData->RtIntInPipe), 0);
 
 	} else if (addr < HW_QUEUE_ENTRY) {
 		ep_num = pHalData->Queue2EPNum[addr];
-		pipe = usb_sndbulkpipe(pusbd, ep_num);
+		pipe = EMBOX_NIY(usb_sndbulkpipe(pusbd, ep_num), 0);
 	}
 
 	return pipe;
@@ -204,7 +204,7 @@ static void usb_bulkout_zero_complete(struct urb *purb, struct pt_regs *regs)
 
 		if(pcontext->purb && (pcontext->purb==purb))
 		{
-			usb_free_urb(pcontext->purb);
+			EMBOX_NIY(usb_free_urb(pcontext->purb), 0);
 		}
 
 
@@ -250,13 +250,13 @@ static u32 usb_bulkout_zero(struct intf_hdl *pintfhdl, u32 addr)
 	//translate DMA FIFO addr to pipehandle
 	//pipe = ffaddr2pipehdl(pdvobj, addr);
 
-	usb_fill_bulk_urb(purb, pusbd, pipe,
+	EMBOX_NIY(usb_fill_bulk_urb(purb, pusbd, pipe,
        				pbuf,
               			len,
               			usb_bulkout_zero_complete,
-              			pcontext);//context is pcontext
+              			pcontext), 0);//context is pcontext
 
-	status = usb_submit_urb(purb, GFP_ATOMIC);
+	status = EMBOX_NIY(usb_submit_urb(purb, GFP_ATOMIC), 1);
 
 	if (!status)
 	{
@@ -559,11 +559,11 @@ _func_enter_;
 #endif
 
 
-	usb_fill_bulk_urb(purb, pusbd, pipe,
+	EMBOX_NIY(usb_fill_bulk_urb(purb, pusbd, pipe,
        				pxmitframe->buf_addr, //= pxmitbuf->pbuf
               			cnt,
               			usb_write_port_complete,
-              			pxmitbuf);//context is pxmitbuf
+              			pxmitbuf), 0);//context is pxmitbuf
 
 #ifdef CONFIG_USE_USB_BUFFER_ALLOC_TX
 	purb->transfer_dma = pxmitbuf->dma_transfer_addr;
@@ -578,7 +578,7 @@ _func_enter_;
         }
 #endif
 
-	status = usb_submit_urb(purb, GFP_ATOMIC);
+	status = EMBOX_NIY(usb_submit_urb(purb, GFP_ATOMIC), 0);
 	if (!status) {
 		#ifdef DBG_CONFIG_ERROR_DETECT
 		{

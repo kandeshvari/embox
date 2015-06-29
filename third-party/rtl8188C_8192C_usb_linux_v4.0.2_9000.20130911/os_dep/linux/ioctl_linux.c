@@ -49,6 +49,11 @@
 #define  iwe_stream_add_point(a, b, c, d, e)  iwe_stream_add_point(b, c, d, e)
 #endif
 
+#ifdef PLATFORM_EMBOX
+#define  iwe_stream_add_event(a, b, c, d, e)  EMBOX_NIY(0, 0)
+#define  iwe_stream_add_point(a, b, c, d, e)  EMBOX_NIY(0, 0)
+#endif
+
 
 #define RTL_IOCTL_WPA_SUPPLICANT	SIOCIWFIRSTPRIV+30
 
@@ -157,7 +162,7 @@ static void indicate_wx_custom_event(_adapter *padapter, char *msg)
 	wrqu.data.length = strlen(msg);
 
 	DBG_871X("%s %s\n", __FUNCTION__, buff);
-	wireless_send_event(padapter->pnetdev, IWEVCUSTOM, &wrqu, buff);
+	EMBOX_NIY(wireless_send_event(padapter->pnetdev, IWEVCUSTOM, &wrqu, buff), 0);
 
 	rtw_mfree(buff, IW_CUSTOM_MAX+1);
 #endif
@@ -188,7 +193,7 @@ static void request_wps_pbc_event(_adapter *padapter)
 
 	DBG_871X("%s\n", __FUNCTION__);
 
-	wireless_send_event(padapter->pnetdev, IWEVCUSTOM, &wrqu, buff);
+	EMBOX_NIY(wireless_send_event(padapter->pnetdev, IWEVCUSTOM, &wrqu, buff), 0);
 
 	if(buff)
 	{
@@ -207,7 +212,7 @@ void indicate_wx_scan_complete_event(_adapter *padapter)
 	_rtw_memset(&wrqu, 0, sizeof(union iwreq_data));
 
 	//DBG_871X("+rtw_indicate_wx_scan_complete_event\n");
-	wireless_send_event(padapter->pnetdev, SIOCGIWSCAN, &wrqu, NULL);
+	EMBOX_NIY(wireless_send_event(padapter->pnetdev, SIOCGIWSCAN, &wrqu, NULL), 0);
 #endif
 }
 
@@ -225,7 +230,7 @@ void rtw_indicate_wx_assoc_event(_adapter *padapter)
 	_rtw_memcpy(wrqu.ap_addr.sa_data, pmlmepriv->cur_network.network.MacAddress, ETH_ALEN);
 
 	//DBG_871X("+rtw_indicate_wx_assoc_event\n");
-	wireless_send_event(padapter->pnetdev, SIOCGIWAP, &wrqu, NULL);
+	EMBOX_NIY(wireless_send_event(padapter->pnetdev, SIOCGIWAP, &wrqu, NULL), 0);
 #endif
 }
 
@@ -240,7 +245,7 @@ void rtw_indicate_wx_disassoc_event(_adapter *padapter)
 	_rtw_memset(wrqu.ap_addr.sa_data, 0, ETH_ALEN);
 
 	//DBG_871X("+rtw_indicate_wx_disassoc_event\n");
-	wireless_send_event(padapter->pnetdev, SIOCGIWAP, &wrqu, NULL);
+	EMBOX_NIY(wireless_send_event(padapter->pnetdev, SIOCGIWAP, &wrqu, NULL), 0);
 #endif
 }
 
@@ -6353,7 +6358,7 @@ static int rtw_rereg_nd_name(struct net_device *dev,
 	}
 
 	DBG_871X("%s new_ifname:%s\n", __FUNCTION__, new_ifname);
-	if( 0 != (ret = rtw_change_ifname(padapter, new_ifname)) ) {
+	if( 0 != (ret = EMBOX_NIY(rtw_change_ifname(padapter, new_ifname), 0)) ) {
 		goto exit;
 	}
 
@@ -8680,7 +8685,7 @@ static int rtw_mp_efuse_get(struct net_device *dev,
 
 	i=0;
 	//mac 16 "00e04c871200" rmap,00,2
-	while ( (token = strsep (&pch,",") )!=NULL )
+	while ( (token = EMBOX_NIY(strsep (&pch,","), 0) )!=NULL )
 	{
 			if(i>2) break;
 			tmp[i] = token;
@@ -8728,11 +8733,11 @@ static int rtw_mp_efuse_get(struct net_device *dev,
 	else if ( strcmp(tmp[0],"rmap") == 0 ) {
 		if ( tmp[1]==NULL || tmp[2]==NULL ) return	-EINVAL;
 		// rmap addr cnts
-		addr = simple_strtoul(tmp[1], &ptmp, 16);
+		addr = EMBOX_NIY(simple_strtoul(tmp[1], &ptmp, 16), 0);
 
 		DBG_871X("addr = %x \n" ,addr);
 
-		cnts=simple_strtoul(tmp[2], &ptmp,10);
+		cnts = EMBOX_NIY(simple_strtoul(tmp[2], &ptmp,10), 0);
 		if(cnts==0) return -EINVAL;
 
 		DBG_871X("cnts = %d \n" ,cnts);
@@ -8896,7 +8901,7 @@ static int rtw_mp_efuse_set(struct net_device *dev,
 	DBG_871X("%s: in=%s\n", __func__, extra);
 
 	i=0;
-	while ( (token = strsep (&pch,",") )!=NULL )
+	while ( (token = EMBOX_NIY(strsep (&pch,","), 0) )!=NULL )
 	{
 		if(i>2) break;
 		tmp[i] = token;
@@ -8909,7 +8914,7 @@ static int rtw_mp_efuse_set(struct net_device *dev,
 		 if ( tmp[1]==NULL || tmp[2]==NULL ) return 	-EINVAL;
 			if ( ! strlen( tmp[2] )/2 > 1 ) return -EFAULT;
 
-			addr = simple_strtoul( tmp[1], &ptmp, 16 );
+			addr = EMBOX_NIY(simple_strtoul( tmp[1], &ptmp, 16 ), 0);
 			addr = addr & 0xFF;
 			DBG_871X("addr = %x \n" ,addr);
 
@@ -8941,7 +8946,7 @@ static int rtw_mp_efuse_set(struct net_device *dev,
 	else if ( strcmp(tmp[0],"wraw") == 0 ) {
 			 if ( tmp[1]==NULL || tmp[2]==NULL ) return 	-EINVAL;
 			 if ( ! strlen( tmp[2] )/2 > 1 ) return -EFAULT;
-			addr = simple_strtoul( tmp[1], &ptmp, 16 );
+			addr = EMBOX_NIY(simple_strtoul( tmp[1], &ptmp, 16 ), 0);
 			addr = addr & 0xFF;
 			DBG_871X("addr = %x \n" ,addr);
 
@@ -11538,7 +11543,7 @@ int rtw_ioctl(struct net_device *dev, struct ifreq *rq, int cmd)
 #endif
 #endif
 		case (SIOCDEVPRIVATE+1):
-			ret = rtw_android_priv_cmd(dev, rq, cmd);
+			ret = EMBOX_NIY(rtw_android_priv_cmd(dev, rq, cmd), 0);
 			break;
 	    default:
 			ret = -EOPNOTSUPP;

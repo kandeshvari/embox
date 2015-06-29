@@ -119,7 +119,7 @@ int rtw_os_recvbuf_resource_free(_adapter *padapter, struct recv_buf *precvbuf)
 	if(precvbuf->purb)
 	{
 		//usb_kill_urb(precvbuf->purb);
-		usb_free_urb(precvbuf->purb);
+		EMBOX_NIY(usb_free_urb(precvbuf->purb), 0);
 	}
 
 #endif //CONFIG_USB_HCI
@@ -279,7 +279,7 @@ _func_enter_;
 
 	skb->data = precv_frame->u.hdr.rx_data;
 
-	skb_set_tail_pointer(skb, precv_frame->u.hdr.len);
+	EMBOX_NIY(skb_set_tail_pointer(skb, precv_frame->u.hdr.len), 0);
 
 	skb->len = precv_frame->u.hdr.len;
 
@@ -316,7 +316,7 @@ _func_enter_;
 				//skb->ip_summed = CHECKSUM_NONE;
 				skb->dev = pnetdev;
 #if (LINUX_VERSION_CODE>=KERNEL_VERSION(2,6,35))
-				skb_set_queue_mapping(skb, rtw_recv_select_queue(skb));
+				EMBOX_NIY(skb_set_queue_mapping(skb, rtw_recv_select_queue(skb)), 0);
 #endif //LINUX_VERSION_CODE>=KERNEL_VERSION(2,6,35)
 
 				_rtw_xmit_entry(skb, pnetdev);

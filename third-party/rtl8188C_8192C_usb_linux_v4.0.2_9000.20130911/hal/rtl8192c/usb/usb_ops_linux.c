@@ -111,12 +111,12 @@ static int usbctrl_vendorreq(struct intf_hdl *pintfhdl, u8 request, u16 value, u
 
 		if (requesttype == 0x01)
 		{
-			pipe = usb_rcvctrlpipe(udev, 0);//read_in
+			pipe = EMBOX_NIY(usb_rcvctrlpipe(udev, 0), 0);//read_in
 			reqtype =  REALTEK_USB_VENQT_READ;
 		}
 		else
 		{
-			pipe = usb_sndctrlpipe(udev, 0);//write_out
+			pipe = EMBOX_NIY(usb_sndctrlpipe(udev, 0), 0);//write_out
 			reqtype =  REALTEK_USB_VENQT_WRITE;
 			_rtw_memcpy( pIo_buf, pdata, len);
 		}
@@ -127,7 +127,7 @@ static int usbctrl_vendorreq(struct intf_hdl *pintfhdl, u8 request, u16 value, u
 			, ((value >= FW_8192C_START_ADDRESS && value <= FW_8192C_END_ADDRESS) ||value!=0x1000) ?RTW_USB_CONTROL_MSG_TIMEOUT : RTW_USB_CONTROL_MSG_TIMEOUT_TEST
 		);
 		#else
-		status = rtw_usb_control_msg(udev, pipe, request, reqtype, value, index, pIo_buf, len, RTW_USB_CONTROL_MSG_TIMEOUT);
+		status = EMBOX_NIY(rtw_usb_control_msg(udev, pipe, request, reqtype, value, index, pIo_buf, len, RTW_USB_CONTROL_MSG_TIMEOUT), 0);
 		#endif
 
 		if ( status == len)   // Success this control transfer.
@@ -1420,7 +1420,7 @@ _func_enter_;
 			EMBOX_NIY(precvbuf->phead = precvbuf->pskb->head, 0);
 		   	precvbuf->pdata = precvbuf->pskb->data;
 			precvbuf->ptail = skb_tail_pointer(precvbuf->pskb);
-			precvbuf->pend = skb_end_pointer(precvbuf->pskb);
+			precvbuf->pend = EMBOX_NIY(skb_end_pointer(precvbuf->pskb), 0);
 			precvbuf->pbuf = precvbuf->pskb->data;
 		}
 		else//reuse skb
@@ -1428,7 +1428,7 @@ _func_enter_;
 			EMBOX_NIY(precvbuf->phead = precvbuf->pskb->head, 0);
 			precvbuf->pdata = precvbuf->pskb->data;
 			precvbuf->ptail = skb_tail_pointer(precvbuf->pskb);
-			precvbuf->pend = skb_end_pointer(precvbuf->pskb);
+			precvbuf->pend = EMBOX_NIY(skb_end_pointer(precvbuf->pskb), 0);
        		precvbuf->pbuf = precvbuf->pskb->data;
 
 			precvbuf->reuse = _FALSE;
@@ -1446,13 +1446,13 @@ _func_enter_;
 		//translate DMA FIFO addr to pipehandle
 		pipe = ffaddr2pipehdl(pdvobj, addr);
 
-		usb_fill_bulk_urb(purb, pusbd, pipe,
+		EMBOX_NIY(usb_fill_bulk_urb(purb, pusbd, pipe,
 						precvbuf->pbuf,
                 				MAX_RECVBUF_SZ,
                 				usb_read_port_complete,
-                				precvbuf);//context is precvbuf
+                				precvbuf), 0);//context is precvbuf
 
-		err = usb_submit_urb(purb, GFP_ATOMIC);
+		err = EMBOX_NIY(usb_submit_urb(purb, GFP_ATOMIC), 0);
 		if((err) && (err != (-EPERM)))
 		{
 			RT_TRACE(_module_hci_ops_os_c_,_drv_err_,("cannot submit rx in-token(err=0x%.8x), URB_STATUS =0x%.8x", err, purb->status));

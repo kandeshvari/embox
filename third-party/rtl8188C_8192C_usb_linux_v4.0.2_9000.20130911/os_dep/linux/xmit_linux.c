@@ -61,7 +61,7 @@ _func_enter_;
       	len = (rlen > len)? len: rlen;
 
        if(rmem)
-	  skb_copy_bits(pfile->pkt, pfile->buf_len-pfile->pkt_len, rmem, len);
+	  EMBOX_NIY(skb_copy_bits(pfile->pkt, pfile->buf_len-pfile->pkt_len, rmem, len), 0);
 
        pfile->cur_addr += len;
        pfile->pkt_len -= len;
@@ -212,11 +212,11 @@ void rtw_os_pkt_complete(_adapter *padapter, _pkt *pkt)
 	u16	queue;
 	struct xmit_priv *pxmitpriv = &padapter->xmitpriv;
 
-	queue = skb_get_queue_mapping(pkt);
-	if(__netif_subqueue_stopped(padapter->pnetdev, queue) &&
+	queue = EMBOX_NIY(skb_get_queue_mapping(pkt), 0);
+	if(EMBOX_NIY(__netif_subqueue_stopped(padapter->pnetdev, queue), 0) &&
 		(pxmitpriv->hwxmits[queue].accnt < NR_XMITFRAME/2))
 	{
-		netif_wake_subqueue(padapter->pnetdev, queue);
+		EMBOX_NIY(netif_wake_subqueue(padapter->pnetdev, queue), 0);
 	}
 #else
 	if (netif_queue_stopped(padapter->pnetdev))
@@ -359,11 +359,11 @@ _func_enter_;
 	}
 
 #if (LINUX_VERSION_CODE>=KERNEL_VERSION(2,6,35))
-	queue = skb_get_queue_mapping(pkt);
+	queue = EMBOX_NIY(skb_get_queue_mapping(pkt), 0);
 	/* No free space for Tx, tx_worker is too slow */
 	if (pxmitpriv->hwxmits[queue].accnt > NR_XMITFRAME/2) {
 		//DBG_871X("%s(): stop netif_subqueue[%d]\n", __FUNCTION__, queue);
-		netif_stop_subqueue(padapter->pnetdev, queue);
+		EMBOX_NIY(netif_stop_subqueue(padapter->pnetdev, queue), 0);
 		return EMBOX_NIY(NETDEV_TX_BUSY, -1);
 	}
 #endif

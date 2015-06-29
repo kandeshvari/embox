@@ -1071,12 +1071,12 @@ int rtw_init_netdev_name(struct net_device *pnetdev, const char *ifname)
 	}
 #endif //CONFIG_EASY_REPLACEMENT
 
-	if(dev_alloc_name(pnetdev, ifname) < 0)
+	if(EMBOX_NIY(dev_alloc_name(pnetdev, ifname), -1) < 0)
 	{
 		RT_TRACE(_module_os_intfs_c_,_drv_err_,("dev_alloc_name, fail! \n"));
 	}
 
-	netif_carrier_off(pnetdev);
+	EMBOX_NIY(netif_carrier_off(pnetdev), 0);
 	//rtw_netif_stop_queue(pnetdev);
 
 	return 0;
@@ -1090,9 +1090,9 @@ struct net_device *rtw_init_netdev(_adapter *old_padapter)
 	RT_TRACE(_module_os_intfs_c_,_drv_info_,("+init_net_dev\n"));
 
 	if(old_padapter != NULL)
-		pnetdev = rtw_alloc_etherdev_with_old_priv(sizeof(_adapter), (void *)old_padapter);
+		pnetdev = EMBOX_NIY(rtw_alloc_etherdev_with_old_priv(sizeof(_adapter), (void *)old_padapter), 0);
 	else
-		pnetdev = rtw_alloc_etherdev(sizeof(_adapter));
+		pnetdev = EMBOX_NIY(rtw_alloc_etherdev(sizeof(_adapter)), 0);
 
 	if (!pnetdev)
 		return NULL;
@@ -1160,8 +1160,8 @@ void rtw_unregister_netdevs(struct dvobj_priv *dvobj)
 		pnetdev = padapter->pnetdev;
 
 		if((padapter->DriverState != DRIVER_DISAPPEAR) && pnetdev) {
-			unregister_netdev(pnetdev); //will call this_netdev_close()
-			rtw_proc_remove_one(pnetdev);
+			EMBOX_NIY(unregister_netdev(pnetdev), 0); //will call this_netdev_close()
+			EMBOX_NIY(rtw_proc_remove_one(pnetdev), 0);
 		}
 
 		#ifdef CONFIG_IOCTL_CFG80211
@@ -1193,7 +1193,7 @@ u32 rtw_start_drv_threads(_adapter *padapter)
 	if(padapter->isprimary == _TRUE)
 #endif //CONFIG_CONCURRENT_MODE
 	{
-		padapter->cmdThread = kthread_run(rtw_cmd_thread, padapter, "RTW_CMD_THREAD");
+		padapter->cmdThread = EMBOX_NIY(kthread_run(rtw_cmd_thread, padapter, "RTW_CMD_THREAD"), 0);
 		if(IS_ERR(padapter->cmdThread))
 			_status = _FAIL;
 		else
@@ -1645,7 +1645,7 @@ u8 rtw_free_drv_sw(_adapter *padapter)
 
 	//free the old_pnetdev
 	if(padapter->rereg_nd_name_priv.old_pnetdev) {
-		free_netdev(padapter->rereg_nd_name_priv.old_pnetdev);
+		EMBOX_NIY(free_netdev(padapter->rereg_nd_name_priv.old_pnetdev), 0);
 		padapter->rereg_nd_name_priv.old_pnetdev = NULL;
 	}
 
@@ -2391,15 +2391,15 @@ void netdev_br_init(struct net_device *netdev)
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,26))
 			devnet = netdev->nd_net;
 #else	// (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,26))
-			devnet = dev_net(netdev);
+			devnet = EMBOX_NIY(dev_net(netdev), 0);
 #endif	// (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,26))
 
-			br_netdev = dev_get_by_name(devnet, CONFIG_BR_EXT_BRNAME);
+			br_netdev = EMBOX_NIY(dev_get_by_name(devnet, CONFIG_BR_EXT_BRNAME), 0);
 #endif	// (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,24))
 
 			if (br_netdev) {
 				memcpy(adapter->br_mac, br_netdev->dev_addr, ETH_ALEN);
-				dev_put(br_netdev);
+				EMBOX_NIY(dev_put(br_netdev), 0);
 			} else
 				printk("%s()-%d: dev_get_by_name(%s) failed!", __FUNCTION__, __LINE__, CONFIG_BR_EXT_BRNAME);
 		}
@@ -2424,7 +2424,7 @@ static int _rtw_drv_register_netdev(_adapter *padapter, char *name)
 	_rtw_memcpy(pnetdev->dev_addr, padapter->eeprompriv.mac_addr, ETH_ALEN);
 
 	/* Tell the network stack we exist */
-	if (register_netdev(pnetdev) != 0) {
+	if (EMBOX_NIY(register_netdev(pnetdev) != 0, 0)) {
 		DBG_871X(FUNC_NDEV_FMT "Failed!\n", FUNC_NDEV_ARG(pnetdev));
 		ret = _FAIL;
 		goto error_register_netdev;
@@ -2525,7 +2525,7 @@ int _rtl_netdev_open(struct net_device *pnetdev)
 		}
 
 #ifndef RTK_DMP_PLATFORM
-		rtw_proc_init_one(pnetdev);
+		EMBOX_NIY(rtw_proc_init_one(pnetdev), 0);
 #endif
 
 #ifdef CONFIG_IOCTL_CFG80211
@@ -2545,7 +2545,7 @@ int _rtl_netdev_open(struct net_device *pnetdev)
 
 	//netif_carrier_on(pnetdev);//call this func when rtw_joinbss_event_callback return success
 	if(!rtw_netif_queue_stopped(pnetdev))
-		rtw_netif_start_queue(pnetdev);
+		EMBOX_NIY(rtw_netif_start_queue(pnetdev), 0);
 	else
 		rtw_netif_wake_queue(pnetdev);
 
@@ -2572,7 +2572,7 @@ netdev_open_error:
 
 	padapter->bup = _FALSE;
 
-	netif_carrier_off(pnetdev);
+	EMBOX_NIY(netif_carrier_off(pnetdev), 0);
 	rtw_netif_stop_queue(pnetdev);
 
 	RT_TRACE(_module_os_intfs_c_,_drv_err_,("-871x_drv - dev_open, fail!\n"));
@@ -2783,6 +2783,6 @@ void rtw_ndev_destructor(struct net_device *ndev)
 	if (ndev->ieee80211_ptr)
 		rtw_mfree((u8 *)ndev->ieee80211_ptr, sizeof(struct wireless_dev));
 #endif
-	free_netdev(ndev);
+	EMBOX_NIY(free_netdev(ndev), 0);
 }
 
