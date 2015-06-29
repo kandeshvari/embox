@@ -22,7 +22,7 @@ $(CONFIGURE) :
 $(objs) : CPPFLAGS=-DCONFIG_LITTLE_ENDIAN
 
 $(objs) : %.o : %.c
-	$(EMBOX_GCC) $(CPPFLAGS) -I./include -c -o $@ $<
+	mkdir -p $(shell dirname $(EMBOX_ROOT_DIR)/build/base/obj/third-party/rtl8188C_8192C_usb_linux_v4.0.2_9000.20130911/$@); $(EMBOX_GCC) $(CPPFLAGS) -I./include -c -o ../../build/base/obj/third-party/rtl8188C_8192C_usb_linux_v4.0.2_9000.20130911/$@ $<
 
 $(MODULE_NAME).o : $(objs)
 
