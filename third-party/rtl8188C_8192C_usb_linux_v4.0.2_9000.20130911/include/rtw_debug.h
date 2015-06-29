@@ -283,7 +283,7 @@ extern void rtl871x_cedbg(const char *fmt, ...);
 	#define ERR_8192C do {} while(0)
 #endif
 
-#ifdef PLATFORM_LINUX
+#if defined PLATFORM_LINUX || defined PLATFORM_EMBOX
 	#define DBG_871X(x, ...) do {} while(0)
 	#define MSG_8192C(x, ...) do {} while(0)
 	#define DBG_8192C(x,...) do {} while(0)
