@@ -396,6 +396,10 @@ static void usb_set_intfdata(struct usb_interface *intf, struct dvobj_priv *priv
 	intf->dvobj_priv = priv;
 }
 
+static struct dvobj_priv *usb_get_intfdata(struct usb_interface *intf) {
+	return intf->dvobj_priv;
+}
+
 static struct dvobj_priv *usb_dvobj_init(struct usb_interface *usb_intf)
 {
 	int	i;
@@ -543,7 +547,7 @@ _func_enter_;
 
 	rtw_reset_continual_urb_error(pdvobjpriv);
 
-	EMBOX_NIY(usb_get_dev(pusbd), 0);
+	//EMBOX_NIY(usb_get_dev(pusbd), 0);
 
 	//DBG_871X("%s %d\n", __func__, ATOMIC_READ(&usb_intf->dev.kobj.kref.refcount));
 
@@ -562,11 +566,11 @@ _func_exit_;
 
 static void usb_dvobj_deinit(struct usb_interface *usb_intf)
 {
-	struct dvobj_priv *dvobj = EMBOX_NIY(usb_get_intfdata(usb_intf), 0);
+	struct dvobj_priv *dvobj = usb_get_intfdata(usb_intf);
 
 _func_enter_;
 
-	EMBOX_NIY(usb_set_intfdata(usb_intf, NULL), 0);
+	usb_set_intfdata(usb_intf, NULL);
 	if (dvobj) {
 		//Modify condition for 92DU DMDP 2010.11.18, by Thomas
 		/*if ((dvobj->NumInterfaces == 1)
