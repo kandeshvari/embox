@@ -1065,6 +1065,9 @@ u32 _rtw_down_sema(_sema *sema)
 
 void	_rtw_mutex_init(_mutex *pmutex)
 {
+#ifdef PLATFORM_EMBOX
+	mutex_init_schedee(pmutex);
+#endif
 #ifdef PLATFORM_LINUX
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,37))
@@ -1078,9 +1081,7 @@ void	_rtw_mutex_init(_mutex *pmutex)
 	mtx_init(pmutex, "", NULL, MTX_DEF|MTX_RECURSE);
 #endif
 #ifdef PLATFORM_OS_XP
-
 	KeInitializeMutex(pmutex, 0);
-
 #endif
 
 #ifdef PLATFORM_OS_CE
