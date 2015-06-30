@@ -25,7 +25,7 @@
 //#include <rtl871x_byteorder.h>
 
 #ifdef PLATFORM_EMBOX
-#define EMBOX_NIY(exp, val) (printk("NIY: %s:%d, func %s:"#exp, __FILE__, __LINE__, __FUNCTION__), val)
+#define EMBOX_NIY(exp, val) (printk("NIY: %s:%d, func %s:"#exp"\n", __FILE__, __LINE__, __FUNCTION__), val)
 #else
 #define EMBOX_NIY(exp, val) (exp)
 #endif
