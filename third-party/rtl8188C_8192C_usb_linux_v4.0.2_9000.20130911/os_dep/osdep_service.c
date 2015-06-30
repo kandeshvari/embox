@@ -164,6 +164,10 @@ u8* _rtw_malloc(u32 sz)
 
 	u8 	*pbuf=NULL;
 
+#ifdef PLATFORM_EMBOX
+	pbuf = sysmalloc(sz);
+#endif
+
 #ifdef PLATFORM_LINUX
 #ifdef RTK_DMP_PLATFORM
 	if(sz > 0x4000)
@@ -205,7 +209,7 @@ u8* _rtw_zmalloc(u32 sz)
 
 	if (pbuf != NULL) {
 
-#ifdef PLATFORM_LINUX
+#if defined PLATFORM_LINUX || defined PLATFORM_EMBOX
 		memset(pbuf, 0, sz);
 #endif
 

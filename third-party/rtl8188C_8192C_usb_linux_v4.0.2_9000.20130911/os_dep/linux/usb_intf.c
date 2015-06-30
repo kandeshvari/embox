@@ -69,7 +69,7 @@ static int rtw_resume(struct usb_interface *intf);
 int rtw_resume_process(_adapter *padapter);
 
 
-static int rtw_drv_init(struct usb_interface *pusb_intf,const struct usb_device_id *pdid);
+int rtw_drv_init(struct usb_interface *pusb_intf,const struct usb_device_id *pdid);
 static void rtw_dev_remove(struct usb_interface *pusb_intf);
 
 #define USB_VENDER_ID_REALTEK		0x0BDA
@@ -1380,7 +1380,7 @@ static void rtw_usb_if1_deinit(_adapter *if1)
 
 _adapter  *rtw_sw_export = NULL;
 
-static int rtw_drv_init(struct usb_interface *pusb_intf, const struct usb_device_id *did)
+int rtw_drv_init(struct usb_interface *pusb_intf, const struct usb_device_id *did)
 {
 	int i;
 	uint status = _FAIL;
