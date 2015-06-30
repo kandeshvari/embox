@@ -388,6 +388,10 @@ static u8 rtw_deinit_intf_priv(struct dvobj_priv *dvobj)
 	return rst;
 }
 
+static struct usb_device *interface_to_usbdev(struct usb_interface *intf) {
+	return intf->dev;
+}
+
 static struct dvobj_priv *usb_dvobj_init(struct usb_interface *usb_intf)
 {
 	int	i;
@@ -408,8 +412,8 @@ _func_enter_;
 	if((pdvobjpriv = devobj_init()) == NULL) {
 		goto exit;
 	}
-	EMBOX_NIY(pdvobjpriv->pusbintf = usb_intf, 0);
-	EMBOX_NIY(ppusbd = pdvobjpriv->pusbdev = interface_to_usbdev(usb_intf), 0);
+	pdvobjpriv->pusbintf = usb_intf;
+	pusbd = pdvobjpriv->pusbdev = interface_to_usbdev(usb_intf);
 	EMBOX_NIY(usb_set_intfdata(usb_intf, pdvobjpriv), 0);
 
 	pdvobjpriv->RtNumInPipes = 0;

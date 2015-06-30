@@ -161,6 +161,7 @@
 	} pm_message_t;
 
 	struct usb_interface {
+		struct usb_dev *dev;
 	};
 
 	typedef unsigned short u16;
