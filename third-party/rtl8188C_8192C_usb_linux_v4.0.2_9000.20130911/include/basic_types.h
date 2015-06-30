@@ -153,6 +153,24 @@
 #endif
 
 #ifdef PLATFORM_EMBOX
+#include <drivers/usb/usb.h>
+#include <drivers/usb/usb_desc.h>
+#endif
+
+struct usb_host_interface {
+#ifndef PLATFORM_EMBOX
+		struct usb_interface_descriptor	desc;
+		struct usb_host_endpoint *endpoint;
+		/* int extralen;
+		unsigned char *extra;
+		char *string; */
+#else
+		struct usb_desc_interface desc;
+		struct usb_endp *endpoint;
+#endif
+	};
+
+#ifdef PLATFORM_EMBOX
 
 	typedef signed char s8;
 	typedef unsigned char u8;
@@ -160,9 +178,11 @@
 		int event;
 	} pm_message_t;
 
+	struct usb_host_interface;
 	struct usb_interface {
 		struct usb_dev *dev;
 		struct dvobj_priv *dvobj_priv;
+		struct usb_host_interface altsetting[1];
 	};
 
 	typedef unsigned short u16;

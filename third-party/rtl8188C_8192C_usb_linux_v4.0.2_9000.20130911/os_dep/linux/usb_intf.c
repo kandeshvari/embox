@@ -423,8 +423,11 @@ _func_enter_;
 	pdvobjpriv->RtNumInPipes = 0;
 	pdvobjpriv->RtNumOutPipes = 0;
 
-
-	EMBOX_NIY(ppdev_desc = &pusbd->descriptor, 0);
+#ifndef PLATFORM_EMBOX
+	pdev_desc = &pusbd->descriptor;
+#else
+	pdev_desc = &pusbd->dev_desc;
+#endif
 #if 0
 	DBG_871X("\n8712_usb_device_descriptor:\n");
 	DBG_871X("bLength=%x\n", pdev_desc->bLength);
@@ -460,7 +463,7 @@ _func_enter_;
 
 	//DBG_871X("\n/****** num of altsetting = (%d) ******/\n", usb_intf->num_altsetting);
 
-	EMBOX_NIY(phost_iface = &usb_intf->altsetting[0], 0);
+	phost_iface = &usb_intf->altsetting[0];
 	piface_desc = &phost_iface->desc;
 
 #if 0
@@ -476,8 +479,8 @@ _func_enter_;
 	DBG_871X("iInterface=%x\n", piface_desc->iInterface);
 #endif
 
-	EMBOX_NIY(pdvobjpriv->NumInterfaces = pconf_desc->bNumInterfaces, 0);
-	EMBOX_NIY(ppdvobjpriv->InterfaceNumber = piface_desc->bInterfaceNumber, 0);
+	pdvobjpriv->NumInterfaces = pconf_desc->bNumInterfaces;
+	pdvobjpriv->InterfaceNumber = piface_desc->bInterfaceNumber;
 	pdvobjpriv->nr_endpoint = piface_desc->bNumEndpoints;
 
 	//DBG_871X("\ndump usb_endpoint_descriptor:\n");

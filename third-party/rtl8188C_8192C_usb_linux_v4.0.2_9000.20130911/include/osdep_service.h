@@ -772,13 +772,14 @@ __inline static void _set_workitem(_workitem *pwork)
 
 #ifdef PLATFORM_EMBOX
 	#define skb_tail_pointer(skb)	EMBOX_NIY(skb->tail, NULL)
-
+	#include <drivers/usb/usb.h>
 	#include <rtw_byteorder.h>
 	#include <byteorder/generic.h>
 	#include <kernel/sched/sched_lock.h>
 	#include <kernel/time/timer.h>
 	#include <util/dlist.h>
 	#include <drivers/usb/usb.h>
+	#include <drivers/usb/usb_desc.h>
 	#include <linux/version.h>
 	#include <linux/spinlock.h>
 	#include <linux/compiler.h>
@@ -1070,7 +1071,7 @@ typedef unsigned gfp_t;
 	};
 
 	struct usb_config_descriptor {
-	/*	uint8_t  bLength;
+		uint8_t  bLength;
 		uint8_t  bDescriptorType;
 
 		uint16_t wTotalLength;
@@ -1078,7 +1079,7 @@ typedef unsigned gfp_t;
 		uint8_t  bConfigurationValue;
 		uint8_t  iConfiguration;
 		uint8_t  bmAttributes;
-		uint8_t  bMaxPower;*/
+		uint8_t  bMaxPower;
 	};
 
 	struct pppoe_tag {
@@ -1165,14 +1166,6 @@ typedef unsigned gfp_t;
 		unsigned char *extra;
 		int extralen;
 	*/};
-	struct usb_host_interface {
-		struct usb_interface_descriptor	desc;
-		struct usb_host_endpoint *endpoint;
-		/* int extralen;
-		unsigned char *extra;
-		char *string; */
-	};
-
 
 	typedef	struct sk_buff	_pkt;
 	typedef unsigned char	_buffer;
