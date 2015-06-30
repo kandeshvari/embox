@@ -392,6 +392,10 @@ static struct usb_device *interface_to_usbdev(struct usb_interface *intf) {
 	return intf->dev;
 }
 
+static void usb_set_intfdata(struct usb_interface *intf, struct dvobj_priv *priv) {
+	intf->dvobj_priv = priv;
+}
+
 static struct dvobj_priv *usb_dvobj_init(struct usb_interface *usb_intf)
 {
 	int	i;
@@ -414,7 +418,7 @@ _func_enter_;
 	}
 	pdvobjpriv->pusbintf = usb_intf;
 	pusbd = pdvobjpriv->pusbdev = interface_to_usbdev(usb_intf);
-	EMBOX_NIY(usb_set_intfdata(usb_intf, pdvobjpriv), 0);
+	usb_set_intfdata(usb_intf, pdvobjpriv);
 
 	pdvobjpriv->RtNumInPipes = 0;
 	pdvobjpriv->RtNumOutPipes = 0;

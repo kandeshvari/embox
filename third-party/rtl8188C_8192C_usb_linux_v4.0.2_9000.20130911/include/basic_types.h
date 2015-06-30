@@ -162,6 +162,7 @@
 
 	struct usb_interface {
 		struct usb_dev *dev;
+		struct dvobj_priv *dvobj_priv;
 	};
 
 	typedef unsigned short u16;
