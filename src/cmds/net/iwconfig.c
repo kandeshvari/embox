@@ -7,9 +7,15 @@
  */
 
 #include <stdio.h>
+#include <drivers/usb/usb_driver.h>
+
+/* realtek stuff */
+#include <basic_types.h>
 #include <osdep_service.h>
 
+extern int rtw_drv_init(struct usb_interface *, const struct usb_device_id *);
+
 int main(int argc, char **argv) {
-	printf("Not implemented yet!\n");
+	rtw_drv_init(NULL, NULL);
 	return 0;
 }

@@ -6,9 +6,10 @@ package embox.cmd.net
 	man = '''
 		TODO
 	''')
-@BuildDepends(third_party.rtlwifi)
 module iwconfig {
+	@IncludePath("$(EMBOX_ROOT_DIR)/third-party/rtl8188C_8192C_usb_linux_v4.0.2_9000.20130911/include")
 	source "iwconfig.c"
 
+	depends third_party.rtlwifi
 	depends embox.compat.libc.stdio.printf
 }
