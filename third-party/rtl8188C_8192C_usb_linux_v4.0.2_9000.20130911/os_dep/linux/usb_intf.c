@@ -587,7 +587,7 @@ _func_enter_;
 	}
 
 	//DBG_871X("%s %d\n", __func__, ATOMIC_READ(&usb_intf->dev.kobj.kref.refcount));
-	EMBOX_NIY(usb_put_dev(interface_to_usbdev(usb_intf)), 0);
+	usb_put_dev(interface_to_usbdev(usb_intf));
 
 _func_exit_;
 }

@@ -1089,10 +1089,10 @@ struct net_device *rtw_init_netdev(_adapter *old_padapter)
 
 	RT_TRACE(_module_os_intfs_c_,_drv_info_,("+init_net_dev\n"));
 
-	if(old_padapter != NULL)
-		pnetdev = EMBOX_NIY(rtw_alloc_etherdev_with_old_priv(sizeof(_adapter), (void *)old_padapter), 0);
+	if (old_padapter != NULL)
+		pnetdev = rtw_alloc_etherdev_with_old_priv(sizeof(_adapter), (void *)old_padapter);
 	else
-		pnetdev = EMBOX_NIY(rtw_alloc_etherdev(sizeof(_adapter)), 0);
+		pnetdev = rtw_alloc_etherdev(sizeof(_adapter));
 
 	if (!pnetdev)
 		return NULL;

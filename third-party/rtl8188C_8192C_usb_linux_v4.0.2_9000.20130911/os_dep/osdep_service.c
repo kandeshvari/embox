@@ -1930,13 +1930,20 @@ int rtw_store_to_file(char *path, u8* buf, u32 sz)
 }
 
 #if 1 //#ifdef MEM_ALLOC_REFINE_ADAPTOR
-#ifdef PLATFORM_LINUX
+#if defined PLATFORM_LINUX || defined PLATFORM_EMBOX
+
+static int rtlwifi_setup_stub(struct net_device *dev) {
+	return 0;
+}
+
 struct net_device *rtw_alloc_etherdev_with_old_priv(int sizeof_priv, void *old_priv)
 {
 	struct net_device *pnetdev;
 	struct rtw_netdev_priv_indicator *pnpi;
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,35))
+#ifdef PLATFORM_EMBOX
+	pnetdev = netdev_alloc("wlan0", rtlwifi_setup_stub, sizeof(struct rtw_netdev_priv_indicator));
+#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,35))
 	pnetdev = alloc_etherdev_mq(sizeof(struct rtw_netdev_priv_indicator), 4);
 #else
 	pnetdev = alloc_etherdev(sizeof(struct rtw_netdev_priv_indicator));
@@ -1944,9 +1951,9 @@ struct net_device *rtw_alloc_etherdev_with_old_priv(int sizeof_priv, void *old_p
 	if (!pnetdev)
 		goto RETURN;
 
-	pnpi = netdev_priv(pnetdev);
-	pnpi->priv=old_priv;
-	pnpi->sizeof_priv=sizeof_priv;
+	pnpi = netdev_priv(pnetdev, void);
+	pnpi->priv = old_priv;
+	pnpi->sizeof_priv = sizeof_priv;
 
 RETURN:
 	return pnetdev;
@@ -1957,7 +1964,9 @@ struct net_device *rtw_alloc_etherdev(int sizeof_priv)
 	struct net_device *pnetdev;
 	struct rtw_netdev_priv_indicator *pnpi;
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,35))
+#ifdef PLATFORM_EMBOX
+	pnetdev = netdev_alloc("wlan0", rtlwifi_setup_stub, sizeof(struct rtw_netdev_priv_indicator));
+#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,35))
 	pnetdev = alloc_etherdev_mq(sizeof(struct rtw_netdev_priv_indicator), 4);
 #else
 	pnetdev = alloc_etherdev(sizeof(struct rtw_netdev_priv_indicator));
@@ -1965,7 +1974,7 @@ struct net_device *rtw_alloc_etherdev(int sizeof_priv)
 	if (!pnetdev)
 		goto RETURN;
 
-	pnpi = netdev_priv(pnetdev);
+	pnpi = netdev_priv(pnetdev, void);
 
 	pnpi->priv = rtw_zvmalloc(sizeof_priv);
 	if (!pnpi->priv) {
@@ -1986,7 +1995,7 @@ void rtw_free_netdev(struct net_device * netdev)
 	if(!netdev)
 		goto RETURN;
 
-	pnpi = netdev_priv(netdev);
+	pnpi = netdev_priv(netdev, void);
 
 	if(!pnpi->priv)
 		goto RETURN;
@@ -2020,7 +2029,7 @@ int rtw_change_ifname(_adapter *padapter, const char *ifname)
 		rereg_priv->old_pnetdev = NULL;
 	}
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,26))
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,26)) && !defined PLATFORM_EMBOX
 	if(!rtnl_is_locked())
 		unregister_netdev(cur_pnetdev);
 	else
@@ -2037,13 +2046,13 @@ int rtw_change_ifname(_adapter *padapter, const char *ifname)
 		goto error;
 	}
 
-	SET_NETDEV_DEV(pnetdev, dvobj_to_dev(adapter_to_dvobj(padapter)));
+	EMBOX_NIY(SET_NETDEV_DEV(pnetdev, dvobj_to_dev(adapter_to_dvobj(padapter))), 0);
 
 	rtw_init_netdev_name(pnetdev, ifname);
 
 	_rtw_memcpy(pnetdev->dev_addr, padapter->eeprompriv.mac_addr, ETH_ALEN);
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,26))
+#if !defined PLATFORM_EMBOX && (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,26))
 	if(!rtnl_is_locked())
 		ret = register_netdev(pnetdev);
 	else
