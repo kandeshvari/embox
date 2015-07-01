@@ -659,38 +659,38 @@ __inline static _list	*get_list_head(_queue	*queue)
 
 __inline static void _enter_critical(_lock *plock, _irqL *pirqL)
 {
-	spin_lock_irqsave(plock, *pirqL);
+	//spin_lock_irqsave(plock, *pirqL);
 }
 
 __inline static void _exit_critical(_lock *plock, _irqL *pirqL)
 {
-	spin_unlock_irqrestore(plock, *pirqL);
+	//spin_unlock_irqrestore(plock, *pirqL);
 }
 
 __inline static void _enter_critical_ex(_lock *plock, _irqL *pirqL)
 {
-	spin_lock_irqsave(plock, *pirqL);
+	//spin_lock_irqsave(plock, *pirqL);
 }
 
 __inline static void _exit_critical_ex(_lock *plock, _irqL *pirqL)
 {
-	spin_unlock_irqrestore(plock, *pirqL);
+	//spin_unlock_irqrestore(plock, *pirqL);
 }
 
 __inline static void _enter_critical_bh(_lock *plock, _irqL *pirqL)
 {
-	spin_lock_bh(plock, *pirqL);
+	//spin_lock_bh(plock, *pirqL);
 }
 
 __inline static void _exit_critical_bh(_lock *plock, _irqL *pirqL)
 {
-	spin_unlock_bh(plock, *pirqL);
+	//spin_unlock_bh(plock, *pirqL);
 }
 
 __inline static void _enter_critical_mutex(_mutex *pmutex, _irqL *pirqL)
 {
 
-		mtx_lock(pmutex);
+		//mtx_lock(pmutex);
 
 }
 
@@ -698,7 +698,7 @@ __inline static void _enter_critical_mutex(_mutex *pmutex, _irqL *pirqL)
 __inline static void _exit_critical_mutex(_mutex *pmutex, _irqL *pirqL)
 {
 
-		mtx_unlock(pmutex);
+		//mtx_unlock(pmutex);
 
 }
 static inline void __list_del(struct list_head * prev, struct list_head * next)
@@ -1238,42 +1238,42 @@ __inline static _list	*get_list_head(_queue	*queue)
 
 __inline static void _enter_critical(_lock *plock, _irqL *pirqL)
 {
-	spin_lock_irqsave(plock, *pirqL);
+	//spin_lock_irqsave(plock, *pirqL);
 }
 
 __inline static void _exit_critical(_lock *plock, _irqL *pirqL)
 {
-	spin_unlock_irqrestore(plock, *pirqL);
+	//spin_unlock_irqrestore(plock, *pirqL);
 }
 
 __inline static void _enter_critical_ex(_lock *plock, _irqL *pirqL)
 {
-	spin_lock_irqsave(plock, *pirqL);
+	//spin_lock_irqsave(plock, *pirqL);
 }
 
 __inline static void _exit_critical_ex(_lock *plock, _irqL *pirqL)
 {
-	spin_unlock_irqrestore(plock, *pirqL);
+	//spin_unlock_irqrestore(plock, *pirqL);
 }
 
 __inline static void _enter_critical_bh(_lock *plock, _irqL *pirqL)
 {
-	spin_lock(plock);
-	sched_lock();
+	//spin_lock(plock);
+	//sched_lock();
 }
 
 __inline static void _exit_critical_bh(_lock *plock, _irqL *pirqL)
 {
-	sched_unlock();
-	spin_unlock(plock);
+	//sched_unlock();
+	//spin_unlock(plock);
 }
 
 __inline static void _enter_critical_mutex(_mutex *pmutex, _irqL *pirqL)
 {
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,37))
-		mutex_lock(pmutex);
+		//mutex_lock(pmutex);
 #else
-		down(pmutex);
+		//down(pmutex);
 #endif
 }
 
