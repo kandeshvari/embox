@@ -797,7 +797,7 @@ void rtw_mfree2d(void *pbuf, int h, int w, int size)
 void _rtw_memcpy(void* dst, void* src, u32 sz)
 {
 
-#if defined (PLATFORM_LINUX)|| defined (PLATFORM_FREEBSD)
+#if defined (PLATFORM_LINUX)|| defined (PLATFORM_FREEBSD) || defined PLATFORM_EMBOX
 
 	memcpy(dst, src, sz);
 
