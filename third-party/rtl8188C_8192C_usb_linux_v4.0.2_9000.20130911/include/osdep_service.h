@@ -771,6 +771,7 @@ __inline static void _set_workitem(_workitem *pwork)
 #endif //PLATFORM_FREEBSD
 
 #ifdef PLATFORM_EMBOX
+	#define kthread_run(x, y, z) thread_create(0, x, y)
 	#define skb_tail_pointer(skb)	EMBOX_NIY(skb->tail, NULL)
 	#define free_netdev(x) netdev_free(x)
 	#define unregister_netdevice(x) netdev_unregister(x)
@@ -781,6 +782,7 @@ __inline static void _set_workitem(_workitem *pwork)
 	#define rtw_proc_init_one(x) {} /* Stub */
 	#define usb_put_dev(x) {} /* Stub */
 
+	#include <kernel/thread.h>
 	#include <drivers/usb/usb.h>
 	#include <rtw_byteorder.h>
 	#include <byteorder/generic.h>
@@ -1186,8 +1188,8 @@ typedef unsigned gfp_t;
 	typedef unsigned long _irqL;
 	typedef	struct	net_device * _nic_hdl;
 
-	typedef void*		_thread_hdl_;
-	typedef int		thread_return;
+	typedef struct thread*	_thread_hdl_;
+	typedef void		thread_return;
 	typedef void*	thread_context;
 
 	#define thread_exit() EMBOX_NIY(complete_and_exit(NULL, 0), 0)

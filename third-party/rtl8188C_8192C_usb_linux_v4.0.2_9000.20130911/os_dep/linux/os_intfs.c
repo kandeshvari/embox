@@ -1193,7 +1193,7 @@ u32 rtw_start_drv_threads(_adapter *padapter)
 	if(padapter->isprimary == _TRUE)
 #endif //CONFIG_CONCURRENT_MODE
 	{
-		padapter->cmdThread = EMBOX_NIY(kthread_run(rtw_cmd_thread, padapter, "RTW_CMD_THREAD"), 0);
+		padapter->cmdThread = kthread_run(rtw_cmd_thread, padapter, "RTW_CMD_THREAD");
 		if(IS_ERR(padapter->cmdThread))
 			_status = _FAIL;
 		else
