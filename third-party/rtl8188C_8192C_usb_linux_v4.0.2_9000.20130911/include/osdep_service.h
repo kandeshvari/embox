@@ -776,7 +776,7 @@ __inline static void _set_workitem(_workitem *pwork)
 	#define unregister_netdevice(x) netdev_unregister(x)
 	#define register_netdevice(x) netdev_register(x)
 	#define unregister_netdev(x) netdev_unregister(x)
-	#define register_netdev(x) netdev_register(x)
+	#define register_netdev(x) inetdev_register_dev(x)
 	#define rtw_proc_remove_one(x) {} /* Stub */
 	#define rtw_proc_init_one(x) {} /* Stub */
 	#define usb_put_dev(x) {} /* Stub */

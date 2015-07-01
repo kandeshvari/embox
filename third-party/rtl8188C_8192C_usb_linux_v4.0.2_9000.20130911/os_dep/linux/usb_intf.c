@@ -1249,6 +1249,7 @@ _adapter *rtw_usb_if1_init(struct dvobj_priv *dvobj,
 	//step 4. read efuse/eeprom data and get mac_addr
 	rtw_hal_read_chip_info(padapter);
 
+
 	if (rtw_handle_dualmac(padapter, 1) != _SUCCESS)
 		goto free_hal_data;
 
@@ -1404,6 +1405,7 @@ int rtw_drv_init(struct usb_interface *pusb_intf, const struct usb_device_id *di
 
 
 	RT_TRACE(_module_hci_intfs_c_, _drv_err_, ("+rtw_drv_init\n"));
+
 
 
 	//step 0.
