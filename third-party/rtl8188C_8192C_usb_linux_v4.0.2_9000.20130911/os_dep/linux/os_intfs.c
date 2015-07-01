@@ -2424,7 +2424,7 @@ static int _rtw_drv_register_netdev(_adapter *padapter, char *name)
 	_rtw_memcpy(pnetdev->dev_addr, padapter->eeprompriv.mac_addr, ETH_ALEN);
 
 	/* Tell the network stack we exist */
-	if (EMBOX_NIY(register_netdev(pnetdev) != 0, 0)) {
+	if (register_netdev(pnetdev) != 0) {
 		DBG_871X(FUNC_NDEV_FMT "Failed!\n", FUNC_NDEV_ARG(pnetdev));
 		ret = _FAIL;
 		goto error_register_netdev;
