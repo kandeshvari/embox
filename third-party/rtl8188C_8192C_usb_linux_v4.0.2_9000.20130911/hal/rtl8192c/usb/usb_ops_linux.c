@@ -128,7 +128,7 @@ static int usbctrl_vendorreq(struct intf_hdl *pintfhdl, u8 request, u16 value, u
 		#if !defined PLATFORM_EMBOX
 		status = rtw_usb_control_msg(udev, pipe, request, reqtype, value, index, pIo_buf, len, RTW_USB_CONTROL_MSG_TIMEOUT);
 		#else
-		status = usb_endp_control(udev->endpoints[0], NULL, NULL, reqtype, request, value, index, len, pIo_buf);
+		status = usb_endp_sync_control(udev->endpoints[0], reqtype, request, value, index, len, pIo_buf);
 		if (status == 0)
 			status = len;
 		else
