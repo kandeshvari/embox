@@ -1394,8 +1394,7 @@ _func_enter_;
 #ifdef CONFIG_PREALLOC_RECV_SKB
 	if((precvbuf->reuse == _FALSE) || (precvbuf->pskb == NULL))
 	{
-		if (EMBOX_NIY(NULL != (precvbuf->pskb = skb_dequeue(&precvpriv->free_recv_skb_queue)), 0))
-		{
+		if (NULL != (precvbuf->pskb = skb_dequeue(&precvpriv->free_recv_skb_queue))) {
 			precvbuf->reuse = _TRUE;
 		}
 	}

@@ -269,11 +269,11 @@ struct recv_priv
 #endif
 
 #endif
-#if defined(PLATFORM_LINUX) || defined(PLATFORM_FREEBSD)
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_FREEBSD) || defined PLATFORM_EMBOX
 #ifdef PLATFORM_FREEBSD
 	struct task irq_prepare_beacon_tasklet;
 	struct task recv_tasklet;
-#else //PLATFORM_FREEBSD
+#elif defined PLATFORM_LINUX //PLATFORM_FREEBSD
 	struct tasklet_struct irq_prepare_beacon_tasklet;
 	struct tasklet_struct recv_tasklet;
 #endif //PLATFORM_FREEBSD
@@ -287,7 +287,7 @@ struct recv_priv
 #ifdef CONFIG_USE_USB_BUFFER_ALLOC_RX
 	_queue	recv_buf_pending_queue;
 #endif	// CONFIG_USE_USB_BUFFER_ALLOC_RX
-#endif //defined(PLATFORM_LINUX) || defined(PLATFORM_FREEBSD)
+#endif //defined(PLATFORM_LINUX) || defined(PLATFORM_FREEBSD) || defined PLATFORM_EMBOX
 
 	u8 *pallocated_recv_buf;
 	u8 *precv_buf;    // 4 alignment
