@@ -70,10 +70,11 @@ int rtw_os_recvbuf_resource_alloc(_adapter *padapter, struct recv_buf *precvbuf)
 
 	precvbuf->irp_pending = _FALSE;
 	EMBOX_NIY(precvbuf->purb = usb_alloc_urb(0, GFP_KERNEL), 0);
+	#if 0
 	if(precvbuf->purb == NULL){
 		res = _FAIL;
 	}
-
+	#endif
 	precvbuf->pskb = NULL;
 
 	precvbuf->reuse = _FALSE;
