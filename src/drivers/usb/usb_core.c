@@ -160,6 +160,22 @@ int usb_endp_interrupt(struct usb_endp *endp, usb_request_notify_hnd_t notify_hn
 	return usb_endp_request(endp, req);
 }
 
+static void sync_ctrl_hnd(struct usb_request *req, void *arg) {
+	*((int*)arg) = 1;
+}
+
+int usb_endp_sync_control(struct usb_endp *endp, uint8_t req_type, uint8_t request,
+		uint16_t value, uint16_t index, uint16_t count, void *data) {
+	int sync_flag = 0, ret;
+	ret = usb_endp_control(endp, sync_ctrl_hnd, &sync_flag, req_type, request, value, index, count, data);
+
+	while (!sync_flag) {
+		ksleep(0);
+	}
+
+	return ret;
+}
+
 int usb_endp_control(struct usb_endp *endp, usb_request_notify_hnd_t notify_hnd, void *arg,
 		uint8_t req_type, uint8_t request, uint16_t value, uint16_t index,
 		uint16_t count, void *data) {

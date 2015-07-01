@@ -297,6 +297,9 @@ extern void usb_request_complete(struct usb_request *req);
 extern int usb_endp_interrupt(struct usb_endp *endp, usb_request_notify_hnd_t notify_hnd,
 		void *buf, size_t len);
 
+extern int usb_endp_sync_control(struct usb_endp *endp, uint8_t req_type, uint8_t request,
+		uint16_t value, uint16_t index, uint16_t count, void *data);
+
 extern int usb_endp_control(struct usb_endp *endp, usb_request_notify_hnd_t notify_hnd, void *arg,
 		uint8_t req_type, uint8_t request, uint16_t value, uint16_t index,
 		uint16_t count, void *data);
