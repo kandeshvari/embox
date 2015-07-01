@@ -142,7 +142,9 @@ _func_enter_;
 	precvpriv->signal_stat_sampling_interval = 1000; //ms
 	//precvpriv->signal_stat_converging_constant = 5000; //ms
 
+#if !defined PLATFORM_EMBOX
 	rtw_set_signal_stat_timer(precvpriv);
+#endif
 #endif //CONFIG_NEW_SIGNAL_STAT_PROCESS
 
 exit:
