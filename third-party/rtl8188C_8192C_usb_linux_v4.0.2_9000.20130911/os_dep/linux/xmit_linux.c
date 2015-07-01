@@ -124,7 +124,7 @@ void rtw_set_tx_chksum_offload(_pkt *pkt, struct pkt_attrib *pattrib)
 
 }
 
-int rtw_os_xmit_resource_alloc(_adapter *padapter, struct xmit_buf *pxmitbuf,u32 alloc_sz)
+int rtw_os_xmit_resource_alloc(_adapter *padapter, struct xmit_buf *pxmitbuf, u32 alloc_sz)
 {
 #ifdef CONFIG_USB_HCI
 	int i;
@@ -145,20 +145,20 @@ int rtw_os_xmit_resource_alloc(_adapter *padapter, struct xmit_buf *pxmitbuf,u32
 	}
 
 	pxmitbuf->pbuf = (u8 *)N_BYTE_ALIGMENT((SIZE_PTR)(pxmitbuf->pallocated_buf), XMITBUF_ALIGN_SZ);
-	EMBOX_NIY(pxmitbuf->dma_transfer_addr = 0, 0);
+	pxmitbuf->dma_transfer_addr = 0;
 
 #endif // CONFIG_USE_USB_BUFFER_ALLOC_TX
 
-	for(i=0; i<8; i++)
-      	{
-				EMBOX_NIY(pxmitbuf->pxmit_urb[i] = usb_alloc_urb(0, GFP_KERNEL), 0);
-				if(EMBOX_NIY(pxmitbuf->pxmit_urb[i] == NULL, 0))
-             	{
+#if !defined PLATFORM_EMBOX
+	for(i = 0; i<8; i++) {
+		pxmitbuf->pxmit_urb[i] = usb_alloc_urb(0, GFP_KERNEL);
+		if (pxmitbuf->pxmit_urb[i] == NULL) {
              		DBG_871X("pxmitbuf->pxmit_urb[i]==NULL");
 	        	return _FAIL;
              	}
 
       	}
+#endif /* !PLATFORM_EMBOX */
 #endif
 #if defined(CONFIG_PCI_HCI) || defined(CONFIG_SDIO_HCI)
 	pxmitbuf->pallocated_buf = rtw_zmalloc(alloc_sz);

@@ -96,7 +96,7 @@ u32 rtw_atoi(u8* s)
 inline u8* _rtw_vmalloc(u32 sz)
 {
 	u8 	*pbuf;
-#ifdef PLATFORM_LINUX
+#if defined PLATFORM_LINUX || defined PLATFORM_EMBOX
 	pbuf = vmalloc(sz);
 #endif
 #ifdef PLATFORM_FREEBSD
@@ -122,7 +122,7 @@ inline u8* _rtw_vmalloc(u32 sz)
 inline u8* _rtw_zvmalloc(u32 sz)
 {
 	u8 	*pbuf;
-#ifdef PLATFORM_LINUX
+#if defined PLATFORM_LINUX || defined PLATFORM_EMBOX
 	pbuf = _rtw_vmalloc(sz);
 	if (pbuf != NULL)
 		memset(pbuf, 0, sz);

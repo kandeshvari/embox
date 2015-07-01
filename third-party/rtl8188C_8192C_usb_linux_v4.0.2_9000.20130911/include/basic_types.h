@@ -171,7 +171,6 @@ struct usb_host_interface {
 	};
 
 #ifdef PLATFORM_EMBOX
-
 	typedef signed char s8;
 	typedef unsigned char u8;
 	typedef struct {
