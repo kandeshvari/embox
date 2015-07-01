@@ -121,13 +121,18 @@ static int usbctrl_vendorreq(struct intf_hdl *pintfhdl, u8 request, u16 value, u
 			_rtw_memcpy( pIo_buf, pdata, len);
 		}
 
-		#if 0
-		//timeout test for firmware downloading
+		/* timeout test for firmware downloading
 		status = rtw_usb_control_msg(udev, pipe, request, reqtype, value, index, pIo_buf, len
 			, ((value >= FW_8192C_START_ADDRESS && value <= FW_8192C_END_ADDRESS) ||value!=0x1000) ?RTW_USB_CONTROL_MSG_TIMEOUT : RTW_USB_CONTROL_MSG_TIMEOUT_TEST
-		);
+		); */
+		#if !defined PLATFORM_EMBOX
+		status = rtw_usb_control_msg(udev, pipe, request, reqtype, value, index, pIo_buf, len, RTW_USB_CONTROL_MSG_TIMEOUT);
 		#else
-		status = EMBOX_NIY(rtw_usb_control_msg(udev, pipe, request, reqtype, value, index, pIo_buf, len, RTW_USB_CONTROL_MSG_TIMEOUT), 0);
+		status = usb_endp_control(udev->endpoints[0], NULL, NULL, reqtype, request, value, index, len, pIo_buf);
+		if (status == 0)
+			status = len;
+		else
+			status = -1;
 		#endif
 
 		if ( status == len)   // Success this control transfer.
