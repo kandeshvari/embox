@@ -841,7 +841,7 @@ int	_rtw_memcmp(void *dst, void *src, u32 sz)
 void _rtw_memset(void *pbuf, int c, u32 sz)
 {
 
-#if defined (PLATFORM_LINUX)|| defined (PLATFORM_FREEBSD)
+#if defined (PLATFORM_LINUX)|| defined (PLATFORM_FREEBSD) || defined PLATFORM_EMBOX
 
         memset(pbuf, c, sz);
 
