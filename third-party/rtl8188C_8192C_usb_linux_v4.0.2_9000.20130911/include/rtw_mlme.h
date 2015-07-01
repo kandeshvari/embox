@@ -739,9 +739,9 @@ __inline static void set_scanned_network_val(struct mlme_priv *pmlmepriv, sint v
 {
 	_irqL irqL;
 
-	_enter_critical_bh(&pmlmepriv->lock, &irqL);
+	//_enter_critical_bh(&pmlmepriv->lock, &irqL);
 	pmlmepriv->num_of_scanned = val;
-	_exit_critical_bh(&pmlmepriv->lock, &irqL);
+	//_exit_critical_bh(&pmlmepriv->lock, &irqL);
 }
 
 extern u16 rtw_get_capability(WLAN_BSSID_EX *bss);
