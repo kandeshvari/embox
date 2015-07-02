@@ -175,7 +175,7 @@
 	#define CONFIG_IOL_RF_RF90_PATH_B
 #endif
 
-#define CONFIG_BR_EXT	0	// Enable NAT2.5 support for STA mode interface with a L2 Bridge
+//#define CONFIG_BR_EXT	0	// Enable NAT2.5 support for STA mode interface with a L2 Bridge
 #ifdef CONFIG_BR_EXT
 #define CONFIG_BR_EXT_BRNAME	"br0"
 #endif	// CONFIG_BR_EXT
