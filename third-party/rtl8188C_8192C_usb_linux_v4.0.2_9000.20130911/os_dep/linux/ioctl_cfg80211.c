@@ -1973,7 +1973,7 @@ static int rtw_cfg80211_set_probe_req_wpsp2pie(_adapter *padapter, char *buf, in
 
 }
 
-static int cfg80211_rtw_scan(struct wiphy *wiphy
+int cfg80211_rtw_scan(struct wiphy *wiphy
 	#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 6, 0))
 	, struct net_device *ndev
 	#endif

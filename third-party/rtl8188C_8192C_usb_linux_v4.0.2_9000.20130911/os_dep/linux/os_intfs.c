@@ -2780,8 +2780,8 @@ void rtw_ndev_destructor(struct net_device *ndev)
 	DBG_871X(FUNC_NDEV_FMT"\n", FUNC_NDEV_ARG(ndev));
 
 #ifdef CONFIG_IOCTL_CFG80211
-	if (ndev->ieee80211_ptr)
-		rtw_mfree((u8 *)ndev->ieee80211_ptr, sizeof(struct wireless_dev));
+	if (EMBOX_NIY(ndev->ieee80211_ptr, 0))
+		EMBOX_NIY(rtw_mfree((u8 *)ndev->ieee80211_ptr, sizeof(struct wireless_dev)), 0);
 #endif
 	EMBOX_NIY(free_netdev(ndev), 0);
 }
