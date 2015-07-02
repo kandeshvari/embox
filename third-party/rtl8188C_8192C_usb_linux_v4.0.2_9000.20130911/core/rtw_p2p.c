@@ -3590,10 +3590,10 @@ _func_enter_;
 
 	DBG_871X("cfg80211_remain_on_channel_expired\n");
 
-	rtw_cfg80211_remain_on_channel_expired(padapter,
+	EMBOX_NIY(rtw_cfg80211_remain_on_channel_expired(padapter,
 		pcfg80211_wdinfo->remain_on_ch_cookie,
 		&pcfg80211_wdinfo->remain_on_ch_channel,
-		pcfg80211_wdinfo->remain_on_ch_type, GFP_KERNEL);
+		pcfg80211_wdinfo->remain_on_ch_type, GFP_KERNEL), 0);
 
 _func_exit_;
 }

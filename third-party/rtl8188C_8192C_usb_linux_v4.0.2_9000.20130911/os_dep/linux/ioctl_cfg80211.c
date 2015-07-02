@@ -428,7 +428,7 @@ static int rtw_cfg80211_inform_bss(_adapter *padapter, struct wlan_network *pnet
 	else
 		freq = rtw_ieee80211_channel_to_frequency(channel, IEEE80211_BAND_5GHZ);
 
-	notify_channel = ieee80211_get_channel(wiphy, freq);
+	notify_channel = EMBOX_NIY(ieee80211_get_channel(wiphy, freq), 0);
 
 	//rtw_get_timestampe_from_ie()
 	notify_timestamp = EMBOX_NIY(jiffies_to_msecs(jiffies), 1)*1000; /* uSec */
@@ -495,8 +495,8 @@ static int rtw_cfg80211_inform_bss(_adapter *padapter, struct wlan_network *pnet
 
 
 #if 1
-	bss = cfg80211_inform_bss_frame(wiphy, notify_channel, (struct ieee80211_mgmt *)buf,
-		len, notify_signal, GFP_ATOMIC);
+	bss = EMBOX_NIY(cfg80211_inform_bss_frame(wiphy, notify_channel, (struct ieee80211_mgmt *)buf,
+		len, notify_signal, GFP_ATOMIC), 0);
 #else
 
 	bss = cfg80211_inform_bss(wiphy, notify_channel, (const u8 *)pnetwork->network.MacAddress,
@@ -542,7 +542,7 @@ static int rtw_cfg80211_inform_bss(_adapter *padapter, struct wlan_network *pnet
 */
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 9, 0)
-	cfg80211_put_bss(wiphy, bss);
+	EMBOX_NIY(cfg80211_put_bss(wiphy, bss), 0);
 #else
 	cfg80211_put_bss(bss);
 #endif
@@ -573,11 +573,11 @@ int rtw_cfg80211_check_bss(_adapter *padapter)
 	else
 		freq = rtw_ieee80211_channel_to_frequency(pnetwork->Configuration.DSConfig, IEEE80211_BAND_5GHZ);
 
-	notify_channel = ieee80211_get_channel(padapter->rtw_wdev->wiphy, freq);
-	bss = cfg80211_get_bss(padapter->rtw_wdev->wiphy, notify_channel,
+	notify_channel = EMBOX_NIY(ieee80211_get_channel(padapter->rtw_wdev->wiphy, freq), 0);
+	bss = EMBOX_NIY(cfg80211_get_bss(padapter->rtw_wdev->wiphy, notify_channel,
 			pnetwork->MacAddress, pnetwork->Ssid.Ssid,
 			pnetwork->Ssid.SsidLength,
-			WLAN_CAPABILITY_ESS, WLAN_CAPABILITY_ESS);
+			WLAN_CAPABILITY_ESS, WLAN_CAPABILITY_ESS), 0);
 
 	return 	(bss!=NULL);
 }
@@ -634,7 +634,7 @@ void rtw_cfg80211_indicate_connect(_adapter *padapter)
 		#endif
 
 		DBG_871X("%s call cfg80211_roamed\n", __FUNCTION__);
-		cfg80211_roamed(padapter->pnetdev
+		EMBOX_NIY(cfg80211_roamed(padapter->pnetdev
 			#if LINUX_VERSION_CODE > KERNEL_VERSION(2, 6, 39) || defined(COMPAT_KERNEL_RELEASE)
 			, notify_channel
 			#endif
@@ -643,18 +643,18 @@ void rtw_cfg80211_indicate_connect(_adapter *padapter)
 			, pmlmepriv->assoc_req_len-sizeof(struct rtw_ieee80211_hdr_3addr)-2
 			, pmlmepriv->assoc_rsp+sizeof(struct rtw_ieee80211_hdr_3addr)+6
 			, pmlmepriv->assoc_rsp_len-sizeof(struct rtw_ieee80211_hdr_3addr)-6
-			, GFP_ATOMIC);
+			, GFP_ATOMIC), 0);
 	}
 	else
 	#endif
 	{
 		DBG_8192C("pwdev->sme_state(b)=%d\n", pwdev->sme_state);
-		cfg80211_connect_result(padapter->pnetdev, cur_network->network.MacAddress
+		EMBOX_NIY(cfg80211_connect_result(padapter->pnetdev, cur_network->network.MacAddress
 			, pmlmepriv->assoc_req+sizeof(struct rtw_ieee80211_hdr_3addr)+2
 			, pmlmepriv->assoc_req_len-sizeof(struct rtw_ieee80211_hdr_3addr)-2
 			, pmlmepriv->assoc_rsp+sizeof(struct rtw_ieee80211_hdr_3addr)+6
 			, pmlmepriv->assoc_rsp_len-sizeof(struct rtw_ieee80211_hdr_3addr)-6
-			, WLAN_STATUS_SUCCESS, GFP_ATOMIC);
+			, WLAN_STATUS_SUCCESS, GFP_ATOMIC), 0);
 		DBG_8192C("pwdev->sme_state(a)=%d\n", pwdev->sme_state);
 	}
 }
@@ -701,10 +701,10 @@ void rtw_cfg80211_indicate_disconnect(_adapter *padapter)
 		DBG_8192C("pwdev->sme_state(b)=%d\n", pwdev->sme_state);
 
 		if(pwdev->sme_state==CFG80211_SME_CONNECTING)
-			cfg80211_connect_result(padapter->pnetdev, NULL, NULL, 0, NULL, 0,
-				WLAN_STATUS_UNSPECIFIED_FAILURE, GFP_ATOMIC/*GFP_KERNEL*/);
+			EMBOX_NIY(cfg80211_connect_result(padapter->pnetdev, NULL, NULL, 0, NULL, 0,
+				WLAN_STATUS_UNSPECIFIED_FAILURE, GFP_ATOMIC/*GFP_KERNEL*/), 0);
 		else if(pwdev->sme_state==CFG80211_SME_CONNECTED)
-			cfg80211_disconnected(padapter->pnetdev, 0, NULL, 0, GFP_ATOMIC);
+			EMBOX_NIY(cfg80211_disconnected(padapter->pnetdev, 0, NULL, 0, GFP_ATOMIC), 0);
 		//else
 			//DBG_8192C("pwdev->sme_state=%d\n", pwdev->sme_state);
 
@@ -1789,7 +1789,7 @@ void rtw_cfg80211_indicate_scan_done(struct rtw_wdev_priv *pwdev_priv, bool abor
 		}
 		else
 		{
-			cfg80211_scan_done(pwdev_priv->scan_request, aborted);
+			EMBOX_NIY(cfg80211_scan_done(pwdev_priv->scan_request, aborted), 0);
 		}
 
 		pwdev_priv->scan_request = NULL;
@@ -3113,7 +3113,7 @@ void rtw_cfg80211_indicate_sta_assoc(_adapter *padapter, u8 *pmgmt_frame, uint f
 		pwdev->iftype = NL80211_IFTYPE_STATION;
 		#endif //CONFIG_PLATFORM_MSTAR
 		DBG_8192C("iftype=%d before call cfg80211_send_rx_assoc()\n", pwdev->iftype);
-		rtw_cfg80211_send_rx_assoc(padapter, NULL, pmgmt_frame, frame_len);
+		EMBOX_NIY(rtw_cfg80211_send_rx_assoc(padapter, NULL, pmgmt_frame, frame_len), 0);
 		DBG_8192C("iftype=%d after call cfg80211_send_rx_assoc()\n", pwdev->iftype);
 		pwdev->iftype = NL80211_IFTYPE_AP;
 		//cfg80211_rx_action(padapter->pnetdev, freq, pmgmt_frame, frame_len, GFP_ATOMIC);
@@ -3174,7 +3174,7 @@ void rtw_cfg80211_indicate_sta_disassoc(_adapter *padapter, unsigned char *da, u
 	#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,37)) && !defined(CONFIG_CFG80211_FORCE_COMPATIBLE_2_6_37_UNDER)
 	rtw_cfg80211_rx_mgmt(padapter, freq, 0, mgmt_buf, frame_len, GFP_ATOMIC);
 	#else //COMPAT_KERNEL_RELEASE
-	cfg80211_send_disassoc(padapter->pnetdev, mgmt_buf, frame_len);
+	EMBOX_NIY(cfg80211_send_disassoc(padapter->pnetdev, mgmt_buf, frame_len), 0);
 	//cfg80211_rx_action(padapter->pnetdev, freq, mgmt_buf, frame_len, GFP_ATOMIC);
 	#endif //COMPAT_KERNEL_RELEASE
 #endif /* defined(RTW_USE_CFG80211_STA_EVENT) */
@@ -3225,7 +3225,7 @@ static int rtw_cfg80211_monitor_if_xmit_entry(struct sk_buff *skb, struct net_de
 	if (unlikely(rtap_hdr->it_version))
 		goto fail;
 
-	rtap_len = ieee80211_get_radiotap_len(skb->data);
+	rtap_len = EMBOX_NIY(ieee80211_get_radiotap_len(skb->data), 0);
 	if (unlikely(skb->len < rtap_len))
 		goto fail;
 
@@ -3356,7 +3356,7 @@ dump:
 
 fail:
 
-	dev_kfree_skb(skb);
+	EMBOX_NIY(dev_kfree_skb(skb), 0);
 
 	return 0;
 
@@ -3409,7 +3409,7 @@ static int rtw_cfg80211_add_monitor_if(_adapter *padapter, char *name, struct ne
 		goto out;
 	}
 
-	mon_ndev = alloc_etherdev(sizeof(struct rtw_netdev_priv_indicator));
+	mon_ndev = EMBOX_NIY(alloc_etherdev(sizeof(struct rtw_netdev_priv_indicator)), 0);
 	if (!mon_ndev) {
 		DBG_871X(FUNC_ADPT_FMT" allocate ndev fail\n", FUNC_ADPT_ARG(padapter));
 		ret = -ENOMEM;
@@ -3956,7 +3956,7 @@ indicate:
 		freq = rtw_ieee80211_channel_to_frequency(channel, IEEE80211_BAND_5GHZ);
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,37)) || defined(COMPAT_KERNEL_RELEASE)
-	rtw_cfg80211_rx_mgmt(padapter, freq, 0, pmgmt_frame, frame_len, GFP_ATOMIC);
+	EMBOX_NIY(rtw_cfg80211_rx_mgmt(padapter, freq, 0, pmgmt_frame, frame_len, GFP_ATOMIC), 0);
 #else
 	cfg80211_rx_action(padapter->pnetdev, freq, pmgmt_frame, frame_len, GFP_ATOMIC);
 #endif
@@ -3996,7 +3996,7 @@ indicate:
 		freq = rtw_ieee80211_channel_to_frequency(channel, IEEE80211_BAND_5GHZ);
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,37)) || defined(COMPAT_KERNEL_RELEASE)
-	rtw_cfg80211_rx_mgmt(padapter, freq, 0, pmgmt_frame, frame_len, GFP_ATOMIC);
+	EMBOX_NIY(rtw_cfg80211_rx_mgmt(padapter, freq, 0, pmgmt_frame, frame_len, GFP_ATOMIC), 0);
 #else
 	cfg80211_rx_action(padapter->pnetdev, freq, pmgmt_frame, frame_len, GFP_ATOMIC);
 #endif
@@ -4026,7 +4026,7 @@ void rtw_cfg80211_rx_action(_adapter *adapter, u8 *frame, uint frame_len, const 
 		freq = rtw_ieee80211_channel_to_frequency(channel, IEEE80211_BAND_5GHZ);
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,37)) || defined(COMPAT_KERNEL_RELEASE)
-	rtw_cfg80211_rx_mgmt(adapter, freq, 0, frame, frame_len, GFP_ATOMIC);
+	EMBOX_NIY(rtw_cfg80211_rx_mgmt(adapter, freq, 0, frame, frame_len, GFP_ATOMIC), 0);
 #else
 	cfg80211_rx_action(adapter->pnetdev, freq, frame, frame_len, GFP_ATOMIC);
 #endif
@@ -4277,7 +4277,7 @@ static s32 cfg80211_rtw_remain_on_channel(struct wiphy *wiphy,
 	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
 	struct wifidirect_info *pwdinfo = &padapter->wdinfo;
 	struct cfg80211_wifidirect_info *pcfg80211_wdinfo = &padapter->cfg80211_wdinfo;
-	u8 remain_ch = (u8) ieee80211_frequency_to_channel(channel->center_freq);
+	u8 remain_ch = EMBOX_NIY((u8) ieee80211_frequency_to_channel(channel->center_freq), 0);
 	u8 ready_on_channel = _FALSE;
 
 	DBG_871X(FUNC_ADPT_FMT" ch:%u duration:%d\n", FUNC_ADPT_ARG(padapter), remain_ch, duration);
@@ -4415,7 +4415,7 @@ static s32 cfg80211_rtw_remain_on_channel(struct wiphy *wiphy,
 	}
 #endif
 
-	rtw_cfg80211_ready_on_channel(padapter, *cookie, channel, channel_type, duration, GFP_KERNEL);
+	EMBOX_NIY(rtw_cfg80211_ready_on_channel(padapter, *cookie, channel, channel_type, duration, GFP_KERNEL), 0);
 
 exit:
 	if (err)
@@ -4673,7 +4673,7 @@ static int cfg80211_rtw_mgmt_tx(struct wiphy *wiphy,
 	u32 dump_limit = RTW_MAX_MGMT_TX_CNT;
 	u32 dump_cnt = 0;
 	bool ack = _TRUE;
-	u8 tx_ch = (u8)ieee80211_frequency_to_channel(chan->center_freq);
+	u8 tx_ch = EMBOX_NIY((u8)ieee80211_frequency_to_channel(chan->center_freq), 0);
 	u8 category, action;
 	int type = (-1);
 	u32 start = rtw_get_current_time();
@@ -4702,7 +4702,7 @@ static int cfg80211_rtw_mgmt_tx(struct wiphy *wiphy,
 
 	/* indicate ack before issue frame to avoid racing with rsp frame */
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,37)) || defined(COMPAT_KERNEL_RELEASE)
-	rtw_cfg80211_mgmt_tx_status(padapter, *cookie, buf, len, ack, GFP_KERNEL);
+	EMBOX_NIY(rtw_cfg80211_mgmt_tx_status(padapter, *cookie, buf, len, ack, GFP_KERNEL), 0);
 #elif  (LINUX_VERSION_CODE>=KERNEL_VERSION(2,6,34) && LINUX_VERSION_CODE<=KERNEL_VERSION(2,6,35))
 	cfg80211_action_tx_status(ndev, *cookie, buf, len, ack, GFP_KERNEL);
 #endif
@@ -5346,7 +5346,7 @@ static void rtw_cfg80211_preinit_wiphy(_adapter *padapter, struct wiphy *wiphy)
 	*/
 
 	wiphy->cipher_suites = rtw_cipher_suites;
-	wiphy->n_cipher_suites = ARRAY_SIZE(rtw_cipher_suites);
+	wiphy->n_cipher_suites = EMBOX_NIY(ARRAY_SIZE(rtw_cipher_suites), 0);
 
 	/* if (padapter->registrypriv.wireless_mode & WIRELESS_11G) */
 		wiphy->bands[IEEE80211_BAND_2GHZ] = rtw_spt_band_alloc(IEEE80211_BAND_2GHZ);
@@ -5484,7 +5484,7 @@ void rtw_wdev_unregister(struct wireless_dev *wdev)
 		unregister_netdev(pwdev_priv->pmon_ndev);
 	}
 
-	wiphy_unregister(wdev->wiphy);
+	EMBOX_NIY(wiphy_unregister(wdev->wiphy), 0);
 }
 
 #endif //CONFIG_IOCTL_CFG80211

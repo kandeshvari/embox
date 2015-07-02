@@ -113,11 +113,16 @@ struct rtw_wdev_priv
 
 };
 
+#ifdef PLATFORM_EMBOX
+#define wdev_to_priv(w) EMBOX_NIY(w, (struct rtw_wdev_priv *) 0)
+#define wiphy_to_wdev(x) EMBOX_NIY(x, (struct wireless_dev *) 0)
+#define wiphy_to_adapter(x) EMBOX_NIY(x, (struct rtw_wdev_priv *) 0)
+#define wiphy_priv(x) EMBOX_NIY(w, (void *) 0)
+#else
 #define wdev_to_priv(w) ((struct rtw_wdev_priv *)(wdev_priv(w)))
-
-#define wiphy_to_adapter(x) (_adapter *)(((struct rtw_wdev_priv*)wiphy_priv(x))->padapter)
-
 #define wiphy_to_wdev(x) (struct wireless_dev *)(((struct rtw_wdev_priv*)wiphy_priv(x))->rtw_wdev)
+#define wiphy_to_adapter(x) (_adapter *)(((struct rtw_wdev_priv*)wiphy_priv(x))->padapter)
+#endif
 
 int rtw_wdev_alloc(_adapter *padapter, struct device *dev);
 void rtw_wdev_free(struct wireless_dev *wdev);

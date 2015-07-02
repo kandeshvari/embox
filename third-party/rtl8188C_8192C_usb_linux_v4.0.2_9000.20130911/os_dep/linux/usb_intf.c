@@ -1254,7 +1254,7 @@ _adapter *rtw_usb_if1_init(struct dvobj_priv *dvobj,
 		goto free_hal_data;
 
 #ifdef CONFIG_IOCTL_CFG80211
-	if(rtw_wdev_alloc(padapter, dvobj_to_dev(dvobj)) != 0) {
+	if(EMBOX_NIY(rtw_wdev_alloc(padapter, dvobj_to_dev(dvobj)), 0) != 0) {
 		goto handle_dualmac;
 	}
 #endif
@@ -1323,7 +1323,7 @@ free_wdev:
 	if(status != _SUCCESS) {
 		#ifdef CONFIG_IOCTL_CFG80211
 		rtw_wdev_unregister(padapter->rtw_wdev);
-		rtw_wdev_free(padapter->rtw_wdev);
+		EMBOX_NIY(rtw_wdev_free(padapter->rtw_wdev), 0);
 		#endif
 	}
 handle_dualmac:
@@ -1372,7 +1372,7 @@ static void rtw_usb_if1_deinit(_adapter *if1)
 
 #ifdef CONFIG_IOCTL_CFG80211
 	if (if1->rtw_wdev)
-		rtw_wdev_free(if1->rtw_wdev);
+		EMBOX_NIY(rtw_wdev_free(if1->rtw_wdev), 0);
 #endif //CONFIG_IOCTL_CFG80211
 
 	rtw_free_drv_sw(if1);
