@@ -870,7 +870,7 @@ static inline void __list_add(_list *pnew, _list *pprev, _list *pnext)
 
 void _rtw_init_listhead(_list *list)
 {
-
+	dlist_head_init(list);
 #ifdef PLATFORM_LINUX
 
         INIT_LIST_HEAD(list);
@@ -897,7 +897,12 @@ Otherwise, there will be racing condition.
 */
 u32	rtw_is_list_empty(_list *phead)
 {
-
+#ifdef PLATFORM_EMBOX
+	if (dlist_empty(phead))
+		return _TRUE;
+	else
+		return _FALSE;
+#endif
 #ifdef PLATFORM_LINUX
 
 	if (list_empty(phead))
@@ -930,7 +935,9 @@ u32	rtw_is_list_empty(_list *phead)
 
 void rtw_list_insert_head(_list *plist, _list *phead)
 {
-
+#ifdef PLATFORM_EMBOX
+	dlist_add_next(phead, plist);
+#endif
 #ifdef PLATFORM_LINUX
 	list_add(plist, phead);
 #endif
@@ -946,7 +953,9 @@ void rtw_list_insert_head(_list *plist, _list *phead)
 
 void rtw_list_insert_tail(_list *plist, _list *phead)
 {
-
+#ifdef PLATFORM_EMBOX
+	dlist_add_prev(phead, plist);
+#endif
 #ifdef PLATFORM_LINUX
 
 	list_add_tail(plist, phead);

@@ -82,7 +82,9 @@ _func_enter_;
 	_rtw_init_queue(&precvpriv->free_recv_queue);
 	_rtw_init_queue(&precvpriv->recv_pending_queue);
 	_rtw_init_queue(&precvpriv->uc_swdec_pending_queue);
-
+#ifdef PLATFORM_EMBOX
+	_rtw_init_queue(&precvpriv->free_recv_skb_queue);
+#endif
 	precvpriv->adapter = padapter;
 
 	precvpriv->free_recvframe_cnt = NR_RECVFRAME;
