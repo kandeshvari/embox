@@ -164,7 +164,7 @@ unsigned int ffaddr2pipehdl(struct dvobj_priv *pdvobj, u32 addr)
 	int ep_num=0;
 	_adapter *padapter = pdvobj->if1;
 	struct usb_device *pusbd = NULL;
-	EMBOX_NIY(pusbd = pdvobj->pusbdev, 0);
+	pusbd = pdvobj->pusbdev;
 	HAL_DATA_TYPE *pHalData = GET_HAL_DATA(padapter);
 
 	if (addr == RECV_BULK_IN_ADDR) {
@@ -224,7 +224,7 @@ static u32 usb_bulkout_zero(struct intf_hdl *pintfhdl, u32 addr)
 	_adapter *padapter = (_adapter *)pintfhdl->padapter;
 	struct dvobj_priv *pdvobj = adapter_to_dvobj(padapter);
 	struct usb_device *pusbd = NULL;
-	EMBOX_NIY(pusbd = pdvobj->pusbdev, 0);
+	pusbd = pdvobj->pusbdev;
 
 	//DBG_871X("%s\n", __func__);
 
@@ -476,7 +476,7 @@ u32 usb_write_port(struct intf_hdl *pintfhdl, u32 addr, u32 cnt, u8 *wmem)
 	struct xmit_buf *pxmitbuf = (struct xmit_buf *)wmem;
 	struct xmit_frame *pxmitframe = (struct xmit_frame *)pxmitbuf->priv_data;
 	struct usb_device *pusbd = NULL;
-	EMBOX_NIY(pusbd = pdvobj->pusbdev, 0);
+	pusbd = pdvobj->pusbdev;
 	struct pkt_attrib *pattrib = &pxmitframe->attrib;
 
 _func_enter_;
