@@ -8,5 +8,9 @@
 
 #ifndef NET_IEEE80211_RADIOTAP
 #define NET_IEEE80211_RADIOTAP
-/* Stub */
+struct ieee80211_channel {
+};
+enum nl80211_channel_type {
+	A
+};
 #endif /* NET_IEEE80211_RADIOTAP */
