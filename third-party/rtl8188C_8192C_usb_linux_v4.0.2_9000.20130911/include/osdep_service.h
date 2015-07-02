@@ -24,6 +24,8 @@
 #include <basic_types.h>
 //#include <rtl871x_byteorder.h>
 
+#define ENOTSUPP ENOSUPP
+
 #ifdef PLATFORM_EMBOX
 #define EMBOX_NIY(exp, val) (printk("NIY: %s:%d, func %s:"#exp"\n", __FILE__, __LINE__, __FUNCTION__), val)
 #else

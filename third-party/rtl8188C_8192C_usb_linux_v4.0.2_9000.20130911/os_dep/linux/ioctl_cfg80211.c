@@ -431,7 +431,7 @@ static int rtw_cfg80211_inform_bss(_adapter *padapter, struct wlan_network *pnet
 	notify_channel = ieee80211_get_channel(wiphy, freq);
 
 	//rtw_get_timestampe_from_ie()
-	notify_timestamp = jiffies_to_msecs(jiffies)*1000; /* uSec */
+	notify_timestamp = EMBOX_NIY(jiffies_to_msecs(jiffies), 1)*1000; /* uSec */
 
 	notify_interval = le16_to_cpu(*(u16*)rtw_get_beacon_interval_from_ie(pnetwork->network.IEs));
 	notify_capability = le16_to_cpu(*(u16*)rtw_get_capability_from_ie(pnetwork->network.IEs));
@@ -2888,6 +2888,7 @@ static int cfg80211_rtw_disconnect(struct wiphy *wiphy, struct net_device *ndev,
 	return 0;
 }
 
+#if 0
 static int cfg80211_rtw_set_txpower(struct wiphy *wiphy,
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,8,0))
 	struct wireless_dev *wdev,
@@ -2927,7 +2928,7 @@ static int cfg80211_rtw_set_txpower(struct wiphy *wiphy,
 	DBG_8192C("%s\n", __func__);
 	return 0;
 }
-
+#endif
 static int cfg80211_rtw_get_txpower(struct wiphy *wiphy,
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,8,0))
 	struct wireless_dev *wdev,
@@ -3374,7 +3375,7 @@ static int rtw_cfg80211_monitor_if_set_mac_address(struct net_device *ndev, void
 
 	return ret;
 }
-
+#if 0
 #if (LINUX_VERSION_CODE>=KERNEL_VERSION(2,6,29))
 static const struct net_device_ops rtw_cfg80211_monitor_if_ops = {
 	.ndo_open = rtw_cfg80211_monitor_if_open,
@@ -3386,7 +3387,7 @@ static const struct net_device_ops rtw_cfg80211_monitor_if_ops = {
        .ndo_set_mac_address = rtw_cfg80211_monitor_if_set_mac_address,
 };
 #endif
-
+#endif
 static int rtw_cfg80211_add_monitor_if(_adapter *padapter, char *name, struct net_device **ndev)
 {
 	int ret = 0;
@@ -3418,10 +3419,10 @@ static int rtw_cfg80211_add_monitor_if(_adapter *padapter, char *name, struct ne
 	mon_ndev->type = ARPHRD_IEEE80211_RADIOTAP;
 	strncpy(mon_ndev->name, name, IFNAMSIZ);
 	mon_ndev->name[IFNAMSIZ - 1] = 0;
-	mon_ndev->destructor = rtw_ndev_destructor;
+	EMBOX_NIY(mon_ndev->destructor = rtw_ndev_destructor, 0);
 
 #if (LINUX_VERSION_CODE>=KERNEL_VERSION(2,6,29))
-	mon_ndev->netdev_ops = &rtw_cfg80211_monitor_if_ops;
+	EMBOX_NIY(mon_ndev->netdev_ops = &rtw_cfg80211_monitor_if_ops, NULL);
 #else
 	mon_ndev->open = rtw_cfg80211_monitor_if_open;
 	mon_ndev->stop = rtw_cfg80211_monitor_if_close;
@@ -3429,7 +3430,7 @@ static int rtw_cfg80211_add_monitor_if(_adapter *padapter, char *name, struct ne
 	mon_ndev->set_mac_address = rtw_cfg80211_monitor_if_set_mac_address;
 #endif
 
-	pnpi = netdev_priv(mon_ndev);
+	pnpi = netdev_priv(mon_ndev, void);
 	pnpi->priv = padapter;
 	pnpi->sizeof_priv = sizeof(_adapter);
 
@@ -3444,7 +3445,7 @@ static int rtw_cfg80211_add_monitor_if(_adapter *padapter, char *name, struct ne
 	mon_wdev->wiphy = padapter->rtw_wdev->wiphy;
 	mon_wdev->netdev = mon_ndev;
 	mon_wdev->iftype = NL80211_IFTYPE_MONITOR;
-	mon_ndev->ieee80211_ptr = mon_wdev;
+	EMBOX_NIY(mon_ndev->ieee80211_ptr = mon_wdev, 0);
 
 	ret = register_netdevice(mon_ndev);
 	if (ret) {
@@ -3524,7 +3525,7 @@ static int
 	DBG_871X(FUNC_ADPT_FMT" ndev:%p, ret:%d\n", FUNC_ADPT_ARG(padapter), ndev, ret);
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,6,0))
-	return ndev ? ndev->ieee80211_ptr : ERR_PTR(ret);
+	return ndev ? EMBOX_NIY(ndev->ieee80211_ptr, 0) : ERR_PTR(ret);
 #elif (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,38)) || defined(COMPAT_KERNEL_RELEASE)
 	return ndev ? ndev : ERR_PTR(ret);
 #else
@@ -5140,7 +5141,7 @@ int rtw_cfg80211_set_mgnt_wpsp2pie(struct net_device *net, char *buf, int len,
 
 }
 
-static struct cfg80211_ops rtw_cfg80211_ops = {
+/* static struct cfg80211_ops rtw_cfg80211_ops = {
 	.change_virtual_intf = cfg80211_rtw_change_iface,
 	.add_key = cfg80211_rtw_add_key,
 	.get_key = cfg80211_rtw_get_key,
@@ -5197,7 +5198,7 @@ static struct cfg80211_ops rtw_cfg80211_ops = {
 #elif  (LINUX_VERSION_CODE>=KERNEL_VERSION(2,6,34) && LINUX_VERSION_CODE<=KERNEL_VERSION(2,6,35))
 	.action = cfg80211_rtw_mgmt_tx,
 #endif
-};
+}; */
 
 static void rtw_cfg80211_init_ht_capab(struct ieee80211_sta_ht_cap *ht_cap, enum ieee80211_band band, u8 rf_type)
 {
@@ -5367,6 +5368,7 @@ static void rtw_cfg80211_preinit_wiphy(_adapter *padapter, struct wiphy *wiphy)
 		wiphy->flags &= ~WIPHY_FLAG_PS_ON_BY_DEFAULT;
 }
 
+#if 0
 int rtw_wdev_alloc(_adapter *padapter, struct device *dev)
 {
 	int ret = 0;
@@ -5463,7 +5465,7 @@ void rtw_wdev_free(struct wireless_dev *wdev)
 
 	rtw_mfree((u8*)wdev, sizeof(struct wireless_dev));
 }
-
+#endif
 void rtw_wdev_unregister(struct wireless_dev *wdev)
 {
 	struct rtw_wdev_priv *pwdev_priv;
