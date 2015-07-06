@@ -1823,7 +1823,7 @@ struct	iw_mlme
 
 }
 
-static int rtw_wx_set_scan(struct net_device *dev, struct iw_request_info *a,
+int rtw_wx_set_scan(struct net_device *dev, struct iw_request_info *a,
 			     union iwreq_data *wrqu, char *extra)
 {
 	u8 _status = _FALSE;
@@ -2073,7 +2073,7 @@ _func_exit_;
 	return ret;
 }
 
-static int rtw_wx_get_scan(struct net_device *dev, struct iw_request_info *a,
+int rtw_wx_get_scan(struct net_device *dev, struct iw_request_info *a,
 			     union iwreq_data *wrqu, char *extra)
 {
 	_irqL	irqL;
