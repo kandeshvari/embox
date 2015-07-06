@@ -1,4 +1,4 @@
-package embox.cmd.net
+package embox.cmd.net.wireless
 
 @AutoCmd
 @Cmd(name = "iwconfig",
