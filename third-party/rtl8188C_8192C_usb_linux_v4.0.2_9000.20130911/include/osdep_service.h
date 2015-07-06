@@ -2127,7 +2127,7 @@ extern void rtw_yield_os(void);
 __inline static unsigned char _cancel_timer_ex(_timer *ptimer)
 {
 #ifdef PLATFORM_EMBOX
-	return EMBOX_NIY(this_function(), 0);
+	return timer_close(ptimer);
 #endif
 #ifdef PLATFORM_LINUX
 	return del_timer_sync(ptimer);
