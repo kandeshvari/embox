@@ -1278,10 +1278,15 @@ u32 rtw_end_of_queue_search(_list *head, _list *plist)
 		return _FALSE;
 }
 
-
+#ifdef PLATFORM_EMBOX
+#include <kernel/time/time.h>
+#include <kernel/time/clock_source.h>
+#endif
 u32	rtw_get_current_time(void)
 {
-
+#ifdef PLATFORM_EMBOX
+	return clock_sys_ticks();
+#endif
 #ifdef PLATFORM_LINUX
 	return jiffies;
 #endif
@@ -1299,6 +1304,9 @@ u32	rtw_get_current_time(void)
 
 inline u32 rtw_systime_to_ms(u32 systime)
 {
+#ifdef PLATFORM_EMBOX
+	return systime / 1000;
+#endif
 #ifdef PLATFORM_LINUX
 	return systime * 1000 / HZ;
 #endif

@@ -86,7 +86,11 @@ void rtw_join_timeout_handler (void *FunctionContext)
 
 void _rtw_scan_timeout_handler (void *FunctionContext)
 {
+#ifndef PLATFORM_EMBOX
 	_adapter *adapter = (_adapter *)FunctionContext;
+#else
+	_adapter *adapter = ((struct sys_timer *) FunctionContext)->param;
+#endif
 	rtw_scan_timeout_handler(adapter);
 }
 
