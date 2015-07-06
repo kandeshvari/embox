@@ -171,6 +171,8 @@ module usbnet {
 }
 
 module tlwn823n {
+	@IncludePath("$(EMBOX_ROOT_DIR)/third-party/rtl8188C_8192C_usb_linux_v4.0.2_9000.20130911/include")
+
 	source "tlwn823n.c"
 
 	depends embox.compat.libc.assert

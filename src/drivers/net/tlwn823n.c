@@ -21,6 +21,8 @@
 #include <net/inetdevice.h>
 #include <net/l2/ethernet.h>
 #include <net/netdevice.h>
+#include <basic_types.h>
+#include <osdep_service.h>
 
 static struct usb_device_id wn823n_id_table[] = {
 	{ 0x0bda, 0x8178 },
@@ -66,84 +68,41 @@ static int rtl_read_byte(struct wn823n_priv *priv, int addr, void *data) {
 	return 0;
 }
 
-static int rtl_write_byte(struct wn823n_priv *priv, int addr, char *data) {
-	uint16_t wvalue;
+extern int rtw_drv_init(struct usb_interface *, const struct usb_device_id *);
+extern int ksleep(useconds_t msec);
+static void *wn823n_probe_hnd(void *arg) {
+	static struct usb_device_id did;
+	printk("Thread started\n");
+	//ksleep(1000);
 
-	wvalue = addr & 0x0000ffff;
+	static struct usb_interface intf = {
+		.altsetting = {
+			{
+				.desc = {
+					/* This data could be obtained runtime */
+					.b_num_endpoints      =   4,
+					.b_length             =   9,
+					.b_desc_type    =   4,
+					.b_interface_number   =   0,
+					.b_alternate_setting  =   0,
+					.b_interface_class    = 255,
+					.b_interface_subclass = 255,
+					.b_interface_protocol = 255,
+					.i_interface          =   0,
+				},
+			.endpoint = NULL,
+			}
+		},
+	};
 
-	usb_endp_control(priv->usbdev->endpoints[0],
-			wn823n_hnd,
-			NULL,
-			REALTEK_USB_VENQT_WRITE,
-			REALTEK_USB_VENQT_CMD_REQ,
-			wvalue,
-			REALTEK_USB_VENQT_CMD_IDX,
-			1,
-			data);
-	return 0;
-}
-
-#define FW_NAME       "firmware/rtl8192cufw.bin"
-#define FW_MAX_LEN    0x4000
-#define FW_START_ADDR 0x1000
-
-static int wn823n_load_firmware(struct wn823n_priv *priv) {
-	FILE *fs_fw;
-	int i;
-	assert(priv);
-
-	if (NULL == (fs_fw = fopen(FW_NAME, "r")))
-		return -EINVAL;
-
-	if ((priv->fw_len = fread(priv->fw, 1, FW_MAX_LEN, fs_fw)) < 0) {
-		return priv->fw_len;
-	}
-
-	for (i = 0; i < priv->fw_len; i++) {
-		if (rtl_write_byte(priv, FW_START_ADDR + i, priv->fw + i))
-			return -1;
-	}
-
+	intf.dev = arg;
+	rtw_drv_init(&intf, &did);
 	return 0;
 }
 
 static int wn823n_probe(struct usb_driver *drv, struct usb_dev *dev, void **data) {
-	struct net_device *nic;
-	struct wn823n_priv *nic_priv;
-	int errcode;
-	assert(drv);
-	assert(dev);
-	assert(data);
-
-	printk("wn823n probe\n");
-	/* TODO etherdev sets ethXX as devname, while wlanXX should be used */
-	nic = (struct net_device *) etherdev_alloc(sizeof *nic_priv);
-	if (!nic)
-		return -ENOMEM;
-
-	nic->drv_ops = &wn823n_drv_ops;
-	nic_priv = netdev_priv(nic, struct wn823n_priv);
-	nic_priv->usbdev = dev;
-	nic_priv->fw = sysmalloc(FW_MAX_LEN);
-
-	sched_lock();
-	wn823n_load_firmware(nic_priv);
-	sched_unlock();
-
-	nic_priv->data = nic_priv->pdata = sysmalloc(ETH_FRAME_LEN);
-	if (!nic_priv->data) {
-		etherdev_free(nic);
-		return -ENOMEM;
-	}
-
-	*nic_priv = (struct wn823n_priv) {
-		.usbdev = dev,
-	};
-
-	if ((errcode = inetdev_register_dev(nic)) < 0) {
-		etherdev_free(nic);
-		return errcode;
-	}
+	thread_create(0, wn823n_probe_hnd, dev);
+	printk("Probe exit\n");
 	return 0;
 }
 
