@@ -1305,7 +1305,11 @@ __inline static void _init_timer(_timer *ptimer,_nic_hdl nic_hdl,void *pfunc,voi
 
 __inline static void _set_timer(_timer *ptimer,u32 delay_time)
 {
+#ifdef PLATFORM_EMBOX
+	timer_start(ptimer, delay_time / 1000);
+#else
 	timer_start(ptimer, delay_time);
+#endif
 }
 
 __inline static void _cancel_timer(_timer *ptimer,u8 *bcancelled)
