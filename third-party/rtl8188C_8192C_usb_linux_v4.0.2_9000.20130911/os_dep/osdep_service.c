@@ -1600,8 +1600,10 @@ inline void ATOMIC_SET(ATOMIC_T *v, int i)
 {
 	#ifdef PLATFORM_LINUX
 	atomic_set(v,i);
+	#elif defined PLATFORM_EMBOX
+	v->counter = i; // XXX
 	#elif defined(PLATFORM_WINDOWS)
-	*v=i;// other choice????
+	*v=i;
 	#elif defined(PLATFORM_FREEBSD)
 	atomic_set_int(v,i);
 	#endif
@@ -1612,7 +1614,9 @@ inline int ATOMIC_READ(ATOMIC_T *v)
 	#ifdef PLATFORM_LINUX
 	return atomic_read(v);
 	#elif defined(PLATFORM_WINDOWS)
-	return *v; // other choice????
+	return *v; // XXX
+	#elif defined PLATFORM_EMBOX
+	return v->counter;
 	#elif defined(PLATFORM_FREEBSD)
 	return atomic_load_acq_32(v);
 	#endif
@@ -1620,7 +1624,9 @@ inline int ATOMIC_READ(ATOMIC_T *v)
 
 inline void ATOMIC_ADD(ATOMIC_T *v, int i)
 {
-	#ifdef PLATFORM_LINUX
+	#ifdef PLATFORM_EMBOX
+	v->counter += i; // XXX
+	#elif defined PLATFORM_LINUX
 	atomic_add(i,v);
 	#elif defined(PLATFORM_WINDOWS)
 	InterlockedAdd(v,i);
@@ -1630,7 +1636,9 @@ inline void ATOMIC_ADD(ATOMIC_T *v, int i)
 }
 inline void ATOMIC_SUB(ATOMIC_T *v, int i)
 {
-	#ifdef PLATFORM_LINUX
+	#ifdef PLATFORM_EMBOX
+	v->counter -= i; // XXX
+	#elif defined PLATFORM_LINUX
 	atomic_sub(i,v);
 	#elif defined(PLATFORM_WINDOWS)
 	InterlockedAdd(v,-i);
@@ -1641,7 +1649,9 @@ inline void ATOMIC_SUB(ATOMIC_T *v, int i)
 
 inline void ATOMIC_INC(ATOMIC_T *v)
 {
-	#ifdef PLATFORM_LINUX
+	#ifdef PLATFORM_EMBOX
+	v->counter++; // XXX
+	#elif defined PLATFORM_LINUX
 	atomic_inc(v);
 	#elif defined(PLATFORM_WINDOWS)
 	InterlockedIncrement(v);
@@ -1652,7 +1662,9 @@ inline void ATOMIC_INC(ATOMIC_T *v)
 
 inline void ATOMIC_DEC(ATOMIC_T *v)
 {
-	#ifdef PLATFORM_LINUX
+	#ifdef PLATFORM_EMBOX
+	v->counter--; // XXX
+	#elif defined PLATFORM_LINUX
 	atomic_dec(v);
 	#elif defined(PLATFORM_WINDOWS)
 	InterlockedDecrement(v);
@@ -1665,6 +1677,8 @@ inline int ATOMIC_ADD_RETURN(ATOMIC_T *v, int i)
 {
 	#ifdef PLATFORM_LINUX
 	return atomic_add_return(i,v);
+	#elif defined PLATFORM_EMBOX
+	return v->counter += i; // XXX
 	#elif defined(PLATFORM_WINDOWS)
 	return InterlockedAdd(v,i);
 	#elif defined(PLATFORM_FREEBSD)
@@ -1677,6 +1691,8 @@ inline int ATOMIC_SUB_RETURN(ATOMIC_T *v, int i)
 {
 	#ifdef PLATFORM_LINUX
 	return atomic_sub_return(i,v);
+	#elif PLATFORM_EMBOX
+	return v->counter -= i; // XXX
 	#elif defined(PLATFORM_WINDOWS)
 	return InterlockedAdd(v,-i);
 	#elif defined(PLATFORM_FREEBSD)
@@ -1689,6 +1705,8 @@ inline int ATOMIC_INC_RETURN(ATOMIC_T *v)
 {
 	#ifdef PLATFORM_LINUX
 	return atomic_inc_return(v);
+	#elif defined PLATFORM_EMBOX
+	return v->counter++; // XXX
 	#elif defined(PLATFORM_WINDOWS)
 	return InterlockedIncrement(v);
 	#elif defined(PLATFORM_FREEBSD)
@@ -1701,6 +1719,8 @@ inline int ATOMIC_DEC_RETURN(ATOMIC_T *v)
 {
 	#ifdef PLATFORM_LINUX
 	return atomic_dec_return(v);
+	#elif defined PLATFORM_EMBOX
+	return v->counter--;
 	#elif defined(PLATFORM_WINDOWS)
 	return InterlockedDecrement(v);
 	#elif defined(PLATFORM_FREEBSD)
