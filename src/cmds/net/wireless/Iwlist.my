@@ -1,0 +1,13 @@
+package embox.cmd.net.wireless
+
+@AutoCmd
+@Cmd(name = "iwlist",
+	help = "List wireless connections",
+	man = '''
+		TODO
+	''')
+module iwlist {
+	source "iwlist.c"
+
+	depends embox.compat.libc.stdio.printf
+}
