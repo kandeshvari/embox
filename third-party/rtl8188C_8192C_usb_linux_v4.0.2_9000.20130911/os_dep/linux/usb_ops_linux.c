@@ -250,11 +250,11 @@ static u32 usb_bulkout_zero(struct intf_hdl *pintfhdl, u32 addr)
 	//translate DMA FIFO addr to pipehandle
 	//pipe = ffaddr2pipehdl(pdvobj, addr);
 
-	EMBOX_NIY(usb_fill_bulk_urb(purb, pusbd, pipe,
+	usb_fill_bulk_urb(purb, pusbd, pipe,
        				pbuf,
               			len,
               			usb_bulkout_zero_complete,
-              			pcontext), 0);//context is pcontext
+              			pcontext);//context is pcontext
 
 	status = EMBOX_NIY(usb_submit_urb(purb, GFP_ATOMIC), 1);
 
@@ -559,11 +559,11 @@ _func_enter_;
 #endif
 
 
-	EMBOX_NIY(usb_fill_bulk_urb(purb, pusbd, pipe,
+	usb_fill_bulk_urb(purb, pusbd, pipe,
        				pxmitframe->buf_addr, //= pxmitbuf->pbuf
               			cnt,
               			usb_write_port_complete,
-              			pxmitbuf), 0);//context is pxmitbuf
+              			pxmitbuf);//context is pxmitbuf
 
 #ifdef CONFIG_USE_USB_BUFFER_ALLOC_TX
 	purb->transfer_dma = pxmitbuf->dma_transfer_addr;

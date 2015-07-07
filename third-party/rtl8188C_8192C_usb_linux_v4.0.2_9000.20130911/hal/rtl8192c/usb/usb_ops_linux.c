@@ -1450,11 +1450,11 @@ _func_enter_;
 		//translate DMA FIFO addr to pipehandle
 		pipe = ffaddr2pipehdl(pdvobj, addr);
 
-		EMBOX_NIY(usb_fill_bulk_urb(purb, pusbd, pipe,
+		usb_fill_bulk_urb(purb, pusbd, pipe,
 						precvbuf->pbuf,
                 				MAX_RECVBUF_SZ,
                 				usb_read_port_complete,
-                				precvbuf), 0);//context is precvbuf
+                				precvbuf);//context is precvbuf
 
 		err = EMBOX_NIY(usb_submit_urb(purb, GFP_ATOMIC), 0);
 		if((err) && (err != (-EPERM)))

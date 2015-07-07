@@ -2172,7 +2172,7 @@ int rtw_wx_get_scan(struct net_device *dev, struct iw_request_info *a,
 
  	while(check_fwstate(pmlmepriv, wait_status) == _TRUE)
 	{
-		rtw_msleep_os(30);
+		rtw_msleep_os(300);
 		cnt++;
 		if(cnt > wait_for_surveydone )
 			break;

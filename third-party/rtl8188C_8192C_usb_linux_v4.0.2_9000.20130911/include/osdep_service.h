@@ -1134,6 +1134,10 @@ typedef unsigned gfp_t;
 	struct urb {
 		int status;			/* (return) non-ISO status */
 		uint32_t actual_length;		/* (return) actual transfer length */
+		struct usb_device *dev;		/* (in) pointer to associated device */
+		struct usb_host_endpoint *ep;	/* (internal) pointer to endpoint */
+		void *transfer_buffer;		/* (in) associated data buffer */
+		u32 transfer_buffer_length;	/* (in) data buffer length */
 #if 0
 		struct kref kref;		/* reference count of the URB */
 		void *hcpriv;			/* private data for host controller */
@@ -1144,17 +1148,13 @@ typedef unsigned gfp_t;
 						 * current owner */
 		struct list_head anchor_list;	/* the URB may be anchored */
 		struct usb_anchor *anchor;
-		struct usb_device *dev;		/* (in) pointer to associated device */
-		struct usb_host_endpoint *ep;	/* (internal) pointer to endpoint */
 		unsigned int pipe;		/* (in) pipe information */
 		unsigned int stream_id;		/* (in) stream ID */
 		unsigned int transfer_flags;	/* (in) URB_SHORT_NOT_OK | ...*/
-		void *transfer_buffer;		/* (in) associated data buffer */
 		dma_addr_t transfer_dma;	/* (in) dma addr for transfer_buffer */
 		struct scatterlist *sg;		/* (in) scatter gather buffer list */
 		int num_mapped_sgs;		/* (internal) mapped sg entries */
 		int num_sgs;			/* (in) number of entries in the sg list */
-		u32 transfer_buffer_length;	/* (in) data buffer length */
 		unsigned char *setup_packet;	/* (in) setup packet (control only) */
 		dma_addr_t setup_dma;		/* (in) dma addr for setup_packet */
 		int start_frame;		/* (modify) start frame (ISO) */
@@ -1169,6 +1169,26 @@ typedef unsigned gfp_t;
 #endif
 	};
 
+
+#ifdef PLATFORM_EMBOX
+static inline void usb_fill_bulk_urb(struct urb *urb,
+				     struct usb_device *dev,
+				     unsigned int pipe,
+				     void *transfer_buffer,
+				     int buffer_length,
+				     void *complete_fn,
+				     void *context)
+{
+	urb->dev = dev;
+	//urb->pipe = pipe;
+	urb->transfer_buffer = transfer_buffer;
+	urb->transfer_buffer_length = buffer_length;
+	//urb->complete = complete_fn;
+	//urb->context = context;
+}
+
+
+#endif
 
 
 	struct usb_host_config {
