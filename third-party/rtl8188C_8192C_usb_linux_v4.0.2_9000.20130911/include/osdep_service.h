@@ -773,6 +773,7 @@ __inline static void _set_workitem(_workitem *pwork)
 #endif //PLATFORM_FREEBSD
 
 #ifdef PLATFORM_EMBOX
+	#define usb_alloc_urb(x, y) sysmalloc(sizeof(struct urb))
 	#define kthread_run(x, y, z) thread_create(0, x, y)
 	#define skb_tail_pointer(skb)	EMBOX_NIY(skb->tail, NULL)
 	#define free_netdev(x) netdev_free(x)
@@ -1306,7 +1307,7 @@ __inline static void _init_timer(_timer *ptimer,_nic_hdl nic_hdl,void *pfunc,voi
 __inline static void _set_timer(_timer *ptimer,u32 delay_time)
 {
 #ifdef PLATFORM_EMBOX
-	timer_start(ptimer, delay_time / 1000);
+	timer_start(ptimer, jiffies2ms(delay_time));
 #else
 	timer_start(ptimer, delay_time);
 #endif

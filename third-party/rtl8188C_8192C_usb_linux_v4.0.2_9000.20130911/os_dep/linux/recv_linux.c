@@ -69,7 +69,7 @@ int rtw_os_recvbuf_resource_alloc(_adapter *padapter, struct recv_buf *precvbuf)
 	struct usb_device	*pusbd = pdvobjpriv->pusbdev;
 
 	precvbuf->irp_pending = _FALSE;
-	EMBOX_NIY(precvbuf->purb = usb_alloc_urb(0, GFP_KERNEL), 0);
+	precvbuf->purb = usb_alloc_urb(0, GFP_KERNEL);
 	#if 0
 	if(precvbuf->purb == NULL){
 		res = _FAIL;
