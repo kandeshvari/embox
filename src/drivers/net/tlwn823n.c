@@ -101,7 +101,7 @@ static void *wn823n_probe_hnd(void *arg) {
 }
 
 static int wn823n_probe(struct usb_driver *drv, struct usb_dev *dev, void **data) {
-	thread_create(0, wn823n_probe_hnd, dev);
+	thread_create(THREAD_FLAG_NOTASK, wn823n_probe_hnd, dev);
 	printk("Probe exit\n");
 	return 0;
 }
