@@ -1287,7 +1287,11 @@ BlinkTimerCallback(
 	unsigned long data
 	)
 {
+#ifndef PLATFORM_EMBOX
 	PLED_871x	 pLed = (PLED_871x)data;
+#else
+	PLED_871x	pLed = (PLED_871x)(((_timer *)data)->param);
+#endif
 	_adapter		*padapter = pLed->padapter;
 
 	//DBG_871X("%s\n", __FUNCTION__);
