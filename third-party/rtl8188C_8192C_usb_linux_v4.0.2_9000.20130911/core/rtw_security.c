@@ -3046,8 +3046,11 @@ void rtw_use_tkipkey_handler (
 void rtw_use_tkipkey_handler(void *FunctionContext)
 #endif
 {
+#ifndef PLATFORM_EMBOX
         _adapter *padapter = (_adapter *)FunctionContext;
-
+#else
+	_adapter *padapter = ((struct sys_timer *) FunctionContext)->param;
+#endif
 
 _func_enter_;
 

@@ -437,7 +437,12 @@ void rtw_os_read_port(_adapter *padapter, struct recv_buf *precvbuf)
 void _rtw_reordering_ctrl_timeout_handler (void *FunctionContext);
 void _rtw_reordering_ctrl_timeout_handler (void *FunctionContext)
 {
+#ifndef PLATFORM_EMBOX
 	struct recv_reorder_ctrl *preorder_ctrl = (struct recv_reorder_ctrl *)FunctionContext;
+#else
+	struct recv_reorder_ctrl *preorder_ctrl = ((struct sys_timer *)FunctionContext)->param;
+#endif
+
 	rtw_reordering_ctrl_timeout_handler(preorder_ctrl);
 }
 

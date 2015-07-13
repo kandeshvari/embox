@@ -293,7 +293,11 @@ exit:
 void pwr_state_check_handler(void *FunctionContext);
 void pwr_state_check_handler(void *FunctionContext)
 {
+#ifndef PLATFORM_EMBOX
 	_adapter *padapter = (_adapter *)FunctionContext;
+#else
+	_adapter *padapter = ((struct sys_timer *) FunctionContext)->param;
+#endif
 	rtw_ps_cmd(padapter);
 }
 #endif

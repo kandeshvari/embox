@@ -79,7 +79,11 @@ void sitesurvey_ctrl_handler(void *FunctionContext)
 
 void rtw_join_timeout_handler (void *FunctionContext)
 {
+#ifndef PLATFORM_EMBOX
 	_adapter *adapter = (_adapter *)FunctionContext;
+#else
+	_adapter *adapter = ((struct sys_timer *) FunctionContext)->param;
+#endif
 	_rtw_join_timeout_handler(adapter);
 }
 
@@ -97,7 +101,11 @@ void _rtw_scan_timeout_handler (void *FunctionContext)
 
 void _dynamic_check_timer_handlder (void *FunctionContext)
 {
+#ifndef PLATFORM_EMBOX
 	_adapter *adapter = (_adapter *)FunctionContext;
+#else
+	_adapter *adapter = ((struct sys_timer *) FunctionContext)->param;
+#endif
 
 	rtw_dynamic_check_timer_handlder(adapter);
 
@@ -107,7 +115,11 @@ void _dynamic_check_timer_handlder (void *FunctionContext)
 #ifdef CONFIG_SET_SCAN_DENY_TIMER
 void _rtw_set_scan_deny_timer_hdl(void *FunctionContext)
 {
+#ifndef PLATFORM_EMBOX
 	_adapter *adapter = (_adapter *)FunctionContext;
+#else
+	_adapter *adapter = ((struct sys_timer *) FunctionContext)->param;
+#endif
 	rtw_set_scan_deny_timer_hdl(adapter);
 }
 #endif
@@ -310,34 +322,49 @@ _func_exit_;
 
 void _survey_timer_hdl (void *FunctionContext)
 {
-	_adapter *padapter = (_adapter *)FunctionContext;
+#ifndef PLATFORM_EMBOX
+	_adapter *adapter = (_adapter *)FunctionContext;
+#else
+	_adapter *adapter = ((struct sys_timer *) FunctionContext)->param;
+#endif
 
-	survey_timer_hdl(padapter);
+	survey_timer_hdl(adapter);
 }
 
 void _link_timer_hdl (void *FunctionContext)
 {
-	_adapter *padapter = (_adapter *)FunctionContext;
-	link_timer_hdl(padapter);
+#ifndef PLATFORM_EMBOX
+	_adapter *adapter = (_adapter *)FunctionContext;
+#else
+	_adapter *adapter = ((struct sys_timer *) FunctionContext)->param;
+#endif
+	link_timer_hdl(adapter);
 }
 
 void _addba_timer_hdl(void *FunctionContext)
 {
+#ifndef PLATFORM_EMBOX
 	struct sta_info *psta = (struct sta_info *)FunctionContext;
+#else
+	struct sta_info *psta = ((struct sys_timer *)FunctionContext)->param;
+#endif
 	addba_timer_hdl(psta);
 }
 
 #ifdef CONFIG_IEEE80211W
 void _sa_query_timer_hdl (void *FunctionContext)
 {
-	_adapter *padapter = (_adapter *)FunctionContext;
-	sa_query_timer_hdl(padapter);
+#ifndef PLATFORM_EMBOX
+	_adapter *adapter = (_adapter *)FunctionContext;
+#else
+	_adapter *adapter = ((struct sys_timer *) FunctionContext)->param;
+#endif
+	sa_query_timer_hdl(adapter);
 }
 #endif //CONFIG_IEEE80211W
 
 void init_addba_retry_timer(_adapter *padapter, struct sta_info *psta)
 {
-
 	_init_timer(&psta->addba_retry_timer, padapter->pnetdev, _addba_timer_hdl, psta);
 }
 
