@@ -774,7 +774,8 @@ __inline static void _set_workitem(_workitem *pwork)
 
 #ifdef PLATFORM_EMBOX
 	#define usb_alloc_urb(x, y) sysmalloc(sizeof(struct urb))
-	#define kthread_run(x, y, z) thread_create(0, x, y)
+	#define kthread_run(x, y, z) thread_create(THREAD_FLAG_KERNEL, x, y)
+
 	#define skb_tail_pointer(skb)	EMBOX_NIY(skb->tail, NULL)
 	#define free_netdev(x) netdev_free(x)
 	#define unregister_netdevice(x) netdev_unregister(x)
