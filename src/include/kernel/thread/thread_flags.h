@@ -17,10 +17,11 @@
 #define THREAD_FLAG_PRIORITY_LOWER   (0x1 << 3)
 /** Create thread with incremented priority */
 #define THREAD_FLAG_PRIORITY_HIGHER  (0x1 << 4)
-
 /**< Create a new thread without launching */
 #define THREAD_FLAG_SUSPENDED        (0x1 << 5)
 /** Create a new thread without attaching to a task. */
 #define THREAD_FLAG_NOTASK           (0x1 << 6)
+/* Attach thread to kernel task */
+#define THREAD_FLAG_KERNEL           (0x1 << 7)
 
 #endif /* THREAD_FLAGS_H_ */

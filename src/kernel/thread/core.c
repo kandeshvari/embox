@@ -28,6 +28,7 @@
 
 #include <kernel/thread.h>
 #include <kernel/task.h>
+#include <kernel/task/kernel_task.h>
 #include <kernel/sched.h>
 #include <kernel/thread/signal.h>
 #include <kernel/thread/thread_alloc.h>
@@ -37,9 +38,7 @@
 #include <kernel/sched/current.h>
 #include <hal/cpu.h>
 #include <kernel/cpu/cpu.h>
-
 #include <kernel/panic.h>
-
 #include <hal/context.h>
 #include <util/err.h>
 #include <compiler.h>
@@ -93,6 +92,8 @@ struct thread *thread_create(unsigned int flags, void *(*run)(void *), void *arg
 	struct thread *t;
 	int priority;
 
+	assert(!(flags & THREAD_FLAG_KERNEL) || !(flags & THREAD_FLAG_NOTASK));
+
 	/* check mutually exclusive flags */
 	if ((flags & THREAD_FLAG_PRIORITY_LOWER)
 			&& (flags & THREAD_FLAG_PRIORITY_HIGHER)) {
@@ -130,7 +131,10 @@ struct thread *thread_create(unsigned int flags, void *(*run)(void *), void *arg
 
 		/* link with task if needed */
 		if (!(flags & THREAD_FLAG_NOTASK)) {
-			task_thread_register(task_self(), t);
+			if (flags & THREAD_FLAG_KERNEL)
+				task_thread_register(task_kernel_task(), t);
+			else
+				task_thread_register(task_self(), t);
 		}
 
 		thread_cancel_init(t);
