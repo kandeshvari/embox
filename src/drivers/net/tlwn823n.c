@@ -73,7 +73,6 @@ extern int ksleep(useconds_t msec);
 static void *wn823n_probe_hnd(void *arg) {
 	static struct usb_device_id did;
 	printk("Thread started\n");
-	//ksleep(1000);
 
 	static struct usb_interface intf = {
 		.altsetting = {
@@ -101,7 +100,7 @@ static void *wn823n_probe_hnd(void *arg) {
 }
 
 static int wn823n_probe(struct usb_driver *drv, struct usb_dev *dev, void **data) {
-	thread_create(THREAD_FLAG_NOTASK, wn823n_probe_hnd, dev);
+	thread_create(THREAD_FLAG_KERNEL, wn823n_probe_hnd, dev);
 	printk("Probe exit\n");
 	return 0;
 }
