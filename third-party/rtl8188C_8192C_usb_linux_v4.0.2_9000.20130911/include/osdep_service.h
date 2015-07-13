@@ -659,40 +659,47 @@ __inline static _list	*get_list_head(_queue	*queue)
         ((type *)((char *)(ptr)-(SIZE_T)(&((type *)0)->member)))
 
 
+#include <kernel/spinlock.h>
 __inline static void _enter_critical(_lock *plock, _irqL *pirqL)
 {
+	spin_lock(plock);
 	//spin_lock_irqsave(plock, *pirqL);
 }
 
 __inline static void _exit_critical(_lock *plock, _irqL *pirqL)
 {
+	spin_unlock(plock);
 	//spin_unlock_irqrestore(plock, *pirqL);
 }
 
 __inline static void _enter_critical_ex(_lock *plock, _irqL *pirqL)
 {
+	spin_lock(plock);
 	//spin_lock_irqsave(plock, *pirqL);
 }
 
 __inline static void _exit_critical_ex(_lock *plock, _irqL *pirqL)
 {
+	spin_unlock(plock);
 	//spin_unlock_irqrestore(plock, *pirqL);
 }
 
 __inline static void _enter_critical_bh(_lock *plock, _irqL *pirqL)
 {
+	spin_lock(plock);
 	//spin_lock_bh(plock, *pirqL);
 }
 
 __inline static void _exit_critical_bh(_lock *plock, _irqL *pirqL)
 {
+	spin_unlock(plock);
 	//spin_unlock_bh(plock, *pirqL);
 }
 
 __inline static void _enter_critical_mutex(_mutex *pmutex, _irqL *pirqL)
 {
 
-		//mtx_lock(pmutex);
+	//mtx_lock(pmutex);
 
 }
 
