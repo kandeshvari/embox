@@ -111,12 +111,14 @@ static int usbctrl_vendorreq(struct intf_hdl *pintfhdl, u8 request, u16 value, u
 
 		if (requesttype == 0x01)
 		{
-			pipe = EMBOX_NIY(usb_rcvctrlpipe(udev, 0), 0);//read_in
+			//pipe = EMBOX_NIY(usb_rcvctrlpipe(udev, 0), 0);//read_in
+			pipe = 0;
 			reqtype =  REALTEK_USB_VENQT_READ;
 		}
 		else
 		{
-			pipe = EMBOX_NIY(usb_sndctrlpipe(udev, 0), 0);//write_out
+			//pipe = EMBOX_NIY(usb_sndctrlpipe(udev, 0), 0);//write_out
+			pipe = 0;
 			reqtype =  REALTEK_USB_VENQT_WRITE;
 			_rtw_memcpy( pIo_buf, pdata, len);
 		}
