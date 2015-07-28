@@ -960,7 +960,7 @@ void rtw_list_insert_head(_list *plist, _list *phead)
 void rtw_list_insert_tail(_list *plist, _list *phead)
 {
 #ifdef PLATFORM_EMBOX
-	dlist_add_prev(phead, plist);
+	dlist_add_prev(plist, phead);
 #endif
 #ifdef PLATFORM_LINUX
 
