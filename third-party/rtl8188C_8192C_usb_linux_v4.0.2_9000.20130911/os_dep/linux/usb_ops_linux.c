@@ -463,6 +463,7 @@ _func_exit_;
 
 }
 
+#ifdef PLATFORM_LINUX
 u32 usb_write_port(struct intf_hdl *pintfhdl, u32 addr, u32 cnt, u8 *wmem)
 {
 	_irqL irqL;
@@ -621,6 +622,54 @@ _func_exit_;
 	return ret;
 
 }
+#elif PLATFORM_EMBOX
+
+
+u32 usb_write_port(struct intf_hdl *pintfhdl, u32 addr, u32 cnt, u8 *wmem)
+{
+	_irqL irqL;
+	unsigned int pipe;
+	int status;
+	u32 ret = _FAIL, bwritezero = _FALSE;
+	PURB	purb = NULL;
+	_adapter *padapter = (_adapter *)pintfhdl->padapter;
+	struct dvobj_priv	*pdvobj = adapter_to_dvobj(padapter);
+	struct xmit_priv	*pxmitpriv = &padapter->xmitpriv;
+	struct xmit_buf *pxmitbuf = (struct xmit_buf *)wmem;
+	struct xmit_frame *pxmitframe = (struct xmit_frame *)pxmitbuf->priv_data;
+	struct usb_device *pusbd = NULL;
+	pusbd = pdvobj->pusbdev;
+	struct pkt_attrib *pattrib = &pxmitframe->attrib;
+
+_func_enter_;
+
+	if ((padapter->bDriverStopped) || (padapter->bSurpriseRemoved) ||(padapter->pwrctrlpriv.pnp_bstop_trx)) {
+		#ifdef DBG_TX
+		//DBG_871X(" DBG_TX %s:%d bDriverStopped%d, bSurpriseRemoved:%d, pnp_bstop_trx:%d\n",__FUNCTION__, __LINE__
+			,padapter->bDriverStopped, padapter->bSurpriseRemoved, padapter->pwrctrlpriv.pnp_bstop_trx );
+		#endif
+		RT_TRACE(_module_hci_ops_os_c_,_drv_err_,("usb_write_port:( padapter->bDriverStopped ||padapter->bSurpriseRemoved ||adapter->pwrctrlpriv.pnp_bstop_trx)!!!\n"));
+		rtw_sctx_done_err(&pxmitbuf->sctx, RTW_SCTX_DONE_TX_DENY);
+		goto exit;
+	}
+
+	EMBOX_NIY(purb = pxmitbuf->pxmit_urb[0], 0);
+
+	//translate DMA FIFO addr to pipehandle
+	pipe = ffaddr2pipehdl(pdvobj, addr);
+
+	//usb_endp_bulk(endp, rtlwifi_send_notify_hnd, pxmitframe->buf_addr, cnt);
+
+	ret= _SUCCESS;
+
+exit:
+	if (ret != _SUCCESS)
+		rtw_free_xmitbuf(pxmitpriv, pxmitbuf);
+_func_exit_;
+	return ret;
+}
+
+#endif // PLATFORM_EMBOX
 
 void usb_write_port_cancel(struct intf_hdl *pintfhdl)
 {
