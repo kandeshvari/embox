@@ -284,6 +284,10 @@ struct dvobj_priv
 
 #ifdef CONFIG_USB_HCI
 
+#ifdef PLATFORM_EMBOX
+	struct usb_interface *usb_intf;
+#endif
+
 	u8	nr_endpoint;
 	u8	ishighspeed;
 	u8	RtNumInPipes;

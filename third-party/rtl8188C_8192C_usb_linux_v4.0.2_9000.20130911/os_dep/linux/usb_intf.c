@@ -424,6 +424,10 @@ _func_enter_;
 	pusbd = pdvobjpriv->pusbdev = interface_to_usbdev(usb_intf);
 	usb_set_intfdata(usb_intf, pdvobjpriv);
 
+#ifdef PLATFORM_EMBOX
+	pdvobjpriv->usb_intf = usb_intf;
+#endif
+
 	pdvobjpriv->RtNumInPipes = 0;
 	pdvobjpriv->RtNumOutPipes = 0;
 
@@ -491,10 +495,21 @@ _func_enter_;
 
 	for (i = 0; i < pdvobjpriv->nr_endpoint; i++)
 	{
-		EMBOX_NIY(phost_endp = phost_iface->endpoint + i, 0);
+	#ifndef PLATFORM_EMBOX
+		phost_endp = phost_iface->endpoint + i;
+	#endif
 		if (phost_endp)
 		{
-			EMBOX_NIY(pendp_desc = &phost_endp->desc, 0);
+		#ifndef PLATFORM_EMBOX
+			pendp_desc = &phost_endp->desc;
+		#else
+			struct usb_desc_endpoint endp = phost_iface->endpoint_desc[i];
+			pendp_desc->bLength = endp.b_length;
+			pendp_desc->bDescriptorType = endp.b_desc_type;
+			pendp_desc->bEndpointAddress = endp.b_endpoint_address;
+			pendp_desc->wMaxPacketSize = endp.w_max_packet_size;
+			pendp_desc->bInterval = endp.b_interval;
+		#endif
 
 			DBG_871X("\nusb_endpoint_descriptor(%d):\n", i);
 			DBG_871X("bLength=%x\n",pendp_desc->bLength);

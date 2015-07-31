@@ -166,7 +166,8 @@ struct usb_host_interface {
 		char *string; */
 #else
 		struct usb_desc_interface desc;
-		struct usb_endp *endpoint;
+		struct usb_endp **endpoint;
+		struct usb_desc_endpoint *endpoint_desc;
 #endif
 	};
 

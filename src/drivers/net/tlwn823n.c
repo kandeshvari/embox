@@ -72,6 +72,8 @@ extern int rtw_drv_init(struct usb_interface *, const struct usb_device_id *);
 extern int ksleep(useconds_t msec);
 static void *wn823n_probe_hnd(void *arg) {
 	static struct usb_device_id did;
+	struct usb_dev *dev = (struct usb_dev *) arg;
+
 	printk("Thread started\n");
 
 	static struct usb_interface intf = {
@@ -93,6 +95,11 @@ static void *wn823n_probe_hnd(void *arg) {
 			}
 		},
 	};
+
+	ksleep(1000);
+
+	intf.altsetting[0].endpoint = dev->endpoints;
+	intf.altsetting[0].endpoint_desc = dev->getconf_data->endp_descs;
 
 	intf.dev = arg;
 	rtw_drv_init(&intf, &did);
