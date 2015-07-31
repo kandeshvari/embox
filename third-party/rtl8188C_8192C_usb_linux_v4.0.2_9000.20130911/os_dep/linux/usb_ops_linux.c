@@ -658,10 +658,12 @@ u32 usb_write_port(struct intf_hdl *pintfhdl, u32 addr, u32 cnt, u8 *wmem)
 	pusbd = pdvobj->pusbdev;
 	struct pkt_attrib *pattrib = &pxmitframe->attrib;
 
-	struct usb_desc_endpoint *endp;
+	struct usb_endp *endp;
 	unsigned int endp_nr;
 	struct usb_interface *usb_intf = pdvobj->usb_intf;
 	struct usb_host_interface *phost_iface = &usb_intf->altsetting[0];
+	unsigned int i = 0;
+	unsigned int len = cnt;
 
 _func_enter_;
 
@@ -675,13 +677,19 @@ _func_enter_;
 		goto exit;
 	}
 
-	EMBOX_NIY(purb = pxmitbuf->pxmit_urb[0], 0);
-
 	//translate DMA FIFO addr to pipehandle
 	endp_nr = ffaddr2pipehdl(pdvobj, addr);
 	endp = phost_iface->endpoint[endp_nr + 1]; // because of it inculudes CONTROL endp
 
-	usb_endp_bulk(endp, rtlwifi_send_notify_hnd, pxmitframe->buf_addr, cnt);
+	for (i = cnt; i != 0 && (cnt = min(i, endp->max_packet_size)); i -= cnt) {
+		usb_endp_bulk(endp, rtlwifi_send_notify_hnd,
+			pxmitframe->buf_addr + (len - i), cnt);
+	}
+
+	/* Send zero length packet if len % max_packet_size == 0 */
+	if (cnt == endp->max_packet_size) {
+		usb_endp_bulk(endp, rtlwifi_send_notify_hnd, pxmitframe->buf_addr + i, 0);
+	}
 
 	ret= _SUCCESS;
 
