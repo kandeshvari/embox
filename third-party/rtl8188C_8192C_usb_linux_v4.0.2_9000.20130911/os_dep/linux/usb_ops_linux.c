@@ -158,6 +158,7 @@ int usb_async_write32(struct intf_hdl *pintfhdl, u32 addr, u32 val)
 }
 #endif /* CONFIG_USB_SUPPORT_ASYNC_VDN_REQ */
 
+#ifndef PLATFORM_EMBOX
 unsigned int ffaddr2pipehdl(struct dvobj_priv *pdvobj, u32 addr)
 {
 	unsigned int pipe=0;
@@ -180,6 +181,20 @@ unsigned int ffaddr2pipehdl(struct dvobj_priv *pdvobj, u32 addr)
 
 	return pipe;
 }
+#else
+
+// A conversion 4 -> 2 I see in Linux, so I simply hardcode this.
+unsigned int ffaddr2pipehdl(struct dvobj_priv *pdvobj, u32 addr)
+{
+	switch (addr) {
+	case 4:
+		return 2;
+	default:
+		return 0;
+	}
+}
+
+#endif // PLATFORM_EMBOX
 
 struct zero_bulkout_context{
 	void *pbuf;
@@ -624,6 +639,8 @@ _func_exit_;
 }
 #elif PLATFORM_EMBOX
 
+static void rtlwifi_send_notify_hnd(struct usb_request *req, void *arg) {
+}
 
 u32 usb_write_port(struct intf_hdl *pintfhdl, u32 addr, u32 cnt, u8 *wmem)
 {
@@ -641,6 +658,11 @@ u32 usb_write_port(struct intf_hdl *pintfhdl, u32 addr, u32 cnt, u8 *wmem)
 	pusbd = pdvobj->pusbdev;
 	struct pkt_attrib *pattrib = &pxmitframe->attrib;
 
+	struct usb_desc_endpoint *endp;
+	unsigned int endp_nr;
+	struct usb_interface *usb_intf = pdvobj->usb_intf;
+	struct usb_host_interface *phost_iface = &usb_intf->altsetting[0];
+
 _func_enter_;
 
 	if ((padapter->bDriverStopped) || (padapter->bSurpriseRemoved) ||(padapter->pwrctrlpriv.pnp_bstop_trx)) {
@@ -656,9 +678,10 @@ _func_enter_;
 	EMBOX_NIY(purb = pxmitbuf->pxmit_urb[0], 0);
 
 	//translate DMA FIFO addr to pipehandle
-	pipe = ffaddr2pipehdl(pdvobj, addr);
+	endp_nr = ffaddr2pipehdl(pdvobj, addr);
+	endp = phost_iface->endpoint[endp_nr + 1]; // because of it inculudes CONTROL endp
 
-	//usb_endp_bulk(endp, rtlwifi_send_notify_hnd, pxmitframe->buf_addr, cnt);
+	usb_endp_bulk(endp, rtlwifi_send_notify_hnd, pxmitframe->buf_addr, cnt);
 
 	ret= _SUCCESS;
 
