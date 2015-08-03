@@ -1370,6 +1370,7 @@ _func_exit_;
 
 }
 
+#ifndef PLATFORM_EMBOX
 static u32 usb_read_port(struct intf_hdl *pintfhdl, u32 addr, u32 cnt, u8 *rmem)
 {
 	_irqL irqL;
@@ -1477,6 +1478,83 @@ _func_exit_;
 
 	return ret;
 }
+#else
+
+
+
+
+static u32 usb_read_port(struct intf_hdl *pintfhdl, u32 addr, u32 cnt, u8 *rmem)
+{
+	_irqL irqL;
+	int err;
+	unsigned int pipe;
+	SIZE_PTR tmpaddr=0;
+	SIZE_PTR alignment=0;
+	u32 ret = _SUCCESS;
+	PURB purb = NULL;
+	struct recv_buf	*precvbuf = (struct recv_buf *)rmem;
+	_adapter		*adapter = pintfhdl->padapter;
+	struct dvobj_priv	*pdvobj = adapter_to_dvobj(adapter);
+	struct recv_priv	*precvpriv = &adapter->recvpriv;
+	struct usb_device	*pusbd = pdvobj->pusbdev;
+
+_func_enter_;
+
+	if(adapter->bDriverStopped || adapter->bSurpriseRemoved ||adapter->pwrctrlpriv.pnp_bstop_trx)
+	{
+		RT_TRACE(_module_hci_ops_os_c_,_drv_err_,("usb_read_port:( padapter->bDriverStopped ||padapter->bSurpriseRemoved ||adapter->pwrctrlpriv.pnp_bstop_trx)!!!\n"));
+		return _FAIL;
+	}
+
+	if(precvbuf !=NULL)
+	{
+		rtl8192cu_init_recvbuf(adapter, precvbuf);
+
+		precvbuf->pskb = rtw_skb_alloc(MAX_RECVBUF_SZ + RECVBUFF_ALIGN_SZ);
+
+		if(precvbuf->pskb == NULL)
+		{
+			RT_TRACE(_module_hci_ops_os_c_,_drv_err_,("init_recvbuf(): alloc_skb fail!\n"));
+			precvpriv->recvbuf_skb_alloc_fail_cnt++;
+			return _FAIL;
+		}
+
+		precvbuf->phead = precvbuf->pskb->p_data;
+		precvbuf->pdata = precvbuf->pskb->p_data;
+		precvbuf->ptail = skb_tail_pointer(precvbuf->pskb);
+		precvbuf->pend = EMBOX_NIY(skb_end_pointer(precvbuf->pskb), precvbuf->ptail);
+		precvbuf->pbuf = precvbuf->pskb->p_data;
+
+		precvbuf->reuse = _FALSE;
+
+		precvpriv->rx_pending_cnt++;
+
+		//translate DMA FIFO addr to pipehandle
+		pipe = ffaddr2pipehdl(pdvobj, addr);
+
+		usb_fill_bulk_urb(purb, pusbd, pipe,
+						precvbuf->pbuf,
+							MAX_RECVBUF_SZ,
+								usb_read_port_complete,
+								precvbuf);//context is precvbuf
+	}
+	else
+	{
+		precvpriv->recvbuf_null_cnt++;
+		RT_TRACE(_module_hci_ops_os_c_,_drv_err_,("usb_read_port:precvbuf ==NULL\n"));
+		ret = _FAIL;
+	}
+
+_func_exit_;
+
+	return ret;
+}
+
+
+#endif
+
+
+
 #endif	// CONFIG_USE_USB_BUFFER_ALLOC_RX
 
 void rtl8192cu_xmit_tasklet(void *priv)
