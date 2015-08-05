@@ -305,7 +305,7 @@ extern int usb_endp_control(struct usb_endp *endp, usb_request_notify_hnd_t noti
 		uint16_t count, void *data);
 
 extern int usb_endp_bulk(struct usb_endp *endp, usb_request_notify_hnd_t hnd,
-		void *buf, size_t len);
+		void *arg, void *buf, size_t len);
 
 extern void usb_dev_configure(struct usb_dev *dev);
 extern void usb_dev_addr_assign(struct usb_dev *dev);

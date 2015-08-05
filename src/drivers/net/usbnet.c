@@ -96,7 +96,7 @@ static void usbnet_rcv_notify(struct usb_request *req, void *arg) {
 				USBNET_TIMER_FREQ, usbnet_timer_handler, nic_priv);
 	} else {
 		/* Receive the next part of the packet */
-		usb_endp_bulk(in_endp, usbnet_rcv_notify, nic_priv->pdata,
+		usb_endp_bulk(in_endp, usbnet_rcv_notify, NULL, nic_priv->pdata,
 				in_endp->max_packet_size);
 	}
 }
@@ -108,7 +108,7 @@ static void usbnet_timer_handler(struct sys_timer *tmr, void *param) {
 	in_endp = nic_priv->usbdev->endpoints[2];
 	assert(in_endp);
 
-	usb_endp_bulk(in_endp, usbnet_rcv_notify, nic_priv->pdata,
+	usb_endp_bulk(in_endp, usbnet_rcv_notify, NULL, nic_priv->pdata,
 			in_endp->max_packet_size);
 }
 
@@ -181,13 +181,13 @@ static void usb_net_bulk_send(struct usb_dev *dev, struct sk_buff *skb) {
 	endp = dev->endpoints[3];
 
 	for (i = skb->len; i != 0 && (len = min(i, endp->max_packet_size)); i -= len) {
-		usb_endp_bulk(endp, usbnet_send_notify_hnd,
+		usb_endp_bulk(endp, usbnet_send_notify_hnd, NULL,
 				skb->mac.raw + (skb->len - i), len);
 	}
 
 	/* Send zero length packet if skb->len % max_packet_size == 0 */
 	if (len == endp->max_packet_size) {
-		usb_endp_bulk(endp, usbnet_send_notify_hnd, skb->mac.raw + i, 0);
+		usb_endp_bulk(endp, usbnet_send_notify_hnd, NULL, skb->mac.raw + i, 0);
 	}
 }
 

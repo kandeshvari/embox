@@ -57,12 +57,12 @@ static void usb_ms_transfer_done(struct usb_request *req, void *arg) {
 		data_endp_i = req_ctx->dir == USB_DIRECTION_IN ? mass->blkin
 			: mass->blkout;
 		req_ctx->req_state = USB_MASS_REQST_DATA;
-		usb_endp_bulk(dev->endpoints[data_endp_i], usb_ms_transfer_done,
+		usb_endp_bulk(dev->endpoints[data_endp_i], usb_ms_transfer_done, NULL,
 				req_ctx->buf, req_ctx->len);
 		break;
 	case USB_MASS_REQST_DATA:
 		req_ctx->req_state = USB_MASS_REQST_CSW;
-		usb_endp_bulk(dev->endpoints[mass->blkin], usb_ms_transfer_done,
+		usb_endp_bulk(dev->endpoints[mass->blkin], usb_ms_transfer_done, NULL,
 				&req_ctx->csw, sizeof(struct usb_mscsw));
 		break;
 	case USB_MASS_REQST_CSW:
@@ -95,7 +95,7 @@ int usb_ms_transfer(struct usb_dev *dev, void *ms_cmd,
 	}
 
 	return usb_endp_bulk(dev->endpoints[mass->blkout], usb_ms_transfer_done,
-			&req_ctx->cbw, sizeof(struct usb_mscbw));
+			NULL, &req_ctx->cbw, sizeof(struct usb_mscbw));
 }
 
 static void *usb_class_mass_alloc(struct usb_class *cls, struct usb_dev *dev) {
