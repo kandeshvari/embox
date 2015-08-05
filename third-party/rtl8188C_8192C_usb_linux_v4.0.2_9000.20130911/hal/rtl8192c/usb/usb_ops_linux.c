@@ -874,7 +874,6 @@ void rtl8192cu_recv_tasklet(void *priv)
 			break;
 		}
 
-
 		recvbuf2recvframe(padapter, precvbuf);
 
 		rtw_read_port(padapter, precvpriv->ff_hwaddr, 0, (unsigned char *)precvbuf);
@@ -1480,8 +1479,29 @@ _func_exit_;
 }
 #else
 
+#define N 32
 
+static struct recv_buf *wifi_precvbufs[N];
+static _adapter	*wifi_adapters[N];
+static unsigned int index[N];
+static int n = 0;
 
+static void rtlwifi_recv_notify_hnd(struct usb_request *req, void *arg) {
+	unsigned int k = *(unsigned int *) arg;
+	struct recv_buf *precvbuf = wifi_precvbufs[k];
+	_adapter *padapter = wifi_adapters[k];
+	struct recv_priv *precvpriv = &padapter->recvpriv;
+
+	//precvbuf->transfer_len = purb->actual_length;
+	//skb_put(precvbuf->pskb, purb->actual_length);
+	skb_queue_tail(&precvpriv->rx_skb_queue, precvbuf->pskb);
+
+	rtl8192cu_recv_tasklet(padapter);
+
+	precvbuf->pskb = NULL;
+	precvbuf->reuse = _FALSE;
+	rtw_read_port(padapter, precvpriv->ff_hwaddr, 0, (unsigned char *)precvbuf);
+}
 
 static u32 usb_read_port(struct intf_hdl *pintfhdl, u32 addr, u32 cnt, u8 *rmem)
 {
@@ -1498,6 +1518,11 @@ static u32 usb_read_port(struct intf_hdl *pintfhdl, u32 addr, u32 cnt, u8 *rmem)
 	struct recv_priv	*precvpriv = &adapter->recvpriv;
 	struct usb_device	*pusbd = pdvobj->pusbdev;
 
+	struct usb_endp *endp;
+	unsigned int endp_nr;
+	struct usb_interface *usb_intf = pdvobj->usb_intf;
+	struct usb_host_interface *phost_iface = &usb_intf->altsetting[0];
+
 _func_enter_;
 
 	if(adapter->bDriverStopped || adapter->bSurpriseRemoved ||adapter->pwrctrlpriv.pnp_bstop_trx)
@@ -1510,7 +1535,7 @@ _func_enter_;
 	{
 		rtl8192cu_init_recvbuf(adapter, precvbuf);
 
-		precvbuf->pskb = rtw_skb_alloc(MAX_RECVBUF_SZ + RECVBUFF_ALIGN_SZ);
+		precvbuf->pskb = rtw_skb_alloc(1024);
 
 		if(precvbuf->pskb == NULL)
 		{
@@ -1519,24 +1544,26 @@ _func_enter_;
 			return _FAIL;
 		}
 
-		precvbuf->phead = precvbuf->pskb->p_data;
-		precvbuf->pdata = precvbuf->pskb->p_data;
-		precvbuf->ptail = skb_tail_pointer(precvbuf->pskb);
+		precvbuf->phead = precvbuf->pskb->mac.raw;
+		precvbuf->pdata = precvbuf->pskb->mac.raw;
+		precvbuf->ptail = precvbuf->phead + precvbuf->pskb->len;
 		precvbuf->pend = EMBOX_NIY(skb_end_pointer(precvbuf->pskb), precvbuf->ptail);
-		precvbuf->pbuf = precvbuf->pskb->p_data;
+		precvbuf->pbuf = precvbuf->pskb->mac.raw;
 
 		precvbuf->reuse = _FALSE;
 
 		precvpriv->rx_pending_cnt++;
 
-		//translate DMA FIFO addr to pipehandle
-		pipe = ffaddr2pipehdl(pdvobj, addr);
+		endp_nr = ffaddr2pipehdl(pdvobj, addr);
+		endp = phost_iface->endpoint[endp_nr + 1]; // because of it inculudes CONTROL endp
 
-		usb_fill_bulk_urb(purb, pusbd, pipe,
-						precvbuf->pbuf,
-							MAX_RECVBUF_SZ,
-								usb_read_port_complete,
-								precvbuf);//context is precvbuf
+		wifi_precvbufs[n] = precvbuf;
+		wifi_adapters[n] = adapter;
+		index[n] = n;
+
+		usb_endp_bulk(endp, rtlwifi_recv_notify_hnd, &index[n], precvbuf->pbuf, endp->max_packet_size - 1);
+
+		n = ++n % N;
 	}
 	else
 	{
