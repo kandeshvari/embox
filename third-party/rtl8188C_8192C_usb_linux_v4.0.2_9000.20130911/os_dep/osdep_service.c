@@ -315,11 +315,19 @@ inline struct sk_buff *_rtw_skb_alloc(u32 sz)
 #ifdef PLATFORM_FREEBSD
 	return dev_alloc_skb(sz);
 #endif /* PLATFORM_FREEBSD */
+
+#ifdef PLATFORM_EMBOX
+	return skb_alloc(sz);
+#endif /* PLATFORM_FREEBSD */
 }
 
 inline void _rtw_skb_free(struct sk_buff *skb)
 {
-	EMBOX_NIY(dev_kfree_skb_any(skb), 0);
+#ifndef PLATFORM_EMBOX
+	dev_kfree_skb_any(skb);
+#else
+	skb_free(skb);
+#endif
 }
 
 inline struct sk_buff *_rtw_skb_copy(const struct sk_buff *skb)
