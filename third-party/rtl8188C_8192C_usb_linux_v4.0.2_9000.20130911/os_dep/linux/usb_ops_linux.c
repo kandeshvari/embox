@@ -183,14 +183,22 @@ unsigned int ffaddr2pipehdl(struct dvobj_priv *pdvobj, u32 addr)
 }
 #else
 
-// A conversion 4 -> 2 I see in Linux, so I simply hardcode this.
+// A conversion 4 -> 2 and 5 -> 2 I see in Linux, so I simply hardcode this.
 unsigned int ffaddr2pipehdl(struct dvobj_priv *pdvobj, u32 addr)
 {
-	switch (addr) {
-	case 4:
-		return 2;
-	default:
+	if (addr == RECV_BULK_IN_ADDR) {
 		return 0;
+	} else if (addr == RECV_INT_IN_ADDR) {
+		return 3;
+	} else {
+		switch (addr) {
+		case 4:
+			return 2;
+		case 5:
+			return 2;
+		default:
+			return 0;
+		}
 	}
 }
 
@@ -667,6 +675,8 @@ u32 usb_write_port(struct intf_hdl *pintfhdl, u32 addr, u32 cnt, u8 *wmem)
 
 _func_enter_;
 
+	DBG_871X("write port \n");
+
 	if ((padapter->bDriverStopped) || (padapter->bSurpriseRemoved) ||(padapter->pwrctrlpriv.pnp_bstop_trx)) {
 		#ifdef DBG_TX
 		//DBG_871X(" DBG_TX %s:%d bDriverStopped%d, bSurpriseRemoved:%d, pnp_bstop_trx:%d\n",__FUNCTION__, __LINE__
@@ -682,14 +692,17 @@ _func_enter_;
 	endp = phost_iface->endpoint[endp_nr + 1]; // because of it inculudes CONTROL endp
 
 	for (i = cnt; i != 0 && (cnt = min(i, endp->max_packet_size)); i -= cnt) {
-		usb_endp_bulk(endp, rtlwifi_send_notify_hnd,
+		usb_endp_bulk(endp, rtlwifi_send_notify_hnd, NULL,
 			pxmitframe->buf_addr + (len - i), cnt);
 	}
 
 	/* Send zero length packet if len % max_packet_size == 0 */
 	if (cnt == endp->max_packet_size) {
-		usb_endp_bulk(endp, rtlwifi_send_notify_hnd, pxmitframe->buf_addr + i, 0);
+		usb_endp_bulk(endp, rtlwifi_send_notify_hnd, NULL,
+			pxmitframe->buf_addr + i, 0);
 	}
+
+	DBG_871X("====> %s: addr=%u, cnt=%u\n",__FUNCTION__, addr, len);
 
 	ret= _SUCCESS;
 
