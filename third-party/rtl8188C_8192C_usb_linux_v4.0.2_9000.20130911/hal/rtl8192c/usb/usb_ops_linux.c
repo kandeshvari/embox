@@ -1223,7 +1223,7 @@ void rtl8192cu_recv_tasklet(void *priv)
 	_adapter		*padapter = (_adapter*)priv;
 	struct recv_priv	*precvpriv = &padapter->recvpriv;
 
-	while (EMBOX_NIY(NULL != (pskb = skb_dequeue(&precvpriv->rx_skb_queue)), 0))
+	while (pskb = skb_queue_pop(&precvpriv->rx_skb_queue))
 	{
 		if ((padapter->bDriverStopped == _TRUE)||(padapter->bSurpriseRemoved== _TRUE))
 		{
@@ -1236,7 +1236,7 @@ void rtl8192cu_recv_tasklet(void *priv)
 
 #ifdef CONFIG_PREALLOC_RECV_SKB
 
-		skb_reset_tail_pointer(pskb);
+		EMBOX_NIY(skb_reset_tail_pointer(pskb), 0);
 
 		pskb->len = 0;
 
@@ -1492,6 +1492,26 @@ static void rtlwifi_recv_notify_hnd(struct usb_request *req, void *arg) {
 	_adapter *padapter = wifi_adapters[k];
 	struct recv_priv *precvpriv = &padapter->recvpriv;
 
+
+	precvpriv->rx_pending_cnt --;
+
+	if(padapter->bSurpriseRemoved || padapter->bDriverStopped||padapter->bReadPortCancel)
+	{
+		RT_TRACE(_module_hci_ops_os_c_,_drv_err_,("usb_read_port_complete:bDriverStopped(%d) OR bSurpriseRemoved(%d)\n", padapter->bDriverStopped, padapter->bSurpriseRemoved));
+
+	#ifdef CONFIG_PREALLOC_RECV_SKB
+		EMBOX_NIY(precvbuf->reuse = _TRUE, 0);
+	#else
+		if(precvbuf->pskb){
+			DBG_8192C("==> free skb(%p)\n",precvbuf->pskb);
+			rtw_skb_free(precvbuf->pskb);
+		}
+	#endif
+		DBG_8192C("%s()-%d: RX Warning! bDriverStopped(%d) OR bSurpriseRemoved(%d) bReadPortCancel(%d)\n",
+		__FUNCTION__, __LINE__,padapter->bDriverStopped, padapter->bSurpriseRemoved,padapter->bReadPortCancel);
+		return;
+	}
+
 	//precvbuf->transfer_len = purb->actual_length;
 	//skb_put(precvbuf->pskb, purb->actual_length);
 	skb_queue_tail(&precvpriv->rx_skb_queue, precvbuf->pskb);
@@ -1500,7 +1520,7 @@ static void rtlwifi_recv_notify_hnd(struct usb_request *req, void *arg) {
 
 	precvbuf->pskb = NULL;
 	precvbuf->reuse = _FALSE;
-	rtw_read_port(padapter, precvpriv->ff_hwaddr, 0, (unsigned char *)precvbuf);
+	//rtw_read_port(padapter, precvpriv->ff_hwaddr, 0, (unsigned char *)precvbuf);
 }
 
 static u32 usb_read_port(struct intf_hdl *pintfhdl, u32 addr, u32 cnt, u8 *rmem)
@@ -1530,6 +1550,15 @@ _func_enter_;
 		RT_TRACE(_module_hci_ops_os_c_,_drv_err_,("usb_read_port:( padapter->bDriverStopped ||padapter->bSurpriseRemoved ||adapter->pwrctrlpriv.pnp_bstop_trx)!!!\n"));
 		return _FAIL;
 	}
+
+#ifdef CONFIG_PREALLOC_RECV_SKB
+	if((precvbuf->reuse == _FALSE) || (precvbuf->pskb == NULL))
+	{
+		if (NULL != (precvbuf->pskb = skb_dequeue(&precvpriv->free_recv_skb_queue))) {
+			precvbuf->reuse = _TRUE;
+		}
+	}
+#endif
 
 	if(precvbuf !=NULL)
 	{
