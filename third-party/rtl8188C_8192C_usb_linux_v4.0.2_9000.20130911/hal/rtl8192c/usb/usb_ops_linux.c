@@ -1514,7 +1514,7 @@ static void rtlwifi_recv_notify_hnd(struct usb_request *req, void *arg) {
 
 	//precvbuf->transfer_len = purb->actual_length;
 	//skb_put(precvbuf->pskb, purb->actual_length);
-	skb_queue_tail(&precvpriv->rx_skb_queue, precvbuf->pskb);
+	skb_queue_push(&precvpriv->rx_skb_queue, precvbuf->pskb);
 
 	rtl8192cu_recv_tasklet(padapter);
 

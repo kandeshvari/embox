@@ -134,6 +134,10 @@ int	rtl8192cu_init_recv_priv(_adapter *padapter)
 
 	precvpriv->free_recv_buf_queue_cnt = NR_RECVBUFF;
 
+#ifdef PLATFORM_EMBOX
+	skb_queue_init(&precvpriv->rx_skb_queue);
+#endif
+
 #ifdef PLATFORM_LINUX
 
 	skb_queue_head_init(&precvpriv->rx_skb_queue);
