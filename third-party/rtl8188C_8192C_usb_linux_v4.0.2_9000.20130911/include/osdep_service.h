@@ -1273,34 +1273,34 @@ __inline static _list	*get_list_head(_queue	*queue)
 
 __inline static void _enter_critical(_lock *plock, _irqL *pirqL)
 {
-	//spin_lock_irqsave(plock, *pirqL);
+	spin_lock_irqsave(plock, *pirqL);
 }
 
 __inline static void _exit_critical(_lock *plock, _irqL *pirqL)
 {
-	//spin_unlock_irqrestore(plock, *pirqL);
+	spin_unlock_irqrestore(plock, *pirqL);
 }
 
 __inline static void _enter_critical_ex(_lock *plock, _irqL *pirqL)
 {
-	//spin_lock_irqsave(plock, *pirqL);
+	spin_lock_irqsave(plock, *pirqL);
 }
 
 __inline static void _exit_critical_ex(_lock *plock, _irqL *pirqL)
 {
-	//spin_unlock_irqrestore(plock, *pirqL);
+	spin_unlock_irqrestore(plock, *pirqL);
 }
 
 __inline static void _enter_critical_bh(_lock *plock, _irqL *pirqL)
 {
-	//spin_lock(plock);
-	//sched_lock();
+	spin_lock(plock);
+	sched_lock();
 }
 
 __inline static void _exit_critical_bh(_lock *plock, _irqL *pirqL)
 {
-	//sched_unlock();
-	//spin_unlock(plock);
+	sched_unlock();
+	spin_unlock(plock);
 }
 
 __inline static void _enter_critical_mutex(_mutex *pmutex, _irqL *pirqL)

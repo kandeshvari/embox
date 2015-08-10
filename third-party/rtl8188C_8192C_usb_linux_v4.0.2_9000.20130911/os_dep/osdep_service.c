@@ -1140,10 +1140,11 @@ void	_rtw_mutex_free(_mutex *pmutex)
 void	_rtw_spinlock_init(_lock *plock)
 {
 
+#ifdef PLATFORM_EMBOX
+	spin_init(plock, __SPIN_UNLOCKED);
+#endif
 #ifdef PLATFORM_LINUX
-
 	spin_lock_init(plock);
-
 #endif
 #ifdef PLATFORM_FREEBSD
 		mtx_init(plock, "", NULL, MTX_DEF|MTX_RECURSE);
