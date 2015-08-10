@@ -1520,7 +1520,8 @@ static void rtlwifi_recv_notify_hnd(struct usb_request *req, void *arg) {
 
 	precvbuf->pskb = NULL;
 	precvbuf->reuse = _FALSE;
-	//rtw_read_port(padapter, precvpriv->ff_hwaddr, 0, (unsigned char *)precvbuf);
+	DBG_871X("rtw_read_port call inside\n");
+	rtw_read_port(padapter, precvpriv->ff_hwaddr, 0, (unsigned char *)precvbuf);
 }
 
 static u32 usb_read_port(struct intf_hdl *pintfhdl, u32 addr, u32 cnt, u8 *rmem)
@@ -1544,6 +1545,8 @@ static u32 usb_read_port(struct intf_hdl *pintfhdl, u32 addr, u32 cnt, u8 *rmem)
 	struct usb_host_interface *phost_iface = &usb_intf->altsetting[0];
 
 _func_enter_;
+
+	DBG_871X(">>> usb_read_port\n");
 
 	if(adapter->bDriverStopped || adapter->bSurpriseRemoved ||adapter->pwrctrlpriv.pnp_bstop_trx)
 	{
