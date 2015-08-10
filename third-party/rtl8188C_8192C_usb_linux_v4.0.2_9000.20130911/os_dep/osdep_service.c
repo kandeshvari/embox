@@ -142,7 +142,7 @@ inline u8* _rtw_zvmalloc(u32 sz)
 inline void _rtw_vmfree(u8 *pbuf, u32 sz)
 {
 #ifdef PLATFORM_EMBOX
-	free(pbuf);
+	sysfree(pbuf);
 #endif
 
 #ifdef	PLATFORM_LINUX
@@ -230,7 +230,7 @@ u8* _rtw_zmalloc(u32 sz)
 void	_rtw_mfree(u8 *pbuf, u32 sz)
 {
 #ifdef PLATFORM_EMBOX
-	free(pbuf);
+	sysfree(pbuf);
 #endif
 #ifdef	PLATFORM_LINUX
 #ifdef RTK_DMP_PLATFORM
