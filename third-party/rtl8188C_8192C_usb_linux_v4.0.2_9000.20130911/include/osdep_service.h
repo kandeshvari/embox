@@ -1294,12 +1294,12 @@ __inline static void _exit_critical_ex(_lock *plock, _irqL *pirqL)
 __inline static void _enter_critical_bh(_lock *plock, _irqL *pirqL)
 {
 	spin_lock(plock);
-	sched_lock();
+	//sched_lock();
 }
 
 __inline static void _exit_critical_bh(_lock *plock, _irqL *pirqL)
 {
-	sched_unlock();
+	//sched_unlock();
 	spin_unlock(plock);
 }
 
