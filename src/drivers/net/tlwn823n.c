@@ -76,6 +76,12 @@ static void *wn823n_probe_hnd(void *arg) {
 
 	printk("Thread started\n");
 
+	/* XXX */
+	dev->endpoints[1]->max_packet_size = 64;
+	dev->endpoints[2]->max_packet_size = 64;
+	dev->endpoints[3]->max_packet_size = 64;
+	dev->endpoints[4]->max_packet_size = 64;
+
 	static struct usb_interface intf = {
 		.altsetting = {
 			{
