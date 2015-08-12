@@ -2525,7 +2525,7 @@ int _rtl_netdev_open(struct net_device *pnetdev)
 		}
 
 #ifndef RTK_DMP_PLATFORM
-		EMBOX_NIY(rtw_proc_init_one(pnetdev), 0);
+		rtw_proc_init_one(pnetdev);
 #endif
 
 #ifdef CONFIG_IOCTL_CFG80211
