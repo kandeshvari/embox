@@ -1239,8 +1239,7 @@ void rtl8192cu_recv_tasklet(void *priv)
 		EMBOX_NIY(skb_reset_tail_pointer(pskb), 0);
 
 		pskb->len = 0;
-
-		EMBOX_NIY(skb_queue_tail(&precvpriv->free_recv_skb_queue, pskb), 0);
+		skb_queue_tail(&precvpriv->free_recv_skb_queue, pskb);
 
 #else
 		rtw_skb_free(pskb);
@@ -1307,7 +1306,7 @@ static void usb_read_port_complete(struct urb *purb, struct pt_regs *regs)
 
 			precvbuf->transfer_len = purb->actual_length;
 			skb_put(precvbuf->pskb, purb->actual_length);
-			EMBOX_NIY(skb_queue_tail(&precvpriv->rx_skb_queue, precvbuf->pskb), 0);
+			skb_queue_tail(&precvpriv->rx_skb_queue, precvbuf->pskb);
 
 			if (EMBOX_NIY(skb_queue_len(&precvpriv->rx_skb_queue)<=1, 0))
 				EMBOX_NIY(tasklet_schedule(&precvpriv->recv_tasklet), 0);
