@@ -1134,7 +1134,7 @@ static int recvbuf2recvframe(_adapter *padapter, _pkt *pskb)
 			pkt_copy->dev = padapter->pnetdev;
 			precvframe->u.hdr.pkt = pkt_copy;
 			precvframe->u.hdr.rx_head = pkt_copy->data;
-			EMBOX_NIY(precvframe->u.hdr.rx_end = pkt_copy->data + alloc_sz, 0);
+			precvframe->u.hdr.rx_end = (void *)pkt_copy->data + alloc_sz;
 			skb_reserve( pkt_copy, 8 - ((SIZE_PTR)( pkt_copy->data ) & 7 ));//force pkt_copy->data at 8-byte alignment address
 			skb_reserve( pkt_copy, shift_sz );//force ip_hdr at 8-byte alignment address according to shift_sz.
 			_rtw_memcpy(pkt_copy->data, (pbuf + pattrib->shift_sz + pattrib->drvinfo_sz + RXDESC_SIZE), skb_len);
