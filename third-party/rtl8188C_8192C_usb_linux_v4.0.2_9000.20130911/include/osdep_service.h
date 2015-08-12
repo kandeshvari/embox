@@ -1208,6 +1208,11 @@ static inline void usb_fill_bulk_urb(struct urb *urb,
 		unsigned char *extra;
 		int extralen;
 	*/};
+	struct sk_buff_data {
+		size_t links;
+
+		char __data[];
+	};
 
 	typedef	struct sk_buff	_pkt;
 	typedef unsigned char	_buffer;
