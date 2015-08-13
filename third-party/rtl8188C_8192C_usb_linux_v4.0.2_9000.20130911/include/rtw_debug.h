@@ -189,6 +189,10 @@ extern void rtl871x_cedbg(const char *fmt, ...);
 
 	#define _dbgdump	printf
 
+#elif defined PLATFORM_EMBOX
+
+#define _dbgdump printk
+
 #endif
 
 #endif /* CONFIG_DEBUG_RTL871X */
@@ -270,6 +274,8 @@ extern void rtl871x_cedbg(const char *fmt, ...);
 
 	#define _dbgdump	printf
 
+#elif defined PLATFORM_EMBOX
+#define _dbgdump printk
 #endif
 
 #endif /* CONFIG_DEBUG_RTL819X */
