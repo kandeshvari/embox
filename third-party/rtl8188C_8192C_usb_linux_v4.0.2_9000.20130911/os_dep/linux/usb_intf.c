@@ -543,7 +543,7 @@ _func_enter_;
 
 	DBG_871X("nr_endpoint=%d, in_num=%d, out_num=%d\n\n", pdvobjpriv->nr_endpoint, pdvobjpriv->RtNumInPipes, pdvobjpriv->RtNumOutPipes);
 
-	if ( EMBOX_NIY(pusbd->speed == USB_SPEED_HIGH, 1))
+	if ( EMBOX_NIY(pusbd->speed == USB_SPEED_HIGH, 0))
 	{
 		pdvobjpriv->ishighspeed = _TRUE;
 		DBG_871X("USB_SPEED_HIGH\n");
