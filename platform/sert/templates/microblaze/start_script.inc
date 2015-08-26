@@ -5,10 +5,10 @@
 "ifconfig eth0 10.0.2.16 netmask 255.255.255.0 hw ether AA:BB:CC:DD:EE:02 up",
 "route add 10.0.2.0 netmask 255.255.255.0 eth0",
 "route add default gw 10.0.2.10 eth0",
-/*"mkdir -m 777 /mandatory_test",*/
-"mkramdisk -s 0x20000 /dev/rd",
-"dd if=/mndt.img of=/dev/rd",
-"mount -t ext2 /dev/rd /mnt",
+"mkdir -m 777 /mandatory_test",
+"mkramdisk -s 0x20000",
+"dd if=/mndt.img of=/dev/ramdisk1",
+"mount -t ext2 /dev/ramdisk1 /mandatory_test",
 
 "smac_adm -R high_label -o low_label  -a r",
 "smac_adm -R low_label  -o high_label -a w",
