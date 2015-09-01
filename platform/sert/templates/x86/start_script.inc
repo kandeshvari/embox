@@ -6,13 +6,14 @@
 "route add 10.0.2.0 netmask 255.255.255.0 eth0",
 "route add default gw 10.0.2.10 eth0",
 "mkdir -m 777 /mandatory_test",
-"mkramdisk -s 0x20000 /dev/ram1",
-"dd if=/mndt.img of=/dev/ram1",
-"mount -t ext2 /dev/ram1 /mandatory_test",
+"mkramdisk -s 0x20000 /dev/ram0",
+"dd if=/mndt.img of=/dev/ram0",
+"mount -t ext2 /dev/ram0 /mandatory_test",
+
 
 "smac_adm -R high_label -o low_label  -a r",
 "smac_adm -R low_label  -o high_label -a w",
-"smac_adm -R _          -o smac_admin -a r",
+"smac_adm -R _  	-o smac_admin -a rw",
 
 "smac_adm -R confidentially -o unclassified  -a r",
 "smac_adm -R confidentially -o service  -a r",
@@ -22,4 +23,13 @@
 "smac_adm -R secret -o service  -a r",
 
 "smac_adm -R service -o unclassified  -a r",
+
+"smac_adm -R high_label		-o default   -a rwx",
+"smac_adm -R low_label		-o default   -a rwx",
+"smac_adm -R confidentially  	-o default   -a rwx",
+"smac_adm -R secret  		-o default   -a rwx",
+"smac_adm -R service    	-o default   -a rwx",
+"smac_adm -R unclassified    	-o default   -a rwx",
+"smac_adm -R _			-o default   -a rwx",
+
 "login",
