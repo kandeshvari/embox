@@ -1,0 +1,17 @@
+package sert.subsytems
+
+module tests {
+	depends embox.test.critical
+	depends embox.test.framework.mod.member.ops_test
+	depends embox.test.kernel.timer_test
+	depends embox.test.recursion
+	depends embox.test.posix.sleep_test
+	depends embox.test.stdlib.bsearch_test
+	depends embox.test.stdlib.qsort_test
+	depends embox.test.util.array_test
+	depends embox.test.util.bit_test
+	depends embox.test.util.slist_test
+	depends embox.test.mem.pool_test
+	depends embox.test.kernel.thread.thread_priority_test
+	depends embox.test.stdlib.setjmp_test
+}

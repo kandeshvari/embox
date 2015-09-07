@@ -1,0 +1,9 @@
+package sert.subsytems
+
+module syslib {
+	@NoRuntime depends embox.mem.pool_adapter
+	@NoRuntime depends embox.util.LibUtil
+	@NoRuntime depends embox.framework.LibFramework
+	@NoRuntime depends embox.compat.libc.all
+	@NoRuntime depends third_party.lib.libgcc_toolchain
+}

@@ -1,0 +1,17 @@
+package sert.subsytems
+
+module net {
+	@NoRuntime depends embox.net.dev
+	@NoRuntime depends embox.net.core
+	@NoRuntime depends embox.net.net_entry
+	@NoRuntime depends embox.net.l2.ethernet
+	@NoRuntime depends embox.net.arp
+	@NoRuntime depends embox.net.af_inet
+	@NoRuntime depends embox.net.ipv4
+	@NoRuntime depends embox.net.icmpv4
+	@NoRuntime depends embox.net.udp
+	@NoRuntime depends embox.net.tcp
+	@NoRuntime depends embox.net.udp_sock
+	@NoRuntime depends embox.net.tcp_sock
+	@NoRuntime depends embox.net.raw_sock
+}
