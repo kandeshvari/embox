@@ -1,6 +1,8 @@
 package sert.subsytems
 
 module tests {
+	depends embox.cmd.test
+
 	depends embox.test.critical
 	depends embox.test.framework.mod.member.ops_test
 	depends embox.test.kernel.timer_test

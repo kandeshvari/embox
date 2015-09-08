@@ -1,6 +1,14 @@
 package sert.subsytems
 
 module net {
+	@NoRuntime depends embox.cmd.net.arp
+	@NoRuntime depends embox.cmd.net.arping
+	@NoRuntime depends embox.cmd.net.ping
+	@NoRuntime depends embox.cmd.net.ifconfig
+	@NoRuntime depends embox.cmd.net.route
+	@NoRuntime depends embox.cmd.net.telnetd
+	@NoRuntime depends embox.cmd.net.httpd
+
 	@NoRuntime depends embox.net.dev
 	@NoRuntime depends embox.net.core
 	@NoRuntime depends embox.net.net_entry

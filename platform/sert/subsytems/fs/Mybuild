@@ -1,0 +1,29 @@
+package sert.subsytems
+
+module fs {
+	@InitFS
+	source "mndt.img"
+
+	@NoRuntime depends embox.cmd.fs.cat
+	@NoRuntime depends embox.cmd.fs.cd
+	@NoRuntime depends embox.cmd.fs.pwd
+	@NoRuntime depends embox.cmd.fs.ls
+	@NoRuntime depends embox.cmd.fs.rm
+	@NoRuntime depends embox.cmd.fs.mkfs
+	@NoRuntime depends embox.cmd.fs.mount
+	@NoRuntime depends embox.cmd.fs.more
+	@NoRuntime depends embox.cmd.fs.umount
+	@NoRuntime depends embox.cmd.fs.stat
+	@NoRuntime depends embox.cmd.fs.echo
+	@NoRuntime depends embox.cmd.fs.touch
+	@NoRuntime depends embox.cmd.fs.mkdir
+	@NoRuntime depends embox.cmd.fs.cp
+	@NoRuntime depends embox.cmd.fs.mv
+	@NoRuntime depends embox.cmd.fs.dd
+	@NoRuntime depends embox.cmd.fs.mkramdisk
+
+	depends embox.fs.driver.initfs
+	depends embox.fs.rootfs
+	depends embox.fs.driver.devfs
+	depends embox.fs.driver.ext2
+}
