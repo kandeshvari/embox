@@ -1,4 +1,4 @@
-package sert.subsytems
+package sert.subsystems
 
 module net {
 	@NoRuntime depends embox.cmd.net.arp

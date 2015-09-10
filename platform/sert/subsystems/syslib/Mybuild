@@ -1,4 +1,4 @@
-package sert.subsytems
+package sert.subsystems
 
 module syslib {
 	@NoRuntime depends embox.mem.pool_adapter
