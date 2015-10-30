@@ -157,10 +157,6 @@ static int stm32_flash_copy(struct flash_dev *dev, uint32_t base_dst,
 	return stm32_flash_program(dev, base_dst, (void *) dev->start + base_src, len);
 }
 
-#if 0
-static int stm32_flash_init(void *arg);
-static size_t stm32_flash_query(struct flash_dev *dev, void * data, size_t len);
-#endif
 static const struct flash_dev_drv stm32_flash_drv = {
 	.flash_read = stm32_flash_read,
 	.flash_erase_block = stm32_flash_erase_block,
