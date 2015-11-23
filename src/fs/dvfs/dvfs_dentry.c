@@ -109,6 +109,9 @@ int dvfs_path_walk(const char *path, struct dentry *parent, struct lookup *looku
 		return 0;
 	}
 
+	if (!FILE_TYPE(parent->flags, S_IFDIR))
+		return -ENOTDIR;
+
 	if ((d = local_lookup(parent, buff)))
 		return dvfs_path_walk(path + strlen(buff), d, lookup);
 
@@ -171,8 +174,10 @@ int dvfs_lookup(const char *path, struct lookup *lookup) {
 		return 0;
 	}
 
-	if (dentry->d_sb == NULL)
+	if (dentry->d_sb == NULL) {
+		lookup->item = NULL;
 		return -ENOENT;
+	}
 
 	/* TODO preprocess path ? Delete "/../" */
 
