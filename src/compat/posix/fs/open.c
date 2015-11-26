@@ -17,7 +17,6 @@
 #include <fs/vfs.h>
 
 #include <fs/kfile.h>
-#include <kernel/task/idesc_table.h>
 #include <kernel/task/resource/idesc_table.h>
 
 #include <dirent_impl.h>
@@ -61,13 +60,15 @@ int open(const char *path, int __oflag, ...) {
 	mode = umask_modify(mode);
 	va_end(args);
 
-	strncpy(path_buf, path, PATH_MAX);
+	strncpy(path_buf, path, PATH_MAX - 1);
+	path_buf[PATH_MAX - 1] = '\0';
 	bname = basename(path_buf);
 
 	if (strlen(bname) >= NAME_MAX)
 		return SET_ERRNO(ENAMETOOLONG);
 
-	strncpy(name, bname, NAME_MAX);
+	strncpy(name, bname, NAME_MAX - 1);
+	name[NAME_MAX - 1] = '\0';
 
 	if (0 == strcmp(name, "/")) {
 		return SET_ERRNO(EISDIR);

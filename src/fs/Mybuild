@@ -26,14 +26,16 @@ module file_desc {
 	source "file_xattr.c"
 
 	depends idesc
-	//depends index_operation
 	depends xattr
 
+	depends embox.fs.syslib.perm
 	depends embox.kernel.task.resource.idesc_table
 }
 
 module idesc {
 	source "idesc.c"
+
+	depends embox.kernel.task.resource.idesc_table
 }
 
 module idesc_event {
@@ -106,6 +108,7 @@ module rootfs_dvfs extends root_file_system {
 	option string bdev = ""
 
 	depends embox.driver.block_common
+	depends embox.driver.char_dev
 	depends embox.fs.dvfs
 	depends embox.fs.driver.dvfs_driver
 	depends embox.kernel.task.api

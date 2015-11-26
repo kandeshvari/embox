@@ -14,6 +14,7 @@
 #include <string.h>
 #include <termios.h>
 #include <poll.h>
+#include <sys/stat.h>
 
 #include <util/ring_buff.h>
 #include <util/ring.h>
@@ -23,11 +24,9 @@
 #include <kernel/task.h>
 #include <fs/idesc.h>
 #include <fs/idesc_event.h>
-#include <fs/flags.h>
 
 #include <kernel/thread/thread_sched_wait.h>
 
-#include <kernel/task/idesc_table.h>
 #include <kernel/task/resource/idesc_table.h>
 #include <mem/misc/pool.h>
 
@@ -41,13 +40,6 @@ struct idesc_pty {
 #define MAX_PTY 20
 POOL_DEF(pty_pool, struct pty, MAX_PTY);
 POOL_DEF(ipty_pool, struct idesc_pty, 2 * MAX_PTY);
-
-#if 0
-struct pty {
-	struct pty pty;
-	/*struct idesc *master, *slave;*/
-};
-#endif
 
 static void pty_out_wake(struct tty *t) {
 	struct pty *pty = pty_from_tty(t);
@@ -158,10 +150,11 @@ static struct idesc_pty *idesc_pty_create(struct pty *pty, const struct idesc_op
 	struct idesc_pty *ipty;
 
 	ipty = pool_alloc(&ipty_pool);
-
-	if (ipty) {
-		idesc_init(&ipty->idesc, ops, FS_MAY_READ | FS_MAY_WRITE);
+	if (!ipty) {
+		return NULL;
 	}
+
+	idesc_init(&ipty->idesc, ops, S_IROTH | S_IWOTH);
 
 	ipty->pty = pty;
 
@@ -174,38 +167,6 @@ static void idesc_pty_delete(struct idesc_pty *ipty, struct idesc **idesc) {
 
 	pool_free(&ipty_pool, ipty);
 }
-
-#if 0
-static int pty_fixup_error(struct idesc *idesc, int code) {
-	struct pty *pty;
-	struct idesc *idesc_other;
-
-	/* Negative => error, positive => some data read */
-	if (code != 0) {
-		return code;
-	}
-
-	pty = ((struct idesc_pty *) idesc)->pty;
-
-	if (idesc == pty->master) {
-		idesc_other = pty->slave;
-	} else {
-		assert(idesc == pty->slave);
-		idesc_other = pty->master;
-	}
-
-	if (idesc_other == NULL) {
-		return 0;
-	}
-
-//	if (code == -EAGAIN) {
-//		return -EAGAIN;
-//	}
-
-	assert(idesc->idesc_flags & O_NONBLOCK);
-	return -EAGAIN;
-}
-#endif
 
 static void pty_close(struct idesc *idesc) {
 	struct idesc_pty *ipty = (struct idesc_pty *) idesc;
@@ -340,12 +301,12 @@ int ppty(int ptyfds[2]) {
 
 	master = idesc_pty_create(pty, &pty_master_ops);
 	slave = idesc_pty_create(pty, &pty_slave_ops);
-	pty_init(pty, &master->idesc, &slave->idesc);
-
 	if (!master || !slave) {
 		res = ENOMEM;
 		goto out_err;
 	}
+
+	pty_init(pty, &master->idesc, &slave->idesc);
 
 	ptyfds[0] = idesc_table_add(it, &master->idesc, 0);
 	ptyfds[1] = idesc_table_add(it, &slave->idesc, 0);

@@ -8,10 +8,11 @@
 #include <errno.h>
 #include <stddef.h>
 #include <unistd.h>
+#include <sys/stat.h>
 
 #include <fs/index_descriptor.h>
 #include <fs/idesc.h>
-#include <kernel/task/idesc_table.h>
+#include <kernel/task/resource/idesc_table.h>
 
 ssize_t write(int fd, const void *buf, size_t nbyte) {
 	ssize_t ret;
@@ -19,7 +20,7 @@ ssize_t write(int fd, const void *buf, size_t nbyte) {
 
 	if (!idesc_index_valid(fd)
 			|| (NULL == (idesc = index_descriptor_get(fd)))
-			|| (!(idesc->idesc_amode & FS_MAY_WRITE))) {
+			|| (!(idesc->idesc_amode & S_IWOTH))) {
 		return SET_ERRNO(EBADF);
 	}
 

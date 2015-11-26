@@ -10,19 +10,17 @@ abstract module setup_tty_api {
 }
 
 module GraphicMode extends Display {
-	option number vesa_mode=3
+	option boolean manual_settings = false
+
+	option number set_bpp
 	option number set_x
 	option number set_y
-
-	option number fb_init=1
 
 	source "graphic_init.c"
 
 	depends embox.driver.video.fb
 	depends embox.driver.video.fb_videomodes
 	depends embox.driver.video.vesa_modes
-
-	depends embox.driver.diag
 }
 
 module TextMode extends Display {
@@ -51,6 +49,7 @@ module diag_fd {
 	depends embox.compat.posix.idx.dup
 	depends embox.fs.idesc
 	depends embox.kernel.task.api
+	depends embox.kernel.task.resource.idesc_table
 }
 
 module start_script {
@@ -65,5 +64,5 @@ module start_script {
 	depends setup_tty_api
 	depends embox.cmd.sh.shell_registry
 	depends embox.cmd.sh.shell_api
-	@NoRuntime depends embox.compat.libc.stdio.file_ops
+	depends embox.compat.libc.stdio.printf
 }

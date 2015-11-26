@@ -299,14 +299,6 @@ typedef struct hdc  {
 	struct waitq waitq;
 } hdc_t;
 
-struct partition {
-	void *bdev;
-	unsigned int start;
-	unsigned int len;
-	unsigned short bootid;
-	unsigned short systid;
-};
-
 typedef struct dev_geometry {
 	int cyls;
 	int heads;
@@ -351,7 +343,5 @@ extern void ide_select_drive(hd_t *hd);
 extern void pio_write_buffer(hd_t *hd, char *buffer, int size);
 extern void pio_read_buffer(hd_t *hd, char *buffer, int size);
 extern void hd_setup_transfer(hd_t *hd, blkno_t blkno, int nsects);
-
-extern int create_partitions(hd_t *hd);
 
 #endif /* IDE_H_ */

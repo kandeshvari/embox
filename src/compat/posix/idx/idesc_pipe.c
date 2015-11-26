@@ -13,13 +13,13 @@
 #include <errno.h>
 #include <poll.h>
 #include <unistd.h>
+#include <sys/stat.h>
 
 #include <util/ring_buff.h>
 
 #include <framework/mod/options.h>
 #include <kernel/thread/sync/mutex.h>
 #include <kernel/task.h>
-#include <kernel/task/idesc_table.h>
 #include <kernel/task/resource/idesc_table.h>
 #include <fs/idesc.h>
 #include <fs/idesc_event.h>
@@ -27,7 +27,6 @@
 #include <kernel/thread/thread_sched_wait.h>
 
 #include <kernel/sched.h>
-#include <fs/flags.h>
 #include <mem/sysmalloc.h>
 
 
@@ -119,7 +118,7 @@ static ssize_t pipe_read(struct idesc *idesc, void *buf, size_t nbyte) {
 	assert(buf);
 	assert(idesc);
 	assert(idesc->idesc_ops == &idesc_pipe_ops);
-	assert(idesc->idesc_amode == FS_MAY_READ);
+	assert(idesc->idesc_amode == S_IROTH);
 
 	if (!nbyte) {
 		return 0;
@@ -158,7 +157,7 @@ static ssize_t pipe_write(struct idesc *idesc, const void *buf, size_t nbyte) {
 	assert(buf);
 	assert(idesc);
 	assert(idesc->idesc_ops == &idesc_pipe_ops);
-	assert(idesc->idesc_amode == FS_MAY_WRITE);
+	assert(idesc->idesc_amode == S_IWOTH);
 
 	cbuf = buf;
 	/* nbyte == 0 is ok to passthrough */
@@ -197,23 +196,6 @@ static ssize_t pipe_write(struct idesc *idesc, const void *buf, size_t nbyte) {
 }
 
 static int pipe_fcntl(struct idesc *data, int cmd, void * args) {
-#if 0
-	struct pipe *pipe;
-	size_t size;
-
-	pipe = (struct pipe*) task_idx_desc_data(data);
-
-	switch (cmd) {
-	case F_GETPIPE_SZ:
-		return pipe->buf_size;
-	case F_SETPIPE_SZ:
-		size = va_arg(args, size_t);
-		pipe_set_buf_size(pipe, size);
-		break;
-	default:
-		break;
-	}
-#endif
 	return 0;
 }
 
@@ -280,7 +262,7 @@ static const struct idesc_ops idesc_pipe_ops = {
 };
 
 static int idesc_pipe_init(struct idesc_pipe *pdesc, struct pipe *pipe,
-		idesc_access_mode_t amode) {
+		mode_t amode) {
 
 	idesc_init(&pdesc->idesc, &idesc_pipe_ops, amode);
 
@@ -295,13 +277,20 @@ static struct pipe *pipe_alloc(void) {
 	struct ring_buff *pipe_buff;
 	void *storage;
 
-	pipe = storage = NULL;
-	pipe_buff = NULL;
-
-	if (!(storage = sysmalloc(DEFAULT_PIPE_BUFFER_SIZE))
-				|| !(pipe = sysmalloc(sizeof(struct pipe)))
-				|| !(pipe_buff = sysmalloc(sizeof(struct ring_buff)))) {
-		goto free_memory;
+	storage = sysmalloc(DEFAULT_PIPE_BUFFER_SIZE);
+	if (!storage) {
+		return NULL;
+	}
+	pipe = sysmalloc(sizeof(struct pipe));
+	if (!pipe) {
+		sysfree(storage);
+		return NULL;
+	}
+	pipe_buff = sysmalloc(sizeof(struct ring_buff));
+	if (!pipe_buff) {
+		sysfree(storage);
+		sysfree(pipe);
+		return NULL;
 	}
 
 	pipe->buff = pipe_buff;
@@ -311,12 +300,6 @@ static struct pipe *pipe_alloc(void) {
 	mutex_init(&pipe->mutex);
 
 	return pipe;
-
-free_memory:
-	if (storage)   sysfree(storage);
-	if (pipe_buff) sysfree(pipe_buff);
-	if (pipe)      sysfree(pipe);
-	return NULL;
 }
 
 static void pipe_free(struct pipe *pipe) {
@@ -345,8 +328,8 @@ int pipe2(int pipefd[2], int flags) {
 	}
 
 
-	idesc_pipe_init(&pipe->read_desc, pipe, FS_MAY_READ);
-	idesc_pipe_init(&pipe->write_desc, pipe, FS_MAY_WRITE);
+	idesc_pipe_init(&pipe->read_desc, pipe, S_IROTH);
+	idesc_pipe_init(&pipe->write_desc, pipe, S_IWOTH);
 
 
 	pipefd[0] = idesc_table_add(it, &pipe->read_desc.idesc, flags);

@@ -4,8 +4,10 @@
  * @date   8 Apr 2014
  */
 
+#include <errno.h>
 #include <fcntl.h>
 #include <string.h>
+#include <sys/stat.h>
 
 #include <fs/dvfs.h>
 #include <framework/mod/options.h>
@@ -80,18 +82,19 @@ int dvfs_default_pathname(struct inode *inode, char *buf, int flags) {
  * @return Pointer to the new superblock
  * @retval NULL Superblock could not be allocated
  */
-struct super_block *dvfs_alloc_sb(struct dumb_fs_driver *drv, struct block_dev *dev) {
+struct super_block *dvfs_alloc_sb(struct dumb_fs_driver *drv, struct file *bdev_file) {
 	struct super_block *sb;
 	assert(drv);
 
 	sb = pool_alloc(&superblock_pool);
 	*sb = (struct super_block) {
-		.fs_drv = drv,
-		.bdev   = dev,
+		.fs_drv    = drv,
+		.bdev_file = bdev_file,
+		.bdev      = bdev_file->f_inode->i_data,
 	};
 
 	if (drv->fill_sb)
-		drv->fill_sb(sb, dev);
+		drv->fill_sb(sb, bdev_file);
 
 	return sb;
 }
@@ -118,7 +121,7 @@ int dvfs_destroy_inode(struct inode *inode) {
 /**
 * @brief Double-linked list of all dentries
 */
-static DLIST_DEFINE(dentry_dlist);
+DLIST_DEFINE(dentry_dlist);
 
 /* @brief Get new dentry from pool
  *
@@ -144,26 +147,28 @@ struct dentry *dvfs_alloc_dentry(void) {
 	}
 
 	memset(dentry, 0, sizeof(struct dentry));
-	dlist_head_init(&dentry->d_lnk);
 	dlist_add_next(&dentry->d_lnk, &dentry_dlist);
 	dlist_init(&dentry->children);
 	return dentry;
 }
 
-/* @brief Remove dentry from pool
+extern int dvfs_cache_del(struct dentry *dentry);
+/**
+ * @brief Remove dentry from pool
  */
 int dvfs_destroy_dentry(struct dentry *dentry) {
 	assert(dentry->usage_count >= 0);
 	if (dentry->usage_count == 0) {
 		if (dentry->d_inode)
 			dvfs_destroy_inode(dentry->d_inode);
-		dentry->parent->usage_count--;
+		dentry_ref_dec(dentry->parent);
 		dlist_del(&dentry->children_lnk);
 		dlist_del(&dentry->d_lnk);
+		dvfs_cache_del(dentry);
 		pool_free(&dentry_pool, dentry);
 		return 0;
 	} else
-		return -1;
+		return -EBUSY;
 }
 
 /**
@@ -173,8 +178,7 @@ int dvfs_destroy_dentry(struct dentry *dentry) {
  */
 void dentry_upd_flags(struct dentry *dentry) {
 	if (dentry->d_inode) {
-		if (dentry->d_inode->flags & O_DIRECTORY)
-			dentry->flags |= O_DIRECTORY;
+		dentry->flags |= dentry->d_inode->flags & (S_IFMT | S_IRWXA);
 	}
 }
 
@@ -202,15 +206,10 @@ int dvfs_destroy_file(struct file *desc) {
  */
 int inode_fill(struct super_block *sb, struct inode *inode,
                       struct dentry *dentry) {
-	*inode = (struct inode) {
-		.i_dentry  = dentry,
-		.i_sb      = sb,
-		.i_ops     = sb ? sb->sb_iops : NULL,
-		.start_pos = inode->start_pos,
-		.i_no      = inode->i_no,
-		.i_data    = inode->i_data,
-		.flags     = inode->flags,
-	};
+	inode->i_dentry = dentry;
+	inode->i_sb     = sb;
+	inode->i_ops    = sb ? sb->sb_iops : NULL;
+	/* Other fields are left without changes on purpose */
 
 	return 0;
 }
@@ -238,9 +237,17 @@ int dentry_fill(struct super_block *sb, struct inode *inode,
 
 	if (parent) {
 		dlist_add_prev(&dentry->children_lnk, &parent->children);
-		parent->usage_count++;
+		dentry_ref_inc(parent);
 	}
 	return 0;
+}
+
+int dentry_ref_inc(struct dentry *dentry) {
+	return ++dentry->usage_count;
+}
+
+int dentry_ref_dec(struct dentry *dentry) {
+	return --dentry->usage_count;
 }
 
 /* Root-related stuff */
@@ -250,26 +257,31 @@ extern struct super_block *rootfs_sb(void);
  *        initialize them if they are empty
  */
 int dvfs_update_root(void) {
-	struct super_block *sb = rootfs_sb();
-	struct inode *inode = global_root->d_inode;
-	if (!global_root)
+	struct super_block *sb;
+	struct inode *inode;
+	if (global_root == NULL)
 		global_root = dvfs_alloc_dentry();
 
-	if (!global_root->d_inode)
+	assert(global_root);
+
+	sb = rootfs_sb();
+	inode = global_root->d_inode;
+	if (inode == NULL)
 		inode = dvfs_alloc_inode(sb);
 
 	*global_root = (struct dentry) {
-		.d_sb    = sb,
-		.d_inode = inode,
-		.parent  = global_root,
-		.name    = "/",
-		.flags   = O_DIRECTORY,
+		.d_sb        = sb,
+		.d_inode     = inode,
+		.parent      = global_root,
+		.name        = "/",
+		.flags       = S_IFDIR | DVFS_DIR_VIRTUAL | DVFS_MOUNT_POINT,
 		.usage_count = 1,
+		.d_lnk       = global_root->d_lnk
 	};
 
 	if (global_root->d_inode)
 		*(global_root->d_inode) = (struct inode) {
-			.flags    = O_DIRECTORY,
+			.flags    = S_IFDIR,
 			.i_ops    = sb->sb_iops,
 			.i_sb     = sb,
 			.i_dentry = global_root,
@@ -292,7 +304,6 @@ struct dentry *dvfs_root(void) {
 
 	return global_root;
 }
-
 
 /**
 * @brief Check if element with given name presents as a subelement
@@ -317,4 +328,62 @@ struct dentry *local_lookup(struct dentry *parent, char *name) {
 	}
 
 	return NULL;
+}
+
+/**
+ * @brief Free superblock resources
+ *
+ * @param sb Superblock to be destroyed
+ *
+ * @return Negative error code or zero if succeed
+ */
+int dvfs_destroy_sb(struct super_block *sb) {
+	/* TODO fs-specific resource free? */
+	if (sb->root)
+		sb->root->d_sb = NULL;
+
+	pool_free(&superblock_pool, sb);
+	return 0;
+}
+
+/**
+ * @brief Read from block device pointed by bdev_file
+ * with args similar to old-style bdev usage
+ *
+ * @param bdev_file File pointing to opened device
+ * @param buff Buffer to read from
+ * @param count Number of bytes to be read
+ * @param blkno Number of block of device
+ *
+ * @return Size of read chunk or negative error number
+ * if failed
+ */
+int dvfs_bdev_read(
+		struct file *bdev_file,
+		char *buff,
+		size_t count,
+		int blkno) {
+	struct block_dev *bdev = bdev_file->f_inode->i_data;
+	return block_dev_read(bdev, buff, count, blkno);
+}
+
+/**
+ * @brief Write data to block device using args similar
+ * to old-style bdev usage
+ *
+ * @param bdev_file File pointing to opened block device
+ * @param buff Buffer to be written
+ * @param count Number of bytes to be written
+ * @param blkno Number of block of device
+ *
+ * @return Size of written chunk of negative error number
+ * if failed
+ */
+int dvfs_bdev_write(
+		struct file *bdev_file,
+		char *buff,
+		size_t count,
+		int blkno) {
+	struct block_dev *bdev = bdev_file->f_inode->i_data;
+	return block_dev_write(bdev, buff, count, blkno);
 }

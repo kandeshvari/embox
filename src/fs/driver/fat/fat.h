@@ -11,12 +11,13 @@
 
 #include <stdint.h>
 
-#include <embox/block_dev.h>
 #include <fs/mbr.h>
 
-#define MSDOS_NAME      11
-#define ROOT_DIR        "/"
 #define DIR_SEPARATOR   '/'	/* character separating directory components*/
+#define ROOT_DIR        "/"
+#define MSDOS_NAME      11
+#define MSDOS_DOT     ".          "
+#define MSDOS_DOTDOT  "..         "
 
 /* 32-bit error codes */
 #define DFS_OK        0          /* no error */
@@ -27,7 +28,7 @@
 #define DFS_ALLOCNEW  5	         /* must allocate new directory cluster */
 #define DFS_ERRMISC   0xffffffff /* generic error */
 #define DFS_WRONGRES  6          /* file expected but dir found or vice versa */
-
+#define DFS_BAD_CLUS  0x0ffffff7
 /* Internal subformat identifiers */
 #define FAT12 0
 #define FAT16 1
@@ -96,7 +97,7 @@ struct bpb {
 	uint8_t rootentries_h;	/* number of root dir entries high byte (0x02 normally) */
 	uint8_t sectors_s_l;	/* small num sectors low byte */
 	uint8_t sectors_s_h;	/* small num sectors high byte */
-	uint8_t mediatype;		/* media descriptor byte */
+	uint8_t mediatype;	/* media descriptor byte */
 	uint8_t secperfat_l;	/* sectors per FAT low byte */
 	uint8_t secperfat_h;	/* sectors per FAT high byte */
 	uint8_t secpertrk_l;	/* sectors per track low byte */
@@ -117,7 +118,7 @@ struct bpb {
  *	Extended BIOS Parameter Block structure (FAT12/16)
  */
 struct ebpb {
-	uint8_t unit;			/* int 13h drive# */
+	uint8_t unit;			/* int 13h drive#: 0x00 for floppy and 0x80 for HDD */
 	uint8_t head;			/* archaic, used by Windows NT-class OSes for flags */
 	uint8_t signature;		/* 0x28 or 0x29 */
 	uint8_t serial_0;		/* serial# */
@@ -126,6 +127,7 @@ struct ebpb {
 	uint8_t serial_3;		/* serial# */
 	uint8_t label[11];		/* volume label */
 	uint8_t system[8];		/* filesystem ID */
+	uint8_t code[448];		/* boot sector code */
 };
 
 /*
@@ -158,10 +160,12 @@ struct ebpb32 {
 	uint8_t serial_3;		/* serial# */
 	uint8_t label[11];		/* volume label */
 	uint8_t system[8];		/* filesystem ID */
+	uint8_t code[420];		/* boot sector code */
 };
 
 /*
  *	Logical Boot Record structure (volume boot sector)
+ *	IMPORTANT NOTE Boot code section is appended to ebpb to fit different offset
  */
 struct lbr {
 	uint8_t jump[3];		/* JMP instruction */
@@ -171,7 +175,6 @@ struct lbr {
 		struct ebpb ebpb;		/* FAT12/16 Extended BIOS Parameter Block */
 		struct ebpb32 ebpb32;	/* FAT32 Extended BIOS Parameter Block */
 	} ebpb;
-	uint8_t code[420];		/* boot sector code */
 	uint8_t sig_55;			/* 0x55 signature byte */
 	uint8_t sig_aa;			/* 0xaa signature byte */
 };
@@ -194,7 +197,7 @@ struct volinfo {
  /*	uint8_t oemid[9]; */		/* OEM ID ASCIIZ */
  /*	uint8_t system[9]; */		/* system ID ASCIIZ */
 	uint8_t label[12];			/* volume label ASCIIZ */
-	uint32_t startsector;		/* starting sector of filesystem */
+	uint32_t startsector;		/* starting sector of filesystem */ /* TODO eliminate this field in new vfs as it handles partition on it's own */
 	uint16_t bytepersec;		/* Bytes per sector */
 	uint8_t secperclus;			/* sectors per cluster */
 	uint16_t reservedsecs;		/* reserved sectors */
@@ -238,14 +241,16 @@ struct fat_file_info {
  *	Directory search structure (Internal to DOSFS)
  */
 struct dirinfo {
+	struct fat_file_info fi;	/* Must be first field in structure */
 	uint32_t currentcluster;	/* current cluster in dir */
 	uint8_t currentsector;		/* current sector in cluster */
 	uint8_t currententry;		/* current dir entry in sector */
 	uint8_t *p_scratch;			/* ptr to user-supplied scratch buffer (one sector) */
 	uint8_t flags;				/* internal DOSFS flags */
-
-	struct fat_file_info fi;
 };
+
+#include <framework/mod/options.h>
+#define FAT_MAX_SECTOR_SIZE OPTION_MODULE_GET(embox__fs__driver__fat, NUMBER, fat_max_sector_size)
 
 extern void fat_set_filetime(struct dirent *de);
 extern void fat_get_filename(char *tmppath, char *filename);
@@ -257,7 +262,7 @@ extern int      fat_write_sector(struct fat_fs_info *fsi, uint8_t *buffer, uint3
 extern int      fat_read_sector(struct fat_fs_info *fsi, uint8_t *buffer, uint32_t sector);
 extern uint32_t fat_get_next(struct fat_fs_info *fsi,
                              struct dirinfo * dirinfo, struct dirent * dirent);
-extern int      fat_create_partition(void *bdev);
+extern int      fat_create_partition(void *bdev, int fat_n);
 extern uint32_t fat_get_ptn_start(void *bdev, uint8_t pnum, uint8_t *pactive,
                                   uint8_t *pptype, uint32_t *psize);
 extern uint32_t fat_get_volinfo(void *bdev, struct volinfo * volinfo, uint32_t startsector);

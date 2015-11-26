@@ -1,9 +1,13 @@
 package embox.driver
 
 module block_common {
-	option number dev_quantity = 16
+	@IncludeExport(path="drivers")
+	source "block_dev.h"
 
+	option number dev_quantity = 16
+	option number default_block_size = 512
 	source "block_dev_common.c"
+	source "block_dev_namer.c"
 
 	depends embox.mem.phymem
 	depends embox.fs.buffer_cache
@@ -13,7 +17,7 @@ module block_common {
 }
 
 module block {
-	source "block_dev.c", "block_dev_namer.c"
+	source "block_dev.c"
 
 	depends block_common
 
@@ -23,4 +27,12 @@ module block {
 	depends embox.util.LibUtil
 	depends embox.util.indexator
 	depends embox.mem.phymem
+}
+
+module block_dvfs {
+	source "block_dev_dvfs.c"
+	source "block_dev_idesc_dvfs.c"
+
+	depends block_common
+	depends embox.driver.common
 }

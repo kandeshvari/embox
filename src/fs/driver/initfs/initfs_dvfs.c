@@ -46,10 +46,6 @@ struct initfs_dir_info {
 
 POOL_DEF(initfs_dir_pool, struct initfs_dir_info, OPTION_GET(NUMBER,dir_quantity));
 
-static int initfs_open(struct inode *node, struct file *file) {
-	return 0;
-}
-
 static size_t initfs_read(struct file *desc, void *buf, size_t size) {
 	struct inode *inode;
 
@@ -64,14 +60,11 @@ static size_t initfs_read(struct file *desc, void *buf, size_t size) {
 	return size;
 }
 
-static int initfs_ioctl(struct file *desc, int request, ...) {
+static int initfs_ioctl(struct file *desc, int request, void *data) {
 	struct inode *inode = desc->f_inode;
 	char **p_addr;
-	va_list args;
 
-	va_start(args, request);
-	p_addr = va_arg(args, char **);
-	va_end(args);
+	p_addr = data;
 
 	*p_addr = (char*) inode->start_pos;
 
@@ -95,7 +88,7 @@ static int initfs_fill_inode_entry(struct inode *node,
 		.start_pos = (int) entry->data,
 		.length    = (size_t) entry->size,
 		.i_data    = di,
-		.flags     = entry->mode & S_IFDIR ? O_DIRECTORY : 0,
+		.flags     = entry->mode & (S_IFMT | S_IRWXA),
 	};
 	return 0;
 }
@@ -219,6 +212,7 @@ static int initfs_destroy_inode(struct inode *inode) {
 }
 
 struct super_block_operations initfs_sbops = {
+	.open_idesc = dvfs_file_open_idesc,
 	.destroy_inode = initfs_destroy_inode,
 };
 
@@ -229,15 +223,20 @@ struct inode_operations initfs_iops = {
 };
 
 struct file_operations initfs_fops = {
-	.open  = initfs_open,
 	.read  = initfs_read,
 	.ioctl = initfs_ioctl,
 };
 
-static int initfs_fill_sb(struct super_block *sb, struct block_dev *dev) {
+static int initfs_fill_sb(struct super_block *sb, struct file *bdev_file) {
 	sb->sb_iops = &initfs_iops;
 	sb->sb_fops = &initfs_fops;
 	sb->sb_ops  = &initfs_sbops;
+	sb->bdev = NULL;
+
+	if (bdev_file) {
+		return -1;
+	}
+
 	return 0;
 }
 
