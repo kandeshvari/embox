@@ -36,28 +36,3 @@ module ext2fuse_xattr {
 	@NoRuntime depends core
 	depends embox.fs.core
 }
-
-@App
-@AutoCmd
-@Cmd(name = "ext2fuse",
-	help = "Concatenate files and print on the standard output",
-	man = '''
-		NAME
-			cat - concatenate files and print on the standard output
-		SYNOPSIS
-			cat [OPTION]... [FILE]...
-		DESCRIPTION
-			Concatenate FILE(s) to standard output.
-		OPTIONS
-			-n  number all output lines
-		AUTHORS
-			Nikolay Korotky
-	''')
-module ext2fuse_driver_dvfs {
-	@IncludePath("$(EXTERNAL_BUILD_DIR)/third_party/fuse/core/install/include")
-	@IncludePath("$(ROOT_DIR)/third-party/fuse/ext2fuse/include")
-	source "ext2fuse_dvfs.c"
-
-	@NoRuntime depends core
-	depends embox.fs.fuse.fuse_linux
-}
