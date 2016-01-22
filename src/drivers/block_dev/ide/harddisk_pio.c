@@ -26,7 +26,7 @@
 #define HD_WAIT_MS 10
 
 extern int hd_ioctl(struct block_dev *bdev, int cmd, void *args, size_t size);
-
+static block_dev_driver_t idedisk_pio_driver;
 static int hd_read_pio(struct block_dev *bdev, char *buffer, size_t count, blkno_t blkno) {
 	hd_t *hd;
 	hdc_t *hdc;
@@ -183,20 +183,14 @@ static int hd_write_pio(struct block_dev *bdev, char *buffer, size_t count, blkn
 	return result == 0 ? count : result;
 }
 
-
-static block_dev_driver_t idedisk_pio_driver = {
-	"idedisk_drv",
-	hd_ioctl,
-	hd_read_pio,
-	hd_write_pio
-};
-
 static int idedisk_init (void *args) {
 	hd_t *drive;
 	size_t size;
 	char path[PATH_MAX];
+	struct block_dev *bdev;
+
+
 	drive = (hd_t *)args;
-	struct block_dev *bdev = drive->bdev;
 	/* Make new device */
 	if ((drive->media == IDE_DISK) && (drive->udmamode == -1)) {
 		*path = 0;
@@ -207,14 +201,26 @@ static int idedisk_init (void *args) {
 		drive->bdev = block_dev_create(path,
 				&idedisk_pio_driver, drive);
 		if (NULL != drive->bdev) {
-			size = drive->blks * bdev->block_size;
-			block_dev(drive->bdev)->size = size;
+			bdev = (struct block_dev *) drive->bdev;
+			bdev->size = drive->blks * bdev->block_size;
 		} else {
 			return -1;
 		}
-		create_partitions(drive);
+		bdev->block_size = 512;
+		size = drive->blks * bdev->block_size;
+		bdev->size = size;
+		drive->bdev = bdev;
+		create_partitions(bdev);
 	}
 	return 0;
 }
 
-BLOCK_DEV_DEF("idedisk", &idedisk_pio_driver, idedisk_init);
+static block_dev_driver_t idedisk_pio_driver = {
+	"idedisk_drv",
+	hd_ioctl,
+	hd_read_pio,
+	hd_write_pio,
+	idedisk_init,
+};
+
+BLOCK_DEV_DEF("idedisk", &idedisk_pio_driver);

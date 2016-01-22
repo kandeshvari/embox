@@ -98,21 +98,6 @@ module stm32_usart extends embox.driver.diag.diag_api {
 	depends diag
 }
 
-@BuildDepends(third_party.bsp.st_f4.core)
-module stm_usart extends embox.driver.diag.diag_api {
-	option number baud_rate
-	option number usartx=6
-	/*option boolean hw_flow = false*/
-
-	source "stm_usart.c"
-
-	/*depends embox.driver.gpio.stm32*/
-	depends core
-	depends diag
-	depends third_party.bsp.st_f4.core
-}
-
-
 @BuildDepends(efm32zg_sk3200.bsp)
 module efm32_leuart extends embox.driver.diag.diag_api {
 	option number baud_rate
@@ -152,4 +137,12 @@ module pl011 extends embox.driver.diag.diag_api {
 	option number base_addr
 
 	source "pl011.c"
+}
+
+@BuildDepends(third_party.bsp.multiclet.core)
+module multiclet extends embox.driver.diag.diag_api {
+	option number baud_rate
+	source "multiclet_uart.c"
+
+	depends third_party.bsp.multiclet.core
 }

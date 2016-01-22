@@ -233,7 +233,7 @@ static int hd_identify(hd_t *hd) {
 
 	/* Read parameter data */
 	insw(hd->hdc->iobase + HDC_DATA,
-			(char *) &(hd->param), sizeof(hd->param));
+			(char *) &(hd->param), sizeof(hd->param) / 2);
 
 	/* XXX this was added when ide drive with reported block size equals 64
  	 * However, block dev tries to use this and fails */
@@ -330,7 +330,7 @@ int hd_ioctl(struct block_dev *bdev, int cmd, void *args, size_t size) {
 		return 0;
 
 	case IOCTL_REVALIDATE:
-		return create_partitions(hd);
+		return create_partitions(bdev);
 	}
 
 	return -ENOSYS;
@@ -599,7 +599,7 @@ static int ide_create_block_dev(hd_t *hd) {
 	if (bdev == NULL) {
 		return 0;
 	}
-	bdev->init(hd);
+	bdev->dev_drv->probe(hd);
 
 	return 0;
 }

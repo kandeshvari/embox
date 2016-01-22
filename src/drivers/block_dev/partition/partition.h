@@ -9,7 +9,6 @@
 #ifndef DRIVERS_BLOCK_DEV_PARTITION_H_
 #define DRIVERS_BLOCK_DEV_PARTITION_H_
 
-struct hd;
-extern int create_partitions(struct hd *hd);
+extern int create_partitions(struct block_dev *hd);
 
 #endif /* DRIVERS_BLOCK_DEV_PARTITION_H_ */
