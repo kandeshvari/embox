@@ -1,0 +1,24 @@
+package embox.arch.riscv.kernel
+
+module boot extends embox.arch.boot {
+	source "boot.S"
+}
+
+module arch extends embox.arch.arch {
+	source "arch.c"
+}
+
+/*
+module context extends embox.arch.context {
+	source "context.c"
+}
+
+module locore extends embox.arch.locore {
+}
+
+module libarch extends embox.arch.libarch {
+}
+
+module clock extends embox.arch.clock {
+}
+*/
