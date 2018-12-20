@@ -19,4 +19,11 @@ SECTIONS {
 		*(.text)
 		*(.text.*)
 	}
+
+	.data : {
+                . = ALIGN(4096);
+		*(.sdata .sdata.*)
+		*(.data .data.*)
+        }
+
 }

@@ -2,11 +2,10 @@
 .equ STACK_SIZE,   1024
 .equ STACK_SHIFT,  10
 
-.section .text
+.section .text.init,"ax",@progbits
 .globl _start
 
 _start:
-
 	# set up stack pointer based on hartid
 	csrr    t0, mhartid
 	slli    t0, t0, STACK_SHIFT

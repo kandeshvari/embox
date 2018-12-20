@@ -7,7 +7,7 @@ module sifive_uart extends embox.driver.diag.diag_api {
 
 	source "sifive_uart.c"
 
-	depends core
-	depends diag
-	depends embox.driver.periph_memory
+//	depends core
+//	depends diag
+//	depends embox.driver.periph_memory
 }

@@ -1,47 +1,39 @@
+#include <asm-generic/embox.lds.h>
+
 OUTPUT_FORMAT("elf32-littleriscv", "elf32-littleriscv", "elf32-littleriscv")
 OUTPUT_ARCH(riscv)
+
 ENTRY(_start)
 
-MEMORY
-{
-  flash (rxai!w) : ORIGIN = 0x20400000, LENGTH = 128M
-  ram   (wxa!ri) : ORIGIN = 0x80000000, LENGTH = 64K
+MEMORY {
+	MEMORY_REGION(RAM)
+	MEMORY_REGION(ROM)
 }
 
-PHDRS
-{
-  text PT_LOAD;
-  data PT_LOAD;
-  bss PT_LOAD;
-}
+PROVIDE(_ram_base = ORIGIN(RAM));
+PROVIDE(_ram_size = LENGTH(RAM));
 
-SECTIONS
-{
-  .text : {
-    PROVIDE(_text_start = .);
-    *(.text.init) *(.text .text.*)
-    PROVIDE(_text_end = .);
-  } >flash AT>flash :text
+SECTIONS {
+	.text : {
+		*(.text.init)
+		*(.text .text.*)
+	}
 
-  .rodata : {
-    PROVIDE(_rodata_start = .);
-    *(.rodata .rodata.*)
-    PROVIDE(_rodata_end = .);
-  } >flash AT>flash :text
+	.rodata : {
+		*(.rodata .rodata.*)
 
-  .data : {
-    . = ALIGN(4096);
-    PROVIDE(_data_start = .);
-    *(.sdata .sdata.*) *(.data .data.*)
-    PROVIDE(_data_end = .);
-  } >ram AT>ram :data
+	} >ROM AT>ROM :text
 
-  .bss :{
-    PROVIDE(_bss_start = .);
-    *(.sbss .sbss.*) *(.bss .bss.*)
-    PROVIDE(_bss_end = .);
-  } >ram AT>ram :bss
+	.data : {
+		. = ALIGN(4096);
+		*(.sdata .sdata.*) *(.data .data.*)
 
-  PROVIDE(_memory_start = ORIGIN(ram));
-  PROVIDE(_memory_end = ORIGIN(ram) + LENGTH(ram));
+	} >RAM AT>RAM :data
+
+	.bss :{
+		. = ALIGN(32);
+		*(.sbss .sbss.*) *(.bss .bss.*)
+
+	} >RAM AT>RAM :bss
+
 }
