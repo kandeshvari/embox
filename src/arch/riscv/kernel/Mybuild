@@ -4,7 +4,6 @@ module boot extends embox.arch.boot {
 	source "boot.S"
 }
 
-
 module arch extends embox.arch.arch {
 	source "arch.c"
 }

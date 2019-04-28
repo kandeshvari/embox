@@ -35,5 +35,4 @@ SECTIONS {
 		*(.sbss .sbss.*) *(.bss .bss.*)
 
 	} >RAM AT>RAM :bss
-
 }

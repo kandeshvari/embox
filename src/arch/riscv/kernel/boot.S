@@ -1,3 +1,4 @@
+# code derived from https://github.com/michaeljclark/riscv-probe
 .equ MAX_HARTS,    4
 .equ STACK_SIZE,   1024
 .equ STACK_SHIFT,  10
