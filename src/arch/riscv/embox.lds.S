@@ -15,7 +15,7 @@ PROVIDE(_ram_size = LENGTH(RAM));
 
 SECTIONS {
 	.text : {
-		*(.text.init)
+		*(.text.init_start)
 		*(.text .text.*)
 	}
 
@@ -26,6 +26,7 @@ SECTIONS {
 
 	.data : {
 		. = ALIGN(4096);
+		PROVIDE( __global_pointer$ = . + 0x800 );
 		*(.sdata .sdata.*) *(.data .data.*)
 
 	} >RAM AT>RAM :data

@@ -6,8 +6,9 @@ module sifive_uart extends embox.driver.diag.diag_api {
 	option number baud_rate
 
 	source "sifive_uart.c"
+	@IncludeExport(path="drivers/serial")
 
-//	depends core
-//	depends diag
-//	depends embox.driver.periph_memory
+	depends core
+	depends diag
+	//depends embox.driver.periph_memory
 }

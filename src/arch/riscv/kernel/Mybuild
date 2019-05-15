@@ -8,6 +8,21 @@ module arch extends embox.arch.arch {
 	source "arch.c"
 }
 
+module libarch extends embox.arch.libarch {
+	source "setjmp.S"
+}
+
+module locore extends embox.arch.locore {
+	depends interrupt
+}
+
+module interrupt extends embox.arch.interrupt {
+        //source "interrupt.c", "ipl_impl.h"
+        source "ipl_impl.c", "ipl_impl.h"
+        //depends exception
+        //depends embox.kernel.irq
+}
+
 /*
 module libarch extends embox.arch.libarch {
 }

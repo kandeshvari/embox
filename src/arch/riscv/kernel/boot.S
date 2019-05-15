@@ -3,7 +3,7 @@
 .equ STACK_SIZE,   1024
 .equ STACK_SHIFT,  10
 
-.section .text.init,"ax",@progbits
+.section .text.init_start,"ax",@progbits
 .globl _start
 
 _start:
