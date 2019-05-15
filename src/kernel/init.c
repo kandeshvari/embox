@@ -55,7 +55,6 @@ static int init(void) {
 	const runlevel_nr_t target_level = RUNLEVEL_NRS_TOTAL - 1;
 
 	printk("\nEmbox kernel start\n");
-
 	ret = runlevel_set(target_level);
 
 	return ret;

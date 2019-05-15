@@ -25,4 +25,10 @@
 #define write_csr(reg, val) ({ \
   __asm volatile ("csrw " #reg ", %0" :: "rK"((val))); })
 
+#define set_csr_bit(reg, mask) ({ \
+  __asm volatile ("csrs " #reg ", %0" :: "rK"((mask))); })
+
+#define clear_csr_bit(reg, mask) ({ \
+  __asm volatile ("csrc " #reg ", %0" :: "rK"((mask))); })
+
 #endif /* RISCV_REGISTERS_H_ */

@@ -8,9 +8,12 @@
 //#include <ipl_impl.h>
 #include <hal/ipl.h>
 #include <asm/regs.h>
+#include <asm/interrupts.h>
 
 void ipl_init(void) {
-	write_csr(mstatus, read_csr(mstatus) | MSTATUS_MIE );
+	enable_interrupts();
+	// set_csr_bit(mstatus, MSTATUS_MIE);
+	// write_csr(mstatus, read_csr(mstatus) | MSTATUS_MIE );
 }
 
 ipl_t ipl_save(void) {

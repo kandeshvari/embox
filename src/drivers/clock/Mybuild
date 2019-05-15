@@ -1,5 +1,10 @@
 package embox.driver.clock
 
+module clint_timer extends embox.arch.clock {
+	source "clint_timer.c"
+	depends embox.kernel.time.clock_source
+}
+
 module at91_pitc extends embox.arch.clock {
 	source "at91_pitc.c"
 
