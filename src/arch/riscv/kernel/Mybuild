@@ -6,6 +6,7 @@ module boot extends embox.arch.boot {
 
 module arch extends embox.arch.arch {
 	source "arch.c"
+	source "trap.c"
 }
 
 module libarch extends embox.arch.libarch {
