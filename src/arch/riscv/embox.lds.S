@@ -33,7 +33,9 @@ SECTIONS {
 
 	.bss :{
 		. = ALIGN(32);
+		PROVIDE( bss_target_start = . );
 		*(.sbss .sbss.*) *(.bss .bss.*)
+		PROVIDE( bss_target_end = . );
 
 	} >RAM AT>RAM :bss
 }

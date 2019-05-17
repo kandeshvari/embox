@@ -60,7 +60,7 @@ static struct clock_source clint_timer_clock_source = {
 };
 
 static int clint_timer_init(void) {
-	clint_timer.cycle_hz = 10000000;
+	clint_timer.cycle_hz = 16000000;
 	printk("CPU frequency: %u\n", clint_timer.cycle_hz);
 	clock_source_register(&clint_timer_clock_source);
 	return ENOERR;

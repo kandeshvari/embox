@@ -62,6 +62,19 @@ _start:
 	la      sp, stacks + STACK_SIZE
 	add     sp, sp, t0
 
+	/* Zero the BSS segment. */
+	la t1, bss_target_start
+	la t2, bss_target_end
+
+	bge t1, t2, 2f
+
+1:
+	sw   x0, 0(t1)
+	addi t1, t1, 4
+	blt  t1, t2, 1b
+2:
+
+
 	j       kernel_start  # jump kernel
 .cfi_endproc
 
