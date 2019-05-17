@@ -1,4 +1,4 @@
-#include <kernel/printk.h>
+// #include <kernel/printk.h>
 #include <kernel/panic.h>
 
 #define METAL_MCAUSE_CAUSE         0x000003FFUL

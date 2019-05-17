@@ -22,7 +22,7 @@
 
 #include <kernel/printk.h>
 
-static int clint_timer_init(void);
+// static int clint_timer_init(void);
 
 /* Read Time Stamp Counter Register */
 static inline unsigned long long rdtsc(void) {
@@ -53,7 +53,7 @@ static struct time_counter_device clint_timer = {
 };
 
 static struct clock_source clint_timer_clock_source = {
-	.name = "TSC",
+	.name = "RISCV",
 	.event_device = NULL,
 	.counter_device = &clint_timer,
 	.read = clock_source_read /* attach default read function */

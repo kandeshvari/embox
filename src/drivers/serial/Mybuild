@@ -15,6 +15,19 @@ module uart_dev_dvfs extends core {
 	@NoRuntime depends embox.driver.tty.serial_dvfs
 }
 
+module uart_core extends core {
+	option number uart_max_n = 4
+
+	source "uart_dev.c"
+
+	@IncludeExport(path="drivers/serial")
+	source "uart_device.h"
+
+	//@NoRuntime depends embox.util.indexator
+	//@NoRuntime depends embox.driver.tty.serial_oldfs
+}
+
+
 module core_old extends core {
 	option number uart_max_n = 4
 
@@ -114,4 +127,18 @@ module multiclet extends embox.driver.diag.diag_api {
 	source "multiclet_uart.c"
 
 	depends third_party.bsp.multiclet.core
+}
+
+module sifive_uart extends embox.driver.diag.diag_api {
+	option number base_addr
+	option number clock_freq
+	option number baud_rate
+
+	//@IncludeExport(path="drivers/serial")
+	source "sifive_uart.c"
+	//@IncludeExport(path="drivers/serial")
+
+	//depends uart_core
+	//depends diag
+	//depends embox.driver.periph_memory
 }
